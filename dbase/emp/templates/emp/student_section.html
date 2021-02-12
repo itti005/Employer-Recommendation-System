@@ -268,7 +268,9 @@ student section
 
 {% block img %}
 {% if user.is_authenticated %}
+{% if request.user.student.pic %}
  <img class="img-profile rounded-circle" src="{{request.user.student.pic.url}}">
+{% endif %}
 {% endif %}
 {% endblock %}
 
