@@ -16,7 +16,10 @@ from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+# TEMPLATE_DIRS = (
+#     os.path.join(BASE_DIR, 'accounts','templates'),
+# )
+SETTINGS_PATH = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -34,6 +37,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'emp.apps.EmpConfig',
+    'accounts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters',
     'django.contrib.humanize',
+    'crispy_forms',
 
 
 ]
@@ -61,7 +66,9 @@ ROOT_URLCONF = 'dbase.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),
+        os.path.join(BASE_DIR, 'accounts','templates','accounts'),
+        os.path.join(BASE_DIR, 'emp','templates','emp')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,15 +94,14 @@ DATABASES = {
     # },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'emp',
-        'USER': 'admin1',
-        'PASSWORD': 'admin123',
+        'NAME': 'db',
+        'USER': 'root',
+        'PASSWORD': 'root123',
         'HOST': '',                            # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',    
     
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -136,6 +142,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT=os.path.join(BASE_DIR,'static')
 
+
 MEDIA_URL='/images/'
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
@@ -152,4 +159,6 @@ EMAIL_USE_TLS=True
 EMAIL_HOST_USER="jainmanish9434@gmail.com"
 EMAIL_HOST_PASSWORD="Harshit@1999"
 
-
+AUTHENTICATION_BACKENDS = ['accounts.backends.EmailBackend']
+LOGIN_REDIRECT_URL='/profile/'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

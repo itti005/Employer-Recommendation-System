@@ -23,6 +23,5 @@ admin.site.index_title="welcome to spoken admin panel"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('emp.urls')),
-
-
+    path('', include('accounts.urls')),
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
