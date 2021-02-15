@@ -113,8 +113,9 @@
 			<hr>
 			<h3 style="text-align: center">Account Settings</h3>
 			<hr>
+      {% if request.user.student.pic %}
 			<img class="profile-pic" src="{{request.user.student.pic.url}}" >
-
+      {% endif %}
 		</div>
 
     </div>

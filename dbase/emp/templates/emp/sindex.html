@@ -16,7 +16,9 @@
 	 <link rel="stylesheet" href="{% static "emp/css/style1.css" %}">
    <div class="resume_left">
      <div class="resume_profile">
+       {% if request.user.student.pic %}
        <img src="{{request.user.student.pic.url}} " alt="profile_pic">
+       {% endif %}
      </div>
      <div class="resume_content">
        <div class="resume_item resume_info">
