@@ -8,9 +8,12 @@ UserModel = get_user_model()
 class EmailBackend(ModelBackend):
 	def authenticate(self, request, username=None, password=None, **kwargs):
 		try:
+			print(" ************* getting user **********")
 			user = UserModel.objects.get(Q(username__iexact=username) | Q(email__iexact=username))
+			print(" ************* username or email is : {}".format(user))
 		except UserModel.DoesNotExist:
-			UserModel().set_password(password)
+			print(" ************* UserModel.DoesNotExist")
+			return None
 		except MultipleObjectsReturned:
 			return User.objects.filter(email=username).order_by('id').first()
 

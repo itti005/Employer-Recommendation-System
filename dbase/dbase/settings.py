@@ -47,8 +47,7 @@ INSTALLED_APPS = [
     'django_filters',
     'django.contrib.humanize',
     'crispy_forms',
-
-
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
