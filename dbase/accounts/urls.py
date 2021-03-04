@@ -12,4 +12,7 @@ urlpatterns = [
     
     path('register/', RegisterView.as_view(), name='register'),
     path('profile/', TemplateView.as_view(template_name="profile.html")),
+    path('register_user/', register_user, name='register_user'),
+    path('validate_student/', validate_student, name='validate_student'),
+
 ]
