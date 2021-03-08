@@ -1,0 +1,48 @@
+{% extends 'accounts/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center flex-column p-5" style="height: 100%;">
+  <h1 class="text-left pb-2" style="font-size: 1.5rem;color: #0D47A1;width: 100%;border-bottom: 2px solid #0D47A1;">Register</h1>
+              <ul class="nav nav-pills mb-3" role="tablist" style="width: 100%;border:1px solid rgba(0,0,0,0.2);border-radius: 10px;">
+  <li class="nav-item" role="presentation" style="width: 50%;">
+    <a class="nav-link active" id="pills-student-tab" data-toggle="pill" href="#pills-student" role="tab" aria-controls="pills-home" aria-selected="true">Student</a>
+  </li>
+  <li class="nav-item" role="presentation" style="width: 50%;">
+    <a class="nav-link" id="pills-employer-tab" data-toggle="pill" href="#pills-employer" role="tab" aria-controls="pills-profile" aria-selected="false">Employer</a>
+  </li>
+</ul>
+<div class="tab-content" id="pills-tabContent" style="width: 100%;">
+  <div class="tab-pane fade show active" id="pills-student" role="tabpanel" aria-labelledby="pills-student-tab">
+    <div>
+      <form action="" method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <input type="hidden" name="group" value="students">
+  <!-- <input type="submit" name="submit" value="Register"> -->
+  <button type="submit" class="btn btn-primary float-right reg-btn" style="width: 100%;background-color: #0D47A1;color: #fff;font-weight: bold;">Register</button>
+</form>
+    </div>
+    
+
+  </div>
+  <div class="tab-pane fade" id="pills-employer" role="tabpanel" aria-labelledby="pills-employer-tab">
+    <div>
+      <form action="" method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <input type="hidden" name="group" value="employer">
+  <!-- <input type="submit" name="submit" value="Register"> -->
+  <button type="submit" class="btn btn-primary float-right reg-btn" style="width: 100%;background-color: #0D47A1;color: #fff;font-weight: bold;">Register</button>
+</form>
+    </div>
+  </div>
+</div>
+<hr>
+<div class="text-left " style="width: 100%;">
+    <p>Already a user ?</p>
+    <a href="{% url 'login' %}" class="btn " style="background: #003d33;color: #fff; font-weight: bold;width: 50%;">Sign In</a>
+  </div>
+</div>
+
+{% endblock %}

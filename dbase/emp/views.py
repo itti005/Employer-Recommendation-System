@@ -16,7 +16,8 @@ import datetime
 from django.core.mail import send_mail                                   # mail sending
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-from payTm import Checksum                                               # payment configuration
+from payTm import Checksum
+from django.core.exceptions import ObjectDoesNotExist                                               # payment configuration
 
 # function for retrieving students profile
 # students information
@@ -235,6 +236,7 @@ def job_gallery():
 
 
 def studentpg(request):
+    print("************** STUDENT")
     jb = jobs.objects.all()
 
     jo = len(jb)
@@ -243,31 +245,31 @@ def studentpg(request):
 
     emplo = employer.objects.all()
     emplo1 = len(emplo)
-    uname=request.user.student.name
+    # uname=request.user.student.name
 
     s=[]
     context = {'head1': head1,'s':s}
-    if request.user.student.name==" ":
-        #job=jobs.objects.all()
-        #print(s)
+    try:
+        if request.user.student.name==" ":
+            #job=jobs.objects.all()
+            #print(s)
 
-        return render(request, 'emp/student_section.html',context)
-    else:
-        ustatus=1
-        a1 = appliedjobs.objects.filter(student__name__startswith=request.user.student)
-        if len(a1)==1:
+            return render(request, 'emp/student_section.html',context)
+        else:
+            ustatus=1
+            a1 = appliedjobs.objects.filter(student__name__startswith=request.user.student)
+            if len(a1)==1:
 
-            date = a1[0].date_created
-        # print(a1.student.all())
-
-            data = a1[0].jobs.all()
-
-            s.append(request.user.student.mail)
-            k=len(data)
-            print(s)
-            data=data[0:10]
-            context = {'data': data, 'date': date,'head1':head1,'s':s}
-            return render(request,'emp/student_section.html',context)
+                date = a1[0].date_created
+                data = a1[0].jobs.all()
+                s.append(request.user.student.mail)
+                k=len(data)
+                print(s)
+                data=data[0:10]
+                context = {'data': data, 'date': date,'head1':head1,'s':s}
+                return render(request,'emp/student_section.html',context)
+    except :
+        pass
 
 
 
@@ -346,9 +348,12 @@ def employer_profile(request):
 
 @allowed_users(allowed_roles=['employer'])
 def company(request):
-    name=request.user.employer.jobs_set.all()
-    details=request.user.employer
-
+    try:
+        details=request.user.employer
+        name=request.user.employer.jobs_set.all()
+    except ObjectDoesNotExist:
+        name = []
+        details = []
     context={'name':name,'details':details}
     return render(request,'emp/employer_section.html',context)
 
