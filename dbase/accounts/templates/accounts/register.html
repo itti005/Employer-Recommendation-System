@@ -88,15 +88,18 @@
         messages.forEach(update_messages)
       if (data.is_spk_test_user) {
             student_reg(true);
+		      document.getElementById("student_email").disabled = true;
             $('#set_email').val(data.email);
+
           }
     }});
 });
   $( "#edit_email" ).click(function() {
             student_reg(false);
+            document.getElementById("student_email").disabled = false;
 });
   function student_reg(disable_email){
-	$('#edit_email,#pwd,#next,#register_btn,#student_email').toggle();
+	$('#edit_email,#pwd,#next,#register_btn').toggle();
   }
 
   

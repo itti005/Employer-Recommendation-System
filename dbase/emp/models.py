@@ -231,3 +231,10 @@ class payUpdate(models.Model):
 
     def __str__(self):
         return self.update_desc[0:7] + "..."
+
+class Skill(models.Model):
+    name = models.CharField(max_length=200)
+
+
+
+

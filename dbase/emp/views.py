@@ -18,7 +18,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from payTm import Checksum
 from django.core.exceptions import ObjectDoesNotExist                                               # payment configuration
-
+from .models import Skill
 # function for retrieving students profile
 # students information
 def forstu(request):
@@ -297,23 +297,26 @@ def more_jobs(request):
 def student_profile(request):
     student=request.user.student
     form=studentform(instance=student)
-
+    skills = Skill.objects.all()
+    print("{}------".format(skills)) 
     if request.method =='POST':
         form=studentform(request.POST, request.FILES,instance=student)
         if form.is_valid():
             fname=form.cleaned_data.get(' upload_your_work')
-
-            form.save()
+            student_profile = form.save()
+            s = request.POST.get("skills_m", "")
+            print("s-------{}".format(s))
+            student_profile.skills = s
+            student_profile.save()
             messages.success(request, "your profile has been created! Now you can apply for jobs")
-
     name=student.name
     print(len(name))
     k=len(name)
     k=k-1
     s=k
-    context={'form':form,'k':k,'s':s}
+    context={'form':form,'k':k,'s':s,'skills':skills}
     #messages.success(request,"profile updated")
-    return render(request,'emp/student_profile.html',context)
+    return render(request,'emp/student_profile_1.html',context)
 
 #-----------------------------------------------student profile card (CV)
 

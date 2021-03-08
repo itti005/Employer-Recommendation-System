@@ -20,10 +20,13 @@ class LoginView(auth_views.LoginView):
 
 	def get_success_url(self):
 		if self.request.user.is_superuser:
+			print("It is an admin")
 			return '/employer'
 		elif self.request.user.groups.filter(name = "employer").exists():
+			print("It is an employer")
 			return '/employer'
 		elif self.request.user.groups.filter(name = "students").exists():
+			print("It is a student")
 			return '/students'
 
 	def get_context_data(self, **kwargs):
@@ -95,22 +98,26 @@ def register_user(request):
 			user = User.objects.using('spk').get(Q(email__iexact=email))
 			if user is not None:
 				if user.check_password(password):
-					rec_user = User.objects.create_user(username=user.username,password=user.password,email=user.email
-						,first_name=user.first_name,last_name=user.last_name)
+					print("pwd matched *************")
+					# rec_user = User.objects.create_user(username=user.username,password=user.password,email=user.email
+					# 	,first_name=user.first_name,last_name=user.last_name)
+					rec_user = User.objects.using('spk').get(pk=user.id)
+					rec_user.pk = None
+					rec_user.save(using='default')
 					try:
 						student_group = Group.objects.get(id=2)
 						rec_user.groups.add(student_group)
 						rec_user.save()
 						student_obj=student.objects.create(user=rec_user)
 					except Exception as e:
-						pass
+						print(e)
 					login(request, rec_user)
 					return render(request, 'emp/student_profile.html')
 				else:
 					messages.add_message(request, messages.INFO, 'Incorrect password !')
 					return render(request, 'register.html',{'email':email})
 		except Exception as e:
-			pass
+			print(e)
 	return render(request, 'login.html')
 
 
