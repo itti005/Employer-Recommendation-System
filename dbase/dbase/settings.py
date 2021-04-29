@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import glob
 from django.contrib.messages import constants as messages
 
 
@@ -48,6 +49,11 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'crispy_forms',
     'widget_tweaks',
+    'events',
+    'temp',
+    'django.contrib.admindocs',
+    'moodle',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -61,14 +67,14 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'dbase.urls'
-
+print("*************** BASE_DIR; ",BASE_DIR)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates'),
         os.path.join(BASE_DIR, 'accounts','templates','accounts'),
-        os.path.join(BASE_DIR, 'emp','templates','emp')],
-        'APP_DIRS': True,
+        ]
+        ,'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -82,7 +88,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dbase.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -93,10 +98,28 @@ DATABASES = {
     # },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db',
+        'NAME': 'recommendation',
         'USER': 'root',
-        'PASSWORD': 'root123',
-        'HOST': '',                            # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PASSWORD': 'root@123',
+        'HOST': '127.0.0.1',                            # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '',    
+    
+    },
+    'spk': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'spoken',
+        'USER': 'root',
+        'PASSWORD': 'root@123',
+        'HOST': '127.0.0.1',                            # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '',    
+    
+    },
+    'moodle': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'moodle',
+        'USER': 'root',
+        'PASSWORD': 'root@123',
+        'HOST': '127.0.0.1',                            # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',    
     
     }
@@ -144,7 +167,12 @@ STATIC_ROOT=os.path.join(BASE_DIR,'static')
 
 MEDIA_URL='/images/'
 MESSAGE_TAGS = {
-    messages.ERROR: 'danger'
+	messages.DEBUG: 'alert-info',
+	messages.INFO: 'alert-info',
+	messages.SUCCESS: 'alert-success',
+	messages.WARNING: 'alert-warning',
+	messages.ERROR: 'alert-danger',
+    #messages.ERROR: 'danger',
 }
 
 
@@ -159,5 +187,29 @@ EMAIL_HOST_USER="jainmanish9434@gmail.com"
 EMAIL_HOST_PASSWORD="Harshit@1999"
 
 AUTHENTICATION_BACKENDS = ['accounts.backends.EmailBackend']
-LOGIN_REDIRECT_URL='/profile/'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#         }
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#         },
+#     }
+# }
+
+
+#Define ROLE Constants
+ROLES = {
+    'HR_MANAGER_ROLE':'manager','STUDENT_ROLE':'students','EMPLOYER_ROLE':'employer'
+}
+
+LOGIN_URL='/login/'
