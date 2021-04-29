@@ -13,6 +13,32 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-2 d-none d-md-block bg-light sidebar">
+        {% if request.user|has_group:"admin" %}
+            <ul class="nav flex-column mt-5">
+              <li class="nav-item">
+                <a class="nav-link" href='/'>
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Admin Dashboard</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="employer_profile">
+      <i class="fas fa-user-tie"></i>
+          <span>Add Company</span></a>
+              </li>
+              
+              <li class="nav-item">
+                <a class="nav-link" href="post_jobs">
+      <i class="fas fa-user-tie"></i>
+          <span>Post jobs</span></a>
+              </li>
+              <li class="nav-item">
+                 <a class="nav-link" href="{% url 'logout' %}">
+          <i class="fas fa-user-graduate"></i>
+          <span>Log out</span></a>
+              </li>
+              
+            </ul>
+            {% endif %}
             {% if request.user|has_group:"students" %}
             <ul class="nav flex-column mt-5">
               <li class="nav-item">
@@ -76,7 +102,53 @@
           <span>Payment</span></a>
               </li>
               <li class="nav-item">
-                 <a class="nav-link" href="logout">
+                 <a class="nav-link" href="{% url 'logout' %}">
+          <i class="fas fa-user-graduate"></i>
+          <span>Log out</span></a>
+              </li>
+              
+            </ul>
+            {% endif %}
+
+            {% if request.user|has_group:"manager" %}
+            <ul class="nav flex-column mt-5">
+              <li class="nav-item">
+                <a class="nav-link" href='/'>
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Manager Dashboard</span></a>
+              </li>
+              <li class="nav-item">
+		      <a class="nav-link" href="{% url 'add_company' %}">
+      <i class="fas fa-user-tie"></i>
+          <span>Add Company</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'company-list' %}">
+      <i class="fas fa-user-tie"></i>
+          <span>View Company</span></a>
+              </li>
+              <li class="nav-item">
+		      <a class="nav-link" href="{% url 'add_job' %}">
+      <i class="fas fa-user-tie"></i>
+          <span>Add Job</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'job-list' %}">
+      <i class="fas fa-user-tie"></i>
+          <span>View Jobs</span></a>
+              </li>
+              <li class="nav-item">
+		      <a class="nav-link" href="{% url 'post_jobs' %}">
+      <i class="fas fa-user-tie"></i>
+          <span>Post jobs 1</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="payment">
+      <i class="fas fa-user-tie"></i>
+          <span>Payment</span></a>
+              </li>
+              <li class="nav-item">
+                 <a class="nav-link" href="{% url 'logout' %}">
           <i class="fas fa-user-graduate"></i>
           <span>Log out</span></a>
               </li>
@@ -85,6 +157,10 @@
             {% endif %}
         </div>
 			<div class="col-md-9 p-5">
+        <!-- heading for page information -->
+        <div class="alert alert-info" role="alert">
+          <h4>{% block content-header %}{% endblock %}</h>
+        </div>
 				{% block content %}
         {% endblock %}
 			</div>

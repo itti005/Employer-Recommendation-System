@@ -7,5 +7,5 @@ class RegisterForm(UserCreationForm):
 		model = get_user_model()
 		fields = ('email', 'username', 'password1', 'password2')
 
-class LoginForm(AuthenticationForm):
-	username = forms.CharField(label='Email / Username')
+# class LoginForm(AuthenticationForm):
+# 	username = forms.CharField(label='Email / Username')		#subclassed AuthenticationForm only to explicitly mention to the user that any of email or username can be used to login

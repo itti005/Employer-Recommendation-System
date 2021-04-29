@@ -7,7 +7,7 @@ from .views import *
 
 
 urlpatterns = [
-    path('signin/', LoginView.as_view(), name='login'),
+    path('login/', LoginViewCustom.as_view(), name='login'),
 	# path('register/success/', LoginView.as_view(), name='register_success'),
     
     path('register/', RegisterView.as_view(), name='register'),
@@ -16,3 +16,5 @@ urlpatterns = [
     path('validate_student/', validate_student, name='validate_student'),
 
 ]
+
+# print("***************** urlpatterns accounts", urlpatterns)

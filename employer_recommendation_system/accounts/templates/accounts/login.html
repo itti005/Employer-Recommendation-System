@@ -1,0 +1,23 @@
+{% extends 'accounts/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="d-flex justify-content-center align-items-center flex-column p-5" style="height: 100%;">
+
+{% include 'accounts/messages.html' %} 
+	<h1 class="text-left pb-2" style="font-size: 1.5rem;color: #0D47A1;width: 100%;border-bottom: 2px solid #0D47A1;">Login</h1>
+	<form action="{% url 'login' %}" method="post" style="width: 100%;">
+	  {% csrf_token %}
+	  {{ form|crispy  }}
+	  <button type="submit" id="submit" class="btn " style="background: #0D47A1;color: #fff; font-weight: bold;width: 100%;">Login</button>
+	</form>
+	<hr>
+	<div class="text-left " style="width: 100%;">
+		<p>Not a user ?</p>
+		<a href="{% url 'register' %}" class="btn " style="background: #003d33;color: #fff; font-weight: bold;width: 50%;">Register</a>
+	</div>
+</div>
+
+
+{% endblock %}
+

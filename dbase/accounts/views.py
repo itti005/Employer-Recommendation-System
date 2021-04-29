@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView
 from django.views import generic
 from django.urls import reverse_lazy, reverse
-from .forms import LoginForm, RegisterForm
+from .forms import RegisterForm
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.contrib.auth.models import Group,User
@@ -12,26 +12,27 @@ from django.http import HttpResponse, JsonResponse
 from events.models import *
 from django.contrib.auth import authenticate, login
 from emp.models import *
+from django.conf import settings
 UserModel = get_user_model()
-# Create your views here.
-class LoginView(auth_views.LoginView):
-	form_class = LoginForm
-	template_name = 'accounts/login.html'
 
-	def get_success_url(self):
-		if self.request.user.is_superuser:
-			print("It is an admin")
-			return '/employer'
-		elif self.request.user.groups.filter(name = "employer").exists():
-			print("It is an employer")
-			return '/employer'
-		elif self.request.user.groups.filter(name = "students").exists():
-			print("It is a student")
-			return '/students'
+class LoginViewCustom(LoginView):
+	template_name = 'accounts/login.html'					#template that will display the login form.
+
+	def get_success_url(self):	
+		print("************** here")							#return profile template based on the user role
+		role_url = {
+		settings.ROLES['HR_MANAGER_ROLE']:'/manager',
+		settings.ROLES['STUDENT_ROLE']:'/students',
+		settings.ROLES['EMPLOYER_ROLE']:'/employer',
+		}
+		url = '/'+ self.request.user.groups.all()[0].name
+		print("************** url",url)
+		return url
 
 	def get_context_data(self, **kwargs):
 		context = super(LoginView, self).get_context_data(**kwargs)
 		context['success'] = "msg here"
+		print("inside login ******************* ")
 		return context
 
 class RegisterView(generic.CreateView):
@@ -105,11 +106,29 @@ def register_user(request):
 					rec_user.pk = None
 					rec_user.save(using='default')
 					try:
+						print('inside try ------------ ')
 						student_group = Group.objects.get(id=2)
 						rec_user.groups.add(student_group)
 						rec_user.save()
+						print(f'{rec_user} is saved ************')
 						student_obj=student.objects.create(user=rec_user)
+						print('1')
+						# fetch student university from spoken db
+						student_spk = Student.objects.using('spk').filter(user_id=user.id)[0]
+						print('2')
+						# univ = TestAttendance.objects.using('spk').filter(student_id=student.id)
+						testAttendance = TestAttendance.objects.using('spk').filter(student_id=student_spk.id).select_related('test')
+						print('3')
+						academic_insti = testAttendance[0].test.academic_id
+						print('4')
+						student_obj.university = AcademicCenter.objects.using('spk').get(pk=academic_insti).institution_name
+						print('5')
+						print("univ --------- {}".format(student_obj.university))
+						
+						student_obj.save()
+						
 					except Exception as e:
+						print("inside exception ------------------------ ")
 						print(e)
 					login(request, rec_user)
 					return render(request, 'emp/student_profile.html')

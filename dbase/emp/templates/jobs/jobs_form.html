@@ -1,0 +1,102 @@
+{% extends 'emp/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content-header %}Add Job Details{% endblock %}
+{% block content %}
+{% for message in messages %}
+         <div class="text-center alert alert-{{ message.tags }}">
+             {{ message|safe }}
+         </div>
+     {% endfor %}
+<form method="POST" enctype="multipart/form-data">
+  
+    <!-- Security token -->
+    {% csrf_token %}
+  
+    <!-- Using the formset -->
+    <div class="form-row">
+    	<div class="form-group col-md-12">
+    		{{ form.employer | as_crispy_field}}
+    	</div>
+    	<div class="form-group col-md-12">
+    		{{ form.jobtitle | as_crispy_field}}
+    	</div>
+    	<div class="form-group col-md-6">
+    		{{ form.joblocation | as_crispy_field}}
+    	</div>
+    </div>
+    <div class="form-row">
+    	<div class="form-group col-md-6">
+    		{{ form.jobcategory | as_crispy_field}}
+    	</div>
+    	<div class="form-group col-md-6">
+    		{{ form.jobskills | as_crispy_field}}
+    	</div>
+    	<div class="form-group col-md-12">
+    		{{ form.jobdescription | as_crispy_field}}
+    	</div>
+    	<div class="form-group col-md-12">
+    		{{ form.criteria | as_crispy_field}}
+    	</div>
+    </div>
+    <div>
+  <div class="demo">
+  <select id="skills" name="" multiple>
+    <option value="1" selected>one</option>
+    <option value="2">two</option>
+    <option value="3">three</option>
+    <option value="4">four</option>
+    <option value="5">five</option>
+    <option value="3">Selected-three</option>
+    <option value="6">6</option>
+  </select>
+  <button type="button" class="btn btn-primary" id="b">Primary</button>
+</div>
+</div>
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock %}
+{% block js %}
+<script  src="{% static 'Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
+<script type="text/javascript">
+  $( document ).ready(function() {
+
+    $('.demo').dropdown({
+  // options here
+  multipleMode:'label'
+
+});
+
+    $( "#b" ).click(function() {
+  alert( "Handler for .click() called." );
+  var res = $('.dropdown-selected').text();
+  console.log(typeof res);
+  console.log( res);
+  var res1 = $('.dropdown-chose').text();
+  console.log(typeof res1);
+  console.log( res1);
+
+  var x =[];
+$('.dropdown-chose').each(function(index, obj)
+{
+  x.push($(this).text());
+});
+
+console.log(x);
+});
+
+    $('select').on('change', function() {
+  console.log('changes');
+    var selectedValues = $(this).val();  
+      var foo = $('#skills').val(); 
+      console.log(selectedValues);
+     console.log(foo);
+});
+//     $('#skills').change(function() {
+      
+// });
+   
+});
+</script>
+{% endblock %}

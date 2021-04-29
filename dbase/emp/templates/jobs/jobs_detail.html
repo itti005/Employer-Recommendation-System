@@ -1,0 +1,58 @@
+{% extends 'emp/base.html' %}
+{% block content-header %}{{ object.jobtitle}}{% endblock %}
+{% block content %}
+{% for message in messages %}
+    <div class="text-center alert alert-{{ message.tags }}">
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+
+
+<h1>{{ object.employer}}</h1>
+<p>Job skills</p>
+{% if object.jobskills %}
+  <ul>
+    {% for s in object.jobskills.all %}
+      <li>
+        {{ s.name }}
+        {# recursively include template itself #}
+        
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+<p>{{ object.jobdescription}}</p>
+<p>Job category</p>
+{% if object.criteria %}
+  <ul>
+    {% for s in object.jobcategory.all %}
+      <li>
+        {{ s.name }}
+        {# recursively include template itself #}
+        
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+<p>{{ object.criteria}}</p>
+
+<p>Job Location</p>
+{% if object.joblocation %}
+  <ul>
+    {% for s in object.joblocation.all %}
+      <li>
+        {{ s.name }}
+        {# recursively include template itself #}
+        
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+<p>{{ object.date_created}}</p>
+<p>{{ object.date_date_updated}}</p>
+
+
+<a href="{% url 'update-job-detail' slug=object.slug %}">Edit</a>
+{% endblock %}
+
+

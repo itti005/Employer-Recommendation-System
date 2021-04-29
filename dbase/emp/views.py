@@ -19,13 +19,23 @@ from django.views.decorators.csrf import csrf_exempt
 from payTm import Checksum
 from django.core.exceptions import ObjectDoesNotExist                                               # payment configuration
 from .models import Skill
+import numpy as np
+from itertools import repeat
+from django.views.generic.edit import CreateView
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic.edit import UpdateView
+from django.urls import reverse
+from django.shortcuts import get_object_or_404
+from django.utils.encoding import smart_str, uri_to_iri
 # function for retrieving students profile
 # students information
 def forstu(request):
-    name = request.user.student.name
-    education = request.user.student.education
+    # name = request.user.student.name
+    # education = request.user.student.education
     exp = request.user.student.experience
-    mail = request.user.student.mail
+    # mail = request.user.student.mail
     skills = request.user.student.skills
     about = request.user.student.about
     git = request.user.student.github
@@ -34,22 +44,28 @@ def forstu(request):
     tscore = request.user.student.Spokentest_score
     gpa = request.user.student.gpa
     lst = skills.split(",")
-    stream = request.user.student.degree
+    # stream = request.user.student.degree
     startyear = request.user.student.startyear
     endyear = request.user.student.endyear
     address = request.user.student.address
 
-    data = {'name': name, 'lnk': lnk, 'gpa': gpa, 'education': education, 'tscore': tscore, 'exp': exp, 'mail': mail,
+    # data = {'name': name, 'lnk': lnk, 'gpa': gpa, 'education': education, 'tscore': tscore, 'exp': exp, 'mail': mail,
+    #         'skills': lst, 'about': about, 'git': git, 'address': address, 'ph': ph, 'startyear': startyear,
+    #         'endyear': endyear, 'stream': stream}
+    data = {'lnk': lnk, 'gpa': gpa, 'tscore': tscore, 'exp': exp,
             'skills': lst, 'about': about, 'git': git, 'address': address, 'ph': ph, 'startyear': startyear,
-            'endyear': endyear, 'stream': stream}
+            'endyear': endyear}
     context = {'data': data}
 
     return context
 
 #--------------------------------               Main Page
 def index(request):
+    print('1 - index')
     if request.user.is_authenticated:
+        print('2 - request.user.is_authenticated, redirecting to student')
         return redirect('student')
+    print('3 - NOT request.user.is_authenticated')
     jb=jobs.objects.all()
     print(jb)
 
@@ -60,8 +76,8 @@ def index(request):
 
     jo=len(jb)
     jb.reverse()
-    head1=jb[(jo-3):]
-    print(jb[jo-1])
+    # head1=jb[(jo-3):]
+    # print(jb[jo-1])
     js=student.objects.all()
     j1=len(js)
     emplo=employer.objects.all()
@@ -82,22 +98,24 @@ def index(request):
     for i in r:
         lst_rating.append(i.rating)                                                         # user rating graph
     lt=len(lst_rating)
-    sr1=lst_rating.count(1)
-    sr2=lst_rating.count(2)
-    sr3=lst_rating.count(3)
-    sr4=lst_rating.count(4)
-    sr5=lst_rating.count(5)
+    if len(lst_rating):
+        sr1=lst_rating.count(1)
+        sr2=lst_rating.count(2)
+        sr3=lst_rating.count(3)
+        sr4=lst_rating.count(4)
+        sr5=lst_rating.count(5)
 
-    s1=(sr1/lt)*100
-    s2=(sr2/lt)*100
-    s3=(sr3/lt)*100
-    s4=(sr4/lt)*100
-    s5=(sr5/lt)*100
+        s1=(sr1/lt)*100
+        s2=(sr2/lt)*100
+        s3=(sr3/lt)*100
+        s4=(sr4/lt)*100
+        s5=(sr5/lt)*100
 
 
 
 
-    context={'head1':head1,'head2':head2,'j1':j1,'emplo1':emplo1,'jo':jo,'lt':lt,'s1':s1,'s2':s2,'s3':s3,'s4':s4,'s5':s5,'sr1':sr1,'sr2':sr2,'sr3':sr3,'sr4':sr4,'sr5':sr5,}
+    # context={'head1':head1,'head2':head2,'j1':j1,'emplo1':emplo1,'jo':jo,'lt':lt,'s1':s1,'s2':s2,'s3':s3,'s4':s4,'s5':s5,'sr1':sr1,'sr2':sr2,'sr3':sr3,'sr4':sr4,'sr5':sr5,}
+    context={'head2':head2,'j1':j1,'emplo1':emplo1,'jo':jo,'lt':lt,}
 
     return render(request,'emp/main_index.html',context)
 
@@ -173,10 +191,10 @@ def recommend(request):
 
 
 # login
-
 def signin(request):
-    if request.user.is_authenticated:
-        return redirect('student')
+
+    if request.user.is_authenticated:                                   #ghnbhs
+        return redirect('student')                                      #lghjklvbn gnn gnoi gb ghnkmj
     else:
         if request.method == 'POST':
             print("Here in login")
@@ -236,26 +254,29 @@ def job_gallery():
 
 
 def studentpg(request):
-    print("************** STUDENT")
+    print('4 - studentpg')
     jb = jobs.objects.all()
 
     jo = len(jb)
 
-    head1 = jb[(jo - 5):]
+    # head1 = jb[(jo - 5):]
 
     emplo = employer.objects.all()
     emplo1 = len(emplo)
     # uname=request.user.student.name
 
     s=[]
-    context = {'head1': head1,'s':s}
+    # context = {'head1': head1,'s':s}
+    context={}
     try:
         if request.user.student.name==" ":
+            print('5 - studentpg')
             #job=jobs.objects.all()
             #print(s)
 
             return render(request, 'emp/student_section.html',context)
         else:
+            print('6 - studentpg')
             ustatus=1
             a1 = appliedjobs.objects.filter(student__name__startswith=request.user.student)
             if len(a1)==1:
@@ -266,13 +287,16 @@ def studentpg(request):
                 k=len(data)
                 print(s)
                 data=data[0:10]
-                context = {'data': data, 'date': date,'head1':head1,'s':s}
+                # context = {'data': data, 'date': date,'head1':head1,'s':s}
+                context = {'data': data, 'date': date,'s':s}
                 return render(request,'emp/student_section.html',context)
     except :
+        print('6 - studentpg')
         pass
 
 
 
+    print('7 - studentpg')
     return render(request, 'emp/student_section.html',context)
 
 
@@ -298,23 +322,30 @@ def student_profile(request):
     student=request.user.student
     form=studentform(instance=student)
     skills = Skill.objects.all()
-    print("{}------".format(skills)) 
+    
     if request.method =='POST':
+        print("inside post")
         form=studentform(request.POST, request.FILES,instance=student)
         if form.is_valid():
-            fname=form.cleaned_data.get(' upload_your_work')
+            print("******** form is valid")
+            fname=form.cleaned_data.get('upload_your_work')
             student_profile = form.save()
             s = request.POST.get("skills_m", "")
-            print("s-------{}".format(s))
+            print("skills --------- {}".format(s))
             student_profile.skills = s
             student_profile.save()
-            messages.success(request, "your profile has been created! Now you can apply for jobs")
-    name=student.name
-    print(len(name))
-    k=len(name)
-    k=k-1
-    s=k
-    context={'form':form,'k':k,'s':s,'skills':skills}
+            messages.success(request, "Your profile has been created! Now you can apply for jobs")
+        else:
+            print("----------- printing errors : ")
+            print(form.errors)
+    # name=student.name
+    # print(len(name))
+    # k=len(name)
+    # k=k-1
+    # s=k
+    print("****************** messages {}".format(messages))
+    # context={'form':form,'k':k,'s':s,'skills':skills}
+    context={'form':form,'skills':skills}
     #messages.success(request,"profile updated")
     return render(request,'emp/student_profile_1.html',context)
 
@@ -329,7 +360,7 @@ def student_page(request):
 #--------------------------------------employer profile settings part
 
 
-@allowed_users(allowed_roles=['employer'])
+@allowed_users(allowed_roles=['employer','manager'])
 def employer_profile(request):
     company=request.user.employer
     form=companyform(instance=company)
@@ -342,25 +373,38 @@ def employer_profile(request):
     return render(request,'emp/employer_profile.html',context)
 
 
+# Company dashboard for deleting and updating posted jobs
 
 
-
-# decorators to allow only employer
-#-------------------------------------Company dashboard for deleting and updating posted jobs
-
-
-@allowed_users(allowed_roles=['employer'])
+@allowed_users(allowed_roles=['employer','manager'])  # decorators to allow only employer & manager to login
 def company(request):
     try:
         details=request.user.employer
         name=request.user.employer.jobs_set.all()
     except ObjectDoesNotExist:
+        print('inside except')
         name = []
         details = []
+
     context={'name':name,'details':details}
     return render(request,'emp/employer_section.html',context)
 
 #----------------------------------------------logout
+
+
+@allowed_users(allowed_roles=['manager'])  # decorators to allow only manager
+def hr_manager(request):
+    # try:
+    #     details=request.user.employer
+    #     name=request.user.employer.jobs_set.all()
+    # except ObjectDoesNotExist:
+    #     print('inside except')
+    #     name = []
+    #     details = []
+
+    # context={'name':name,'details':details}
+    context={}
+    return render(request,'emp/employer_section.html',context)
 
 def handlelogout(request):
 
@@ -639,38 +683,51 @@ def searchjob(request):
 #!------------------------------showcasing all jobs to students posted by companies no filtering initially.will apply later
 # for students
 
+def is_recommended(x,y):
+    job_skills = x.jobskills.split(',')
+    z = set(job_skills).intersection(set(y))
+    if len(z):
+        return x
+
 @allowed_users(allowed_roles=['students'])
 def apply_jobs(request):
-    if request.user.student.name==" ":
-        messages.success(request, 'Create your profile before applying for jobs')
-        return render(request,'emp/student_section.html')
-    else:
-        job=[]
-        a1 = appliedjobs.objects.filter(student__name__startswith=request.user.student)
-        #applied=a1.jobs.all()
-        #print(applied)
-        alljobs = jobs.objects.all()
-        stud = request.user.student
-        ds=stud.skills.split(',')
-        for jobb in alljobs:
-            dj = jobb.jobskills.split(',')
-            for d in ds:
+    # if request.user.student.name==" ":
+    #     messages.success(request, 'Create your profile before applying for jobs')
+    #     return render(request,'emp/student_section.html')
+    # else:
+    job=[]
+    # a1 = appliedjobs.objects.filter(student__name__startswith=request.user.student)
+    #applied=a1.jobs.all()
+    #print(applied)
+    alljobs = jobs.objects.all()
+    student = request.user.student
+    student_skills = student.skills.split(',')
+    #
+    # student skills
+    #ds=stud.skills.split(',')
+    #for jobb in alljobs:
+        # individual job skills
+     #   dj = jobb.jobskills.split(',')
+      #  for d in ds:
+#
+ #           if d in dj:
+  #              job.append(jobb)
+   #             break
+    #job=jobs.objects.all()
+    #s1=request.user.student
 
-                if d in dj:
-                    job.append(jobb)
-                    break
-        #job=jobs.objects.all()
-        s1=request.user.student
-
-
-        total=len(job)
-        print(job)
-        #job=list(set(job)-set(applied))
-        context={'job':job}
+    jobs_list = np.array(alljobs)
+    rec_jobs = map(is_recommended,jobs_list,repeat(student_skills))
+    print("rec_jobs *****************")
+    rec_jobs= np.array(list(rec_jobs))
+    rec_jobs_a= rec_jobs[rec_jobs!=None]
+    #job=list(set(job)-set(applied))
+    # context={'job':job}
+    context={'job':rec_jobs_a}
 
 
 
-        return render(request,'emp/apply.html',context)
+    return render(request,'emp/apply.html',context)
     return HttpResponse("404 NOT FOUND")
 
 # for students
@@ -1074,6 +1131,76 @@ def handlerequest(request):
             print('order was not successful because' + response_dict['RESPMSG'])
     return render(request, 'home/paymentstatus.html', {'response': response_dict})
 
+####################################################################
+# CBV for Create, Detail, List, Update for Company starts
+####################################################################
 
+class CompanyCreate(SuccessMessageMixin,CreateView):                        #CBV for creating company
+    template_name = 'employer/employer_form.html'
+    model = employer
+    fields = ['emp_name','company_name','logo','company_description','sector']
+    success_message ="%(company_name)s was created successfully"
+    def get_success_url(self):
+        return reverse('company-detail', kwargs={'slug': self.object.slug})
+    
+class CompanyDetailView(DetailView):
+    template_name = 'employer/employer_detail.html'
+    model = employer
+    def get_context_data(self, **kwargs):
+        print("inside detail voew *****************")
+        context = super().get_context_data(**kwargs)
+        return context
 
+class CompanyListView(ListView):
+    template_name = 'employer/employer_list.html'
+    model = employer
+    #paginate_by = 10
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print("************ context : ",context)
+        return context
+
+class CompanyUpdate(SuccessMessageMixin,UpdateView):
+    template_name = 'employer/employer_update_form.html'
+    model = employer
+    fields = ['emp_name','company_name','logo','company_description','sector']
+    success_message ="%(company_name)s was updated successfully"
+
+#################################################################### CBV for Company ends
+####################################################################
+# CBV for Create, Detail, List, Update for Jobs starts
+####################################################################
+class JobCreate(SuccessMessageMixin,CreateView):                 #CBV for creating job
+    template_name = 'jobs/jobs_form.html'
+    model = jobs
+    fields = ['jobtitle','joblocation','jobskills','jobdescription','jobcategory','criteria',
+    'employer']
+    success_message ="%(jobtitle)s job was created successfully"
+    def get_success_url(self):
+        return reverse('job-detail', kwargs={'slug': self.object.slug})
+
+class JobDetailView(DetailView):
+    template_name = 'jobs/jobs_detail.html'
+    model = jobs
+    def get_context_data(self, **kwargs):
+        print("inside job detial view *****************")
+        context = super().get_context_data(**kwargs)
+        return context
+
+class JobListView(ListView):
+    template_name = 'jobs/jobs_list.html'
+    model = jobs
+    #paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print("************ context : ",context)
+        return context
+
+class JobUpdate(SuccessMessageMixin,UpdateView):
+    template_name = 'jobs/jobs_update_form.html'
+    model = jobs
+    fields = ['jobtitle','joblocation','jobskills','jobdescription','jobcategory','criteria',
+    'employer']
+    success_message ="%(jobtitle)s was updated successfully"

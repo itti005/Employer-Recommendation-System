@@ -25,6 +25,7 @@ def allowed_users(allowed_roles=[]):
         return wrapper_func
     return decorator
 
+
 def employers_only(view_func):
     def wrapper_func(request,*args,**kwargs):
         group=None
