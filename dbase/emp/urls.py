@@ -3,6 +3,9 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from  .import views
 from .views import GeneratePdf
+from .views import *
+from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
 urlpatterns = [
     path('jobsapplied/<str:pk>/',views.jobs_applied,name="appliedjobs"),
     path('apply_job/<str:pk>/',views.apply_to_particular,name='apply_job'),
@@ -14,7 +17,7 @@ urlpatterns = [
     path('contact_student',views.contact_student,name='contact_student'),
     path('more_jobs',views.more_jobs,name='more_jobs'),
     path('st_report/<str:pk>',views.st_report,name='st_report'),                              #student report to emp
-    path('company/<str:pk>/', views.company_info, name="company_info"),                       #company card
+    #path('company/<str:pk>/', views.company_info, name="company_info"),                       #company card
     path('apply', views.apply_jobs, name="apply"),                                            #apply to jobs
     path('post_jobs',views.postjob,name="post_jobs"),                                         #post jobs by company
     path('results/',views.recommend,name="results"),                                          #recommended students
@@ -23,7 +26,7 @@ urlpatterns = [
     path('signup_employer/', views.registerpage_employer, name='signup2'),
     path('updatejob/<str:pk>/',views.update_job,name='update_job'),
     path('deletejob/<str:pk>/', views.delete_job, name='update_job'),
-    path('login',views.signin,name='login'),
+    #path('login',views.signin,name='login'),
     path('apply_job/<str:pk1>/accept/<str:pk>/<str:pk3>',views.accept,name='accept'),
     path('logout', views.handlelogout, name='logout'),
     path('ets',views.students_to_employer,name='students_to_employer'),
@@ -36,8 +39,9 @@ urlpatterns = [
     path('search4',views.search_student,name='search4'),
     path('students',views.studentpg,name="student"),
     path('employer', views.company, name="employer"),
+    path('manager', views.hr_manager, name="manager"),
     path('student_profile',views.student_profile,name='student_profile'),
-    path('employer_profile', views.employer_profile, name='emprofile'),
+    # path('employer_profile', views.employer_profile, name='emprofile'),
     path('blog/',views.blogHome,name='blogHome'),
     path('blog/postcomment', views.postcomment, name='postcomment'),
     path('blog/<str:slug>', views.blogPost, name='blogPost'),
@@ -52,7 +56,18 @@ urlpatterns = [
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(template_name="emp/password_reset_sent.html"),name="password_reset_done"),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name="emp/password_reset_form.html"),name="password_reset_confirm"),
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(template_name="emp/password_reset_done.html"),name="password_reset_complete"),
-
-
-
+    path('documentation',TemplateView.as_view(template_name='documentation.html'),name='documentation'),
+    ################### company urls
+    path('add_company/', CompanyCreate.as_view(), name='add_company'),
+    path('<slug:slug>/update-company/', CompanyUpdate.as_view(), name='update-company-detail'),
+    path('company_list/', CompanyListView.as_view(), name='company-list'),
+    path('company/<slug:slug>/', CompanyDetailView.as_view(), name='company-detail'),
+    ################### job urls
+    path('add_job/', JobCreate.as_view(), name='add_job'),
+    path('<slug:slug>/update-job/', JobUpdate.as_view(), name='update-job-detail'),
+    path('job_list/', JobListView.as_view(), name='job-list'),
+    path('job/<slug:slug>/', JobDetailView.as_view(), name='job-detail'),
+    path('employer_profile', CompanyCreate.as_view(), name='emprofile'),
 ]
+
+# print("***************** urlpatterns emp", urlpatterns)

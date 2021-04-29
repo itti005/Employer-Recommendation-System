@@ -1,6 +1,7 @@
 {% extends 'accounts/base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
-
+{% include 'partials/messages.html' %}
 {% block content %}
 <div class="d-flex justify-content-center align-items-center flex-column p-5" style="height: 100%;">
   <h1 class="text-left pb-2" style="font-size: 1.5rem;color: #0D47A1;width: 100%;border-bottom: 2px solid #0D47A1;">Register</h1>
@@ -12,15 +13,31 @@
     <a class="nav-link" id="pills-employer-tab" data-toggle="pill" href="#pills-employer" role="tab" aria-controls="pills-profile" aria-selected="false">Employer</a>
   </li>
 </ul>
+{% include 'partials/messages.html' %}
 <div class="tab-content" id="pills-tabContent" style="width: 100%;">
   <div class="tab-pane fade show active" id="pills-student" role="tabpanel" aria-labelledby="pills-student-tab">
+    <div id="msg_bar" class="alert" role="alert"></div>
     <div>
-      <form action="" method="post">
+      <form method="post" action="{% url 'register_user' %}">
   {% csrf_token %}
-  {{ form|crispy }}
+  <div class="mb-3">
+    <label for="exampleInputEmail1" class="form-label">Email address 
+     <small><button type="button" id="edit_email" style="display: none;"><small>Edit</small></button></small> 
+    </label>
+    <input type="email" name="email" class="form-control" id="student_email" aria-describedby="emailHelp" value={{email}}>
+    <div id="emailHelp" class="form-text">Enter registered email address with spoken tutorials.</div>
+<div id="status" class="form-text"></div>  
+</div>
+  <div class="mb-3" id="pwd" style="display: none;">
+    <label for="exampleInputPassword1" class="form-label">Password</label>
+    <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+  </div>
+  <input type="hidden" name="student_email" value="" id="set_email">
   <input type="hidden" name="group" value="students">
+  <!-- <a href="" id="next">here</a> -->
+  <button class="btn" id="next" type="button">next</button>
   <!-- <input type="submit" name="submit" value="Register"> -->
-  <button type="submit" class="btn btn-primary float-right reg-btn" style="width: 100%;background-color: #0D47A1;color: #fff;font-weight: bold;">Register</button>
+  <button type="submit" class="btn btn-primary float-right reg-btn " id="register_btn" style="width: 100%;background-color: #0D47A1;color: #fff;font-weight: bold;display: none;">Register</button>
 </form>
     </div>
     
@@ -28,7 +45,7 @@
   </div>
   <div class="tab-pane fade" id="pills-employer" role="tabpanel" aria-labelledby="pills-employer-tab">
     <div>
-      <form action="" method="post">
+      <form action="{% url 'register' %}" method="post">
   {% csrf_token %}
   {{ form|crispy }}
   <input type="hidden" name="group" value="employer">
@@ -44,5 +61,48 @@
     <a href="{% url 'login' %}" class="btn " style="background: #003d33;color: #fff; font-weight: bold;width: 50%;">Sign In</a>
   </div>
 </div>
+
+{% endblock %}
+{% block script %}
+<script type="text/javascript" src="{% static 'accounts/js/main.js' %}"></script>
+<script type="text/javascript">
+  // parameter : list of message objects with message text and tag params
+  // updates ajax related messages
+  function update_messages(msg){
+    status = '<span>'+msg.message+'</span>';
+    $("#msg_bar").html(status);
+    $("#msg_bar").addClass(msg.tag);
+
+  }
+  $( "#next" ).click(function() {
+    email = $('#student_email').val();
+    $('#msg,#base_msgs').hide();
+    $.ajax({
+      url: "/validate_student",
+      data: {
+        'email' : email
+      },
+      dataType: 'json',
+      success:function(data){
+        var messages = data.messages
+        messages.forEach(update_messages)
+      if (data.is_spk_test_user) {
+            student_reg(true);
+		      document.getElementById("student_email").disabled = true;
+            $('#set_email').val(data.email);
+
+          }
+    }});
+});
+  $( "#edit_email" ).click(function() {
+            student_reg(false);
+            document.getElementById("student_email").disabled = false;
+});
+  function student_reg(disable_email){
+	$('#edit_email,#pwd,#next,#register_btn').toggle();
+  }
+
+  
+</script>
 
 {% endblock %}

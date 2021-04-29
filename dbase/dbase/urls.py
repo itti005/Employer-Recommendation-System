@@ -17,11 +17,19 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
+
 admin.site.site_header="spoken admin"
 admin.site.site_title="spoken admin panel"
 admin.site.index_title="welcome to spoken admin panel"
 urlpatterns = [
+    path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
-    path('', include('emp.urls')),
     path('', include('accounts.urls')),
+    path('', include('emp.urls')),
+    path('api/', include('moodle.urls')),
+    
+    # path('', include('manager.urls')),
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+
+
+# print("***************** urlpatterns", urlpatterns)
