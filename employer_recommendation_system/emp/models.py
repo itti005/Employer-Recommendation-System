@@ -3,16 +3,23 @@ from django.conf import settings
 import datetime
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+from django.urls import reverse
+import os
 # Create your models here.
-
+from events.models import AcademicCenter
 GENDER = [('f','f'),('m','m'),('a','No criteria'),]
 START_YEAR_CHOICES = []
 END_YEAR_CHOICES = []
-for r in range(2015, (datetime.datetime.now().year+1)):
+for r in range(2000, (datetime.datetime.now().year+1)):
     START_YEAR_CHOICES.append((r,r))
-    END_YEAR_CHOICES.append((r+6,r+6))
+    END_YEAR_CHOICES.append((r+1,r+1))
 
-class Degree(models.Model):
+def profile_picture(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    ext = ext.lower()
+    return '/'.join(['user', str(instance.user.id), str(instance.user.id) + ext])
+
+class Degree(models.Model): # eg. BTech-Mechanical, MCA, BSc 
     name = models.CharField(max_length=200)
     def __str__(self):
         return self.name
@@ -63,20 +70,34 @@ class City(models.Model):
   class Meta(object):
     unique_together = (("name","state"),)
 
+class Skill(models.Model):
+    name = models.CharField(max_length=240)
+
+    def __str__(self):
+        return self.name
+
+class Education(models.Model):
+    degree = models.ForeignKey(Degree,null=True,blank=True,on_delete=models.CASCADE)
+    name = models.CharField(max_length=400)
+    start_year = models.IntegerField()
+    end_year = models.IntegerField()
+    gpa = models.CharField(max_length=10,null=True,blank=True)
+    def __str__(self):
+        return self.degree.name+'_'+self.name
+
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
-    phone = models.CharField(max_length=10)
-    address = models.CharField(max_length=400)
-    institute = models.CharField(max_length=200)
-    degree = models.ForeignKey(Degree,null=True,blank=True,on_delete=models.CASCADE)
-    course = models.ForeignKey(Course,null=True,blank=True,on_delete=models.CASCADE)
-    start_year = models.IntegerField(choices=START_YEAR_CHOICES,null=True,blank=True)
-    end_year = models.IntegerField(choices=END_YEAR_CHOICES,null=True,blank=True)
-    gpa = models.CharField(max_length=10,null=True,blank=True)
-    skills = models.CharField(max_length=400,null=True,blank=True)
+    phone = models.CharField(max_length=10) #spk
+    address = models.CharField(max_length=400)  #spk
+    #spk_institute = models.CharField(max_length=200) #spk
+    education = models.ManyToManyField(Education)
+    spk_institute = models.IntegerField()  #spk
+    #course = models.ForeignKey(Course,null=True,blank=True,on_delete=models.CASCADE)
+    skills = models.ManyToManyField(Skill)
     about = models.TextField(null=True,blank=True) #Short description/introduction about student profile
     experience = models.TextField(null=True,blank=True) #Project/work or internship experience 
-    photo = models.ImageField(null=True,blank=True) #profile photo
+    #photo = models.ImageField(null=True,blank=True) #profile photo
+    picture = models.FileField(upload_to=profile_picture, null=True, blank=True)    #spk
     github = models.URLField(null=True,blank=True)
     linkedin = models.URLField(null=True,blank=True)
     cover_letter = models.FileField(null=True,blank=True)
@@ -84,9 +105,16 @@ class Student(models.Model):
     date_updated = models.DateTimeField(null=True,blank=True)
     #spoken_score = 
     status = models.BooleanField(default=True) #False to restrict student from accessing
-
+    spk_usr_id = models.IntegerField()  # spoken student id
+    gender = models.CharField(max_length=10,choices=GENDER) # autopopulated spk cms profile
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
+
+    
+    def get_absolute_url(self):
+        print("****************************** ABS URL*************")
+        url = str(self.id)+'/'+'profile'
+        return reverse('student_profile',kwargs={'pk':self.id}) 
 
 class Company(models.Model):
     NUM_OF_EMPS = [

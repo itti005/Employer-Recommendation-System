@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'accounts',
     'events',
     'crispy_forms',
+    'moodle',
+    'creation',
 ]
 
 MIDDLEWARE = [
