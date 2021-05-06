@@ -40,10 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'emp',
     'accounts',
-    'events',
     'crispy_forms',
     'moodle',
-    'creation',
+    'spoken',
 ]
 
 MIDDLEWARE = [

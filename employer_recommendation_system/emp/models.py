@@ -6,7 +6,6 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 import os
 # Create your models here.
-from events.models import AcademicCenter
 GENDER = [('f','f'),('m','m'),('a','No criteria'),]
 START_YEAR_CHOICES = []
 END_YEAR_CHOICES = []
@@ -78,7 +77,7 @@ class Skill(models.Model):
 
 class Education(models.Model):
     degree = models.ForeignKey(Degree,null=True,blank=True,on_delete=models.CASCADE)
-    name = models.CharField(max_length=400)
+    institute = models.CharField(max_length=400) #Institute name
     start_year = models.IntegerField()
     end_year = models.IntegerField()
     gpa = models.CharField(max_length=10,null=True,blank=True)
@@ -106,7 +105,11 @@ class Student(models.Model):
     #spoken_score = 
     status = models.BooleanField(default=True) #False to restrict student from accessing
     spk_usr_id = models.IntegerField()  # spoken student id
-    gender = models.CharField(max_length=10,choices=GENDER) # autopopulated spk cms profile
+    gender = models.CharField(max_length=10) # autopopulated spk cms profile
+    location = models.CharField(max_length=400,null=True,blank=True)  #spk
+    state = models.CharField(max_length=400)  #spk
+    district = models.CharField(max_length=400)  #spk
+    city = models.CharField(max_length=400)  #spk
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
 
