@@ -9,7 +9,7 @@
 from django.db import models
 
 
-class User(models.Model):
+class SpokenUser(models.Model):
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_superuser = models.IntegerField()
@@ -27,16 +27,15 @@ class User(models.Model):
         #app_label = 'spoken'
 
 
-class Student(models.Model):
+class SpokenStudent(models.Model):
     gender = models.CharField(max_length=15)
     verified = models.PositiveSmallIntegerField()
     error = models.IntegerField()
     created = models.DateTimeField()
     updated = models.DateTimeField()
-    user = models.OneToOneField(User, models.DO_NOTHING)
+    user = models.OneToOneField(SpokenUser, models.DO_NOTHING, db_column='user_id')
 
     class Meta:
-        managed = False
         db_table = 'events_student'
         #app_label = 'spoken'
 
@@ -112,7 +111,7 @@ class InstituteType(models.Model):
         db_table = 'events_institutetype'
 
 class AcademicCenter(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT )
+    user = models.ForeignKey(SpokenUser, on_delete=models.PROTECT , db_column='user_id')
     state = models.ForeignKey(State, on_delete=models.PROTECT )
     institution_type = models.ForeignKey(InstituteType, on_delete=models.PROTECT )
     #institute_category = models.ForeignKey(InstituteCategory, on_delete=models.PROTECT )
@@ -161,26 +160,6 @@ class Test(models.Model):
         managed = False
         db_table = 'events_test'
         unique_together = (('organiser', 'academic', 'foss', 'tdate', 'ttime'),)
-class TestAttendance(models.Model):
-    test = models.ForeignKey(Test, on_delete=models.PROTECT )
-    mdluser_firstname = models.CharField(max_length=100)
-    mdluser_lastname = models.CharField(max_length=100)
-    mdluser_id = models.PositiveIntegerField()
-    mdlcourse_id = models.PositiveIntegerField()
-    mdlquiz_id = models.PositiveIntegerField()
-    mdlattempt_id = models.PositiveIntegerField()
-    password = models.CharField(max_length=100, blank=True, null=True)
-    count = models.PositiveSmallIntegerField()
-    status = models.PositiveSmallIntegerField()
-    created = models.DateTimeField()
-    updated = models.DateTimeField()
-    student_id = models.BigIntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'events_testattendance'
-        unique_together = (('test', 'mdluser_id'),)
-        #app_label = 'spoken'
 
 class FossCategory(models.Model):
     foss = models.CharField(unique=True, max_length=255)
@@ -215,8 +194,7 @@ class FossMdlCourses(models.Model):
 
 
 class TestAttendance(models.Model):
-    test = models.ForeignKey('Test', models.DO_NOTHING)
-   # test_id = models.BigIntegerField()
+    test = models.ForeignKey(Test, models.DO_NOTHING)
     mdluser_firstname = models.CharField(max_length=100)
     mdluser_lastname = models.CharField(max_length=100)
     mdluser_id = models.PositiveIntegerField()
@@ -228,8 +206,7 @@ class TestAttendance(models.Model):
     status = models.PositiveSmallIntegerField()
     created = models.DateTimeField()
     updated = models.DateTimeField()
-    #student = models.ForeignKey('Student', models.DO_NOTHING, blank=True, null=True)
-    student_id = models.BigIntegerField()
+    student = models.ForeignKey(SpokenStudent, models.DO_NOTHING, blank=True, null=True, db_column='student_id')
 
     class Meta:
         managed = False
@@ -238,7 +215,7 @@ class TestAttendance(models.Model):
 
 
 class Profile(models.Model):
-    user = models.ForeignKey('User', models.DO_NOTHING)
+    user = models.ForeignKey(SpokenUser, models.DO_NOTHING, db_column='user_id')
     confirmation_code = models.CharField(max_length=255)
     street = models.CharField(max_length=255, blank=True, null=True)
     location = models.ForeignKey('Location', models.DO_NOTHING, blank=True, null=True)

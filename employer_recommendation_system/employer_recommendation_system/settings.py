@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+from .config import *
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
@@ -82,28 +82,28 @@ WSGI_APPLICATION = 'employer_recommendation_system.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'emp_rec',
-        'USER':'root',
-        'PASSWORD':'root@123',
+        'NAME': DB,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASS,
         'HOST':'127.0.0.1',
         'PORT':'',
     },
 
     'spk': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'spoken',
-        'USER':'root',
-        'PASSWORD':'root@123',
-        'HOST':'127.0.0.1',
+        'NAME': SPOKEN_DB,
+        'USER': SPOKEN_DB_USER,
+        'PASSWORD': SPOKEN_DB_PASS,
+        'HOST': SPOKEN_DB_HOST,
         'PORT':'',
     },
 
     'moodle': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'moodle',
-        'USER':'root',
-        'PASSWORD':'root@123',
-        'HOST':'127.0.0.1',
+        'NAME': MDB,
+        'USER': MDB_USER,
+        'PASSWORD': MDB_PASS,
+        'HOST': MDB_HOST,
         'PORT':'',
     },
 }
@@ -165,3 +165,24 @@ MESSAGE_TAGS = {
     #messages.ERROR: 'danger',
 }
 LOGIN_URL='/login/'
+
+DATABASE_ROUTERS = [
+    'spoken.router.SpokenRouter',
+    'moodle.router.MdlRouter'
+]
+
+AUTHENTICATION_BACKENDS = (
+    'spoken.backends.SpokenStudentBackend',
+    'django.contrib.auth.backends.ModelBackend'
+)
+
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.BCryptPasswordHasher',
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+    'django.contrib.auth.hashers.CryptPasswordHasher',
+)
