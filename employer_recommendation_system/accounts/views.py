@@ -9,12 +9,10 @@ from django.contrib.auth.models import Group,User
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
-from events.models import *
 from django.contrib.auth import authenticate, login
 from emp.models import *
 from django.conf import settings
 UserModel = get_user_model()
-from events.models import Student as SpkStudent
 from emp.models import Student as RecStudent
 class LoginViewCustom(LoginView):
 	template_name = 'accounts/login.html'					

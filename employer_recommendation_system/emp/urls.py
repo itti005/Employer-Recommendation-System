@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import StudentUpdateView 
+from .views import StudentUpdateView ,StudentGradeFilter
 
 from . import views
 
@@ -10,7 +10,9 @@ urlpatterns = [
     path('employer',views.employer_homepage,name="employer"),
     path('manager',views.manager_homepage,name="manager"),
     path('logout', views.handlelogout, name='logout'),
+    path('student_grade_filter', StudentGradeFilter.as_view(), name='student_grade_filter'),
+
+    
+
    # path('view_profile', views.student_profile_view, name='student_profile_view'),
-
-
         ]

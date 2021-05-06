@@ -7,7 +7,6 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
-
 class MdlQuiz(models.Model):
     id = models.BigAutoField(primary_key=True)
     course = models.BigIntegerField()
@@ -52,7 +51,7 @@ class MdlQuiz(models.Model):
     class Meta:
         managed = False
         db_table = 'mdl_quiz'
-
+        app_label = 'mdl'
 
 class MdlQuizGrades(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -64,3 +63,6 @@ class MdlQuizGrades(models.Model):
     class Meta:
         managed = False
         db_table = 'mdl_quiz_grades'
+        app_label = 'mdl'
+
+
