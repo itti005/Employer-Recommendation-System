@@ -82,7 +82,7 @@ class Education(models.Model):
     end_year = models.IntegerField()
     gpa = models.CharField(max_length=10,null=True,blank=True)
     def __str__(self):
-        return self.degree.name+'_'+self.name
+        return self.degree.institute+'_'+self.institute
 
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
