@@ -14,6 +14,7 @@ from emp.models import *
 from django.conf import settings
 UserModel = get_user_model()
 from emp.models import Student as RecStudent
+from spoken.models import Student as SpkStudent
 class LoginViewCustom(LoginView):
 	template_name = 'accounts/login.html'					
 
@@ -63,7 +64,10 @@ def update_msg(request):
 			return django_messages
 
 def validate_student(request):
+#def validate_student():
 	email = request.GET.get('email', None)
+	#email = 'ankita7@gmail.com' 
+
 	if User.objects.filter(email__iexact=email).exists():
 		data = {'is_rec_student':True}
 		messages.success(request,'Email Id already registered with recommendation system')
@@ -76,6 +80,7 @@ def validate_student(request):
 		user = User.objects.using('spk').filter(email__iexact=email)[0]
 		try:
 			student = SpkStudent.objects.using('spk').filter(user_id=user.id)[0]
+			print(f'student ------ {student.user_id}')
 			attendance_exists = TestAttendance.objects.using('spk').filter(student_id=student.id).exists()
 			if attendance_exists:
 				data['is_spk_test_user']=True
