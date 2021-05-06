@@ -14,7 +14,7 @@ from emp.models import *
 from django.conf import settings
 UserModel = get_user_model()
 from emp.models import Student as RecStudent
-from spoken.models import Student as SpkStudent
+from spoken.models import SpokenStudent as SpkStudent
 class LoginViewCustom(LoginView):
 	template_name = 'accounts/login.html'					
 
@@ -31,12 +31,6 @@ class LoginViewCustom(LoginView):
 		print("************** url",url)
 		print("************** url",url)
 		return url
-
-	def get_context_data(self, **kwargs):
-		context = super(LoginView, self).get_context_data(**kwargs)
-		context['success'] = "msg here"
-		print("inside login ******************* ")
-		return context
 
 class RegisterView(generic.CreateView):
 	form_class = RegisterForm
