@@ -41,107 +41,6 @@ class Student(models.Model):
         #app_label = 'spoken'
 
 
-class TestAttendance(models.Model):
-    test = models.BigIntegerField()
-    mdluser_firstname = models.CharField(max_length=100)
-    mdluser_lastname = models.CharField(max_length=100)
-    mdluser_id = models.PositiveIntegerField()
-    mdlcourse_id = models.PositiveIntegerField()
-    mdlquiz_id = models.PositiveIntegerField()
-    mdlattempt_id = models.PositiveIntegerField()
-    password = models.CharField(max_length=100, blank=True, null=True)
-    count = models.PositiveSmallIntegerField()
-    status = models.PositiveSmallIntegerField()
-    created = models.DateTimeField()
-    updated = models.DateTimeField()
-    student_id = models.BigIntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'events_testattendance'
-        unique_together = (('test', 'mdluser_id'),)
-        #app_label = 'spoken'
-class FossMdlCourses(models.Model):
-    foss_id = models.BigIntegerField()
-    mdlcourse_id = models.PositiveIntegerField()
-    mdlquiz_id = models.PositiveIntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'events_fossmdlcourses'
-        #app_label = 'spoken'
-
-class FossCategory(models.Model):
-    foss = models.CharField(unique=True, max_length=255)
-    description = models.TextField()
-    status = models.IntegerField()
-    user_id = models.BigIntegerField()
-    created = models.DateTimeField()
-    updated = models.DateTimeField()
-    is_learners_allowed = models.IntegerField()
-    show_on_homepage = models.PositiveSmallIntegerField()
-    is_translation_allowed = models.IntegerField()
-    available_for_nasscom = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'creation_fosscategory'
-        #app = 'spoken'
-
-    def __str__(self):
-        return self.foss
-
-class Test(models.Model):
-    #organiser = models.ForeignKey('Organiser', models.DO_NOTHING)
-    organiser = models.BigIntegerField()
-    #test_category = models.ForeignKey('Testcategory', models.DO_NOTHING)
-    test_category = models.BigIntegerField()
-    #appoved_by = models.ForeignKey('AuthUser', models.DO_NOTHING, blank=True, null=True)
-    appoved_by = models.BigIntegerField()
-    #invigilator = models.ForeignKey('Invigilator', models.DO_NOTHING, blank=True, null=True)
-    invigilator = models.BigIntegerField()
-    #academic = models.ForeignKey('Academiccenter', models.DO_NOTHING)
-    academic = models.BigIntegerField()
-    #training = models.ForeignKey('Trainingrequest', models.DO_NOTHING, blank=True, null=True)
-    training = models.BigIntegerField()
-    #foss = models.ForeignKey('CreationFosscategory', models.DO_NOTHING)
-    foss = models.BigIntegerField()
-    test_code = models.CharField(max_length=100)
-    tdate = models.DateField()
-    ttime = models.TimeField()
-    status = models.PositiveSmallIntegerField()
-    participant_count = models.PositiveIntegerField()
-    created = models.DateTimeField()
-    updated = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'events_test'
-        unique_together = (('organiser', 'academic', 'foss', 'tdate', 'ttime'),)
-
-
-class TestAttendance(models.Model):
-    test = models.ForeignKey('Test', models.DO_NOTHING)
-   # test_id = models.BigIntegerField()
-    mdluser_firstname = models.CharField(max_length=100)
-    mdluser_lastname = models.CharField(max_length=100)
-    mdluser_id = models.PositiveIntegerField()
-    mdlcourse_id = models.PositiveIntegerField()
-    mdlquiz_id = models.PositiveIntegerField()
-    mdlattempt_id = models.PositiveIntegerField()
-    password = models.CharField(max_length=100, blank=True, null=True)
-    count = models.PositiveSmallIntegerField()
-    status = models.PositiveSmallIntegerField()
-    created = models.DateTimeField()
-    updated = models.DateTimeField()
-    #student = models.ForeignKey('Student', models.DO_NOTHING, blank=True, null=True)
-    student_id = models.BigIntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'events_testattendance'
-        unique_together = (('test', 'mdluser_id'),)
-
 class State(models.Model):
     code = models.CharField(max_length=3)
     name = models.CharField(max_length=50)
@@ -200,6 +99,144 @@ class City(models.Model):
         return self.name
 
 
+class InstituteType(models.Model):
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        managed = False
+        db_table = 'events_institutetype'
+
+class AcademicCenter(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT )
+    state = models.ForeignKey(State, on_delete=models.PROTECT )
+    institution_type = models.ForeignKey(InstituteType, on_delete=models.PROTECT )
+    #institute_category = models.ForeignKey(InstituteCategory, on_delete=models.PROTECT )
+    #university = models.ForeignKey(University, on_delete=models.PROTECT )
+    academic_code = models.CharField(max_length=100, unique = True)
+    institution_name = models.CharField(max_length=200)
+    district = models.ForeignKey(District, on_delete=models.PROTECT )
+    location = models.ForeignKey(Location, null=True, on_delete=models.PROTECT )
+    city = models.ForeignKey(City, on_delete=models.PROTECT )
+    address = models.TextField()
+    pincode = models.PositiveIntegerField()
+    resource_center = models.BooleanField()
+    rating = models.PositiveSmallIntegerField()
+    contact_person = models.TextField()
+    remarks = models.TextField()
+    status = models.PositiveSmallIntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'events_academiccenter'
+
+class Test(models.Model):
+    #organiser = models.ForeignKey('Organiser', models.DO_NOTHING)
+    organiser = models.BigIntegerField()
+    #test_category = models.ForeignKey('Testcategory', models.DO_NOTHING)
+    test_category = models.BigIntegerField()
+    #appoved_by = models.ForeignKey('AuthUser', models.DO_NOTHING, blank=True, null=True)
+    appoved_by = models.BigIntegerField()
+    #invigilator = models.ForeignKey('Invigilator', models.DO_NOTHING, blank=True, null=True)
+    invigilator = models.BigIntegerField()
+    #academic = models.ForeignKey('Academiccenter', models.DO_NOTHING)
+    academic = models.ForeignKey(AcademicCenter, on_delete=models.PROTECT ) 
+    #training = models.ForeignKey('Trainingrequest', models.DO_NOTHING, blank=True, null=True)
+    training = models.BigIntegerField()
+    #foss = models.ForeignKey('CreationFosscategory', models.DO_NOTHING)
+    foss = models.BigIntegerField()
+    test_code = models.CharField(max_length=100)
+    tdate = models.DateField()
+    ttime = models.TimeField()
+    status = models.PositiveSmallIntegerField()
+    participant_count = models.PositiveIntegerField()
+    created = models.DateTimeField()
+    updated = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'events_test'
+        unique_together = (('organiser', 'academic', 'foss', 'tdate', 'ttime'),)
+class TestAttendance(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.PROTECT )
+    mdluser_firstname = models.CharField(max_length=100)
+    mdluser_lastname = models.CharField(max_length=100)
+    mdluser_id = models.PositiveIntegerField()
+    mdlcourse_id = models.PositiveIntegerField()
+    mdlquiz_id = models.PositiveIntegerField()
+    mdlattempt_id = models.PositiveIntegerField()
+    password = models.CharField(max_length=100, blank=True, null=True)
+    count = models.PositiveSmallIntegerField()
+    status = models.PositiveSmallIntegerField()
+    created = models.DateTimeField()
+    updated = models.DateTimeField()
+    student_id = models.BigIntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'events_testattendance'
+        unique_together = (('test', 'mdluser_id'),)
+        #app_label = 'spoken'
+
+class FossCategory(models.Model):
+    foss = models.CharField(unique=True, max_length=255)
+    description = models.TextField()
+    status = models.IntegerField()
+    user_id = models.BigIntegerField()
+    created = models.DateTimeField()
+    updated = models.DateTimeField()
+    is_learners_allowed = models.IntegerField()
+    show_on_homepage = models.PositiveSmallIntegerField()
+    is_translation_allowed = models.IntegerField()
+    available_for_nasscom = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'creation_fosscategory'
+        #app = 'spoken'
+
+    def __str__(self):
+        return self.foss
+
+
+class FossMdlCourses(models.Model):
+    foss = models.ForeignKey(FossCategory, on_delete=models.PROTECT ) 
+    mdlcourse_id = models.PositiveIntegerField()
+    mdlquiz_id = models.PositiveIntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'events_fossmdlcourses'
+        #app_label = 'spoken'
+
+
+class TestAttendance(models.Model):
+    test = models.ForeignKey('Test', models.DO_NOTHING)
+   # test_id = models.BigIntegerField()
+    mdluser_firstname = models.CharField(max_length=100)
+    mdluser_lastname = models.CharField(max_length=100)
+    mdluser_id = models.PositiveIntegerField()
+    mdlcourse_id = models.PositiveIntegerField()
+    mdlquiz_id = models.PositiveIntegerField()
+    mdlattempt_id = models.PositiveIntegerField()
+    password = models.CharField(max_length=100, blank=True, null=True)
+    count = models.PositiveSmallIntegerField()
+    status = models.PositiveSmallIntegerField()
+    created = models.DateTimeField()
+    updated = models.DateTimeField()
+    #student = models.ForeignKey('Student', models.DO_NOTHING, blank=True, null=True)
+    student_id = models.BigIntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'events_testattendance'
+        unique_together = (('test', 'mdluser_id'),)
+
+
 class Profile(models.Model):
     user = models.ForeignKey('User', models.DO_NOTHING)
     confirmation_code = models.CharField(max_length=255)
@@ -224,14 +261,4 @@ class Profile(models.Model):
         managed = False
         db_table = 'cms_profile'
 
-class InstituteType(models.Model):
-    name = models.CharField(max_length=200)
-    created = models.DateTimeField(auto_now_add = True)
-    updated = models.DateTimeField(auto_now = True)
 
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        managed = False
-        db_table = 'events_institutetype'
