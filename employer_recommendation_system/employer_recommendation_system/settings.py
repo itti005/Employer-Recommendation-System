@@ -82,27 +82,27 @@ WSGI_APPLICATION = 'employer_recommendation_system.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'emp_rec',
-        'USER':'root',
-        'PASSWORD':'root@123',
+        'NAME': 'recommendation',
+        'USER':'admin1',
+        'PASSWORD':'admin123',
         'HOST':'127.0.0.1',
         'PORT':'',
     },
 
     'spk': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'spoken',
-        'USER':'root',
-        'PASSWORD':'root@123',
+        'NAME': 'spoken_new',
+        'USER':'admin1',
+        'PASSWORD':'admin123',
         'HOST':'127.0.0.1',
         'PORT':'',
     },
 
     'moodle': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'moodle',
-        'USER':'root',
-        'PASSWORD':'root@123',
+        'NAME': 'OTC',
+        'USER':'admin1',
+        'PASSWORD':'admin123',
         'HOST':'127.0.0.1',
         'PORT':'',
     },

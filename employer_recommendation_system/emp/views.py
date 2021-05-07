@@ -138,15 +138,28 @@ class StudentGradeFilter(FormView):
                 user_grade=MdlQuizGrades.objects.using('moodle').values_list('userid', 'quiz', 'grade').filter(quiz__in=[f.mdlquiz_id for f in fossmdl], grade__gte=int(grade))
                 #convert moodle user and grades as key value pairs
                 dictgrade = {i[0]:{i[1]:[i[2],False]} for i in user_grade}
+                print(list(dictgrade.keys()))
                 #get all test attendance for moodle user ids and for a specific moodle quiz ids
-                test_attendance=TestAttendance.objects.using('spk').filter(mdluser_id__in=list(dictgrade.keys()), 
-                        mdlquiz_id__in=[f.mdlquiz_id for f in fossmdl], test__academic__state__in=state if state else State.objects.all(),test__academic__city__in=city if city else City.objects.using('spk').all(), status__gte=3, test__academic__institution_type__in=institution_type if institution_type else InstituteType.objects.using('spk').all(), test__academic__status__in=[activation_status] if activation_status else [1,3])
+                test_attendance=TestAttendance.objects.using('spk').filter(
+                    mdluser_id__in=list(dictgrade.keys()),
+                    mdlquiz_id__in=[f.mdlquiz_id for f in fossmdl],
+                    test__academic__state__in=state if state else State.objects.using('spk').all(),
+                    test__academic__city__in=city if city else City.objects.using('spk').all(),
+                    status__gte=3, 
+                    test__academic__institution_type__in=institution_type if institution_type else InstituteType.objects.using('spk').all(), 
+                    test__academic__status__in=[activation_status] if activation_status else [1,3]
+                    )
+                print("################################")
+                print(test_attendance)
+
                 if from_date and to_date:
                     test_attendance = test_attendance.filter(test__tdate__range=[from_date, to_date])
                 elif from_date:
                     test_attendance = test_attendance.filter(test__tdate__gte=from_date)
                 filter_ta=[]
+
                 for i in range(test_attendance.count()):
+                    print("here")
                     if not dictgrade[test_attendance[i].mdluser_id][test_attendance[i].mdlquiz_id][1]:
                         dictgrade[test_attendance[i].mdluser_id][test_attendance[i].mdlquiz_id][1] = True
                         filter_ta.append(test_attendance[i])
