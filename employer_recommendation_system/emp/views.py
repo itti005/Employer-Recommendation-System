@@ -9,9 +9,9 @@ from moodle.models import MdlQuizGrades
 #from events.models import TestAttendance,FossMdlCourses
 from django.views.generic.edit import UpdateView
 #from events.models import Student as SpkStudent 
-from spoken.models import Student as SpkStudent 
+from spoken.models import SpokenStudent as SpkStudent 
 #from events.models import User as SpkUser 
-from spoken.models import User as SpkUser 
+from spoken.models import SpokenUser as SpkUser 
 #from creation.models import FossCategory 
 from django.views.generic import FormView
 from emp.forms import StudentGradeFilterForm
