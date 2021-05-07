@@ -1,0 +1,10 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}Update Company Details{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}
+    {{ form | crispy }}
+    <input type="submit" value="Update">
+</form>
+{% endblock %}
+

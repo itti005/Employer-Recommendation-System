@@ -14,7 +14,7 @@
 		<div class="row">
 			<div class="col-md-2 d-none d-md-block bg-light sidebar">
         {% if request.user|has_group:"MANAGER" %}
-            <ul class="nav flex-column mt-5">
+            <!-- <ul class="nav flex-column mt-5">
               <li class="nav-item">
                 <a class="nav-link" href='/'>
           <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -27,9 +27,7 @@
               </li>
               
               <li class="nav-item">
-                <a class="nav-link" href="post_jobs">
-      <i class="fas fa-user-tie"></i>
-          <span>Post jobs</span></a>
+          <span>Post jobs</span>
               </li>
               <li class="nav-item">
                  <a class="nav-link" href="{% url 'logout' %}">
@@ -37,7 +35,7 @@
           <span>Log out</span></a>
               </li>
               
-            </ul>
+            </ul> -->
             {% endif %}
             {% if request.user|has_group:"STUDENT" %}
             <ul class="nav flex-column mt-5">
@@ -48,17 +46,13 @@
           <span>Student Dashboard</span></a>
               </li>
               <li class="nav-item">
-                 <a class="nav-link" href="{% url 'student_profile_view' %}">
+                 <a class="nav-link" href="{% url 'student_profile' pk=request.user.id%}">
           <i class="fas fa-user-graduate"></i>
           <span>My Profile</span></a>
               </li>
+             
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'apply' %}">
-          <i class="fas fa-user-graduate"></i>
-          <span>jobs recommended</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'student_profile' %}">
+                <a class="nav-link" href="{% url 'student_profile' pk=1%}">
           <i class="fas fa-user-graduate"></i>
           <span>Profile Settings</span></a>
               </li>
@@ -67,11 +61,11 @@
           <i class="fas fa-user-graduate"></i>
           <span>Ask us</span></a>
               </li>
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a class="nav-link" href='blogstudent/'>
       <i class="fas fa-user-tie"></i>
           <span>blogs</span></a>
-              </li>
+              </li> -->
                <li class="nav-item">
                 <a class="nav-link" href="{% url 'logout' %}">
           <i class="fas fa-user-graduate"></i>
@@ -92,9 +86,7 @@
           <span>Create Profile</span></a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="post_jobs">
-      <i class="fas fa-user-tie"></i>
-          <span>Post jobs</span></a>
+          <span>Post jobs</span>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="payment">
@@ -137,16 +129,14 @@
       <i class="fas fa-user-tie"></i>
           <span>View Jobs</span></a>
               </li>
-              <li class="nav-item">
-		      <a class="nav-link" href="{% url 'post_jobs' %}">
-      <i class="fas fa-user-tie"></i>
-          <span>Post jobs 1</span></a>
+             <!--  <li class="nav-item">
+          <span>Post jobs 1</span>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="payment">
       <i class="fas fa-user-tie"></i>
           <span>Payment</span></a>
-              </li>
+              </li> -->
               <li class="nav-item">
                  <a class="nav-link" href="{% url 'logout' %}">
           <i class="fas fa-user-graduate"></i>

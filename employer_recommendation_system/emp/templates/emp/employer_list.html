@@ -1,0 +1,21 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}Company List{% endblock %}
+{% block content %}
+{% for message in messages %}
+    <div class="text-center alert alert-{{ message.tags }}">
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+<ul class="list-group">
+{% for company in object_list %}
+    <li class="list-group-item">
+    	<a href="{% url 'company-detail' slug=company.slug %}">{{ company.name }}</a>
+    </li>
+{% empty %}
+    <li>No companies yet.</li>
+{% endfor %}
+</ul>
+{% endblock %}
+
+

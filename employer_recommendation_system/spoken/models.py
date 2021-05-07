@@ -7,6 +7,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from datetime import datetime, date, timedelta
 
 
 class SpokenUser(models.Model):
@@ -133,33 +134,70 @@ class AcademicCenter(models.Model):
         managed = False
         db_table = 'events_academiccenter'
 
-class Test(models.Model):
-    #organiser = models.ForeignKey('Organiser', models.DO_NOTHING)
-    organiser = models.BigIntegerField()
-    #test_category = models.ForeignKey('Testcategory', models.DO_NOTHING)
-    test_category = models.BigIntegerField()
-    #appoved_by = models.ForeignKey('AuthUser', models.DO_NOTHING, blank=True, null=True)
-    appoved_by = models.BigIntegerField()
-    #invigilator = models.ForeignKey('Invigilator', models.DO_NOTHING, blank=True, null=True)
-    invigilator = models.BigIntegerField()
-    #academic = models.ForeignKey('Academiccenter', models.DO_NOTHING)
-    academic = models.ForeignKey(AcademicCenter, on_delete=models.PROTECT ) 
-    #training = models.ForeignKey('Trainingrequest', models.DO_NOTHING, blank=True, null=True)
-    training = models.BigIntegerField()
-    #foss = models.ForeignKey('CreationFosscategory', models.DO_NOTHING)
-    foss = models.BigIntegerField()
-    test_code = models.CharField(max_length=100)
-    tdate = models.DateField()
-    ttime = models.TimeField()
-    status = models.PositiveSmallIntegerField()
-    participant_count = models.PositiveIntegerField()
-    created = models.DateTimeField()
-    updated = models.DateTimeField()
+
+class Organiser(models.Model):
+    user = models.OneToOneField(SpokenUser, related_name = 'organiser', on_delete=models.PROTECT )
+    appoved_by = models.ForeignKey(SpokenUser,related_name = 'organiser_approved_by',blank=True,
+    null=True, on_delete=models.PROTECT )
+    academic = models.ForeignKey(AcademicCenter, blank=True, null=True, on_delete=models.PROTECT )
+    status = models.PositiveSmallIntegerField(default=0)
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+
+    def __str__(self):
+        return self.user.username
 
     class Meta:
         managed = False
-        db_table = 'events_test'
-        unique_together = (('organiser', 'academic', 'foss', 'tdate', 'ttime'),)
+        db_table = 'events_organiser'
+
+
+class TestCategory(models.Model):
+    name = models.CharField(max_length=200)
+    status = models.BooleanField(default = 0)
+    created = models.DateTimeField(auto_now_add = True, null=True)
+    updated = models.DateTimeField(auto_now = True, null=True)
+
+    def __str__(self):
+        return self.name
+
+class Invigilator(models.Model):
+    user = models.OneToOneField(SpokenUser, on_delete=models.PROTECT )
+    appoved_by = models.ForeignKey(SpokenUser,related_name = 'invigilator_approved_by',blank=True,null=True,  on_delete=models.PROTECT )
+    # appoved_by = models.ForeignKey(SpokenUser, on_delete=models.PROTECT)
+    academic = models.ForeignKey(AcademicCenter, on_delete=models.PROTECT )
+    status = models.PositiveSmallIntegerField(default=0)
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+
+    def __str__(self):
+        return self.user.username
+
+class Department(models.Model):
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+
+class TrainingRequest(models.Model):
+    training_planner = models.BigIntegerField()
+    # training_planner = models.ForeignKey(TrainingPlanner, on_delete=models.PROTECT )
+    department = models.ForeignKey(Department, on_delete=models.PROTECT )
+    sem_start_date = models.DateField()
+    training_start_date = models.DateField(default=datetime.now)
+    training_end_date = models.DateField(default=datetime.now)
+    # course = models.ForeignKey(CourseMap, on_delete=models.PROTECT )
+    course = models.BigIntegerField()
+    # batch = models.ForeignKey(StudentBatch, null = True, on_delete=models.PROTECT )
+    batch = models.BigIntegerField()
+    participants = models.PositiveIntegerField(default=0)
+    course_type = models.PositiveIntegerField(default=None)
+  #status = models.BooleanField(default=False)
+    status = models.PositiveSmallIntegerField(default=0)
+    cert_status = models.PositiveSmallIntegerField(default=0)
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+
+
 
 class FossCategory(models.Model):
     foss = models.CharField(unique=True, max_length=255)
@@ -180,6 +218,34 @@ class FossCategory(models.Model):
 
     def __str__(self):
         return self.foss
+
+class Test(models.Model):
+    organiser = models.ForeignKey(Organiser, models.DO_NOTHING)
+    # organiser = models.BigIntegerField()
+    test_category = models.ForeignKey(TestCategory, models.DO_NOTHING)
+    # test_category = models.BigIntegerField()
+    appoved_by = models.ForeignKey(SpokenUser, models.DO_NOTHING, blank=True, null=True)
+    # appoved_by = models.BigIntegerField()
+    invigilator = models.ForeignKey('Invigilator', models.DO_NOTHING, blank=True, null=True)
+    # invigilator = models.BigIntegerField()
+    #academic = models.ForeignKey('Academiccenter', models.DO_NOTHING)
+    academic = models.ForeignKey(AcademicCenter, on_delete=models.PROTECT ) 
+    training = models.ForeignKey('Trainingrequest', models.DO_NOTHING, blank=True, null=True)
+    # training = models.BigIntegerField()
+    #foss = models.ForeignKey('CreationFosscategory', models.DO_NOTHING)
+    foss = models.ForeignKey(FossCategory, on_delete=models.PROTECT )
+    test_code = models.CharField(max_length=100)
+    tdate = models.DateField()
+    ttime = models.TimeField()
+    status = models.PositiveSmallIntegerField()
+    participant_count = models.PositiveIntegerField()
+    created = models.DateTimeField()
+    updated = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'events_test'
+        unique_together = (('organiser', 'academic', 'foss', 'tdate', 'ttime'),)
 
 
 class FossMdlCourses(models.Model):

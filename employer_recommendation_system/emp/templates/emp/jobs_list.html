@@ -1,0 +1,23 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}Job List{% endblock %}
+{% block content %}
+{% for message in messages %}
+    <div class="text-center alert alert-{{ message.tags }}">
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+
+<ul class="list-group">
+{% for job in object_list %}
+    <li class="list-group-item">
+    	<a href="{% url 'job-detail' slug=job.slug %}">{{ job.title }}</a>
+    </li>
+{% empty %}
+    <li>No jobs yet.</li>
+{% endfor %}
+</ul>
+
+{% endblock %}
+
+

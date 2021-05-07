@@ -1,5 +1,6 @@
 {% extends 'emp/base.html' %}
 {% load helper %}
+{% load crispy_forms_tags %}
 {% block content %}
 <div class= 'filters row' >
 <form action="" method="post" class='form-horizontal'>
@@ -128,4 +129,9 @@
       {% endif %}
     </div>
   </div>
+
+
+	<!-- <button type="submit" class="btn btn-primary">Filter</button> -->
+</form>
 {% endblock %}
+
