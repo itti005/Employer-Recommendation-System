@@ -64,24 +64,6 @@ def fetch_spk_student_data():
     
 def student_homepage(request):
     context={}
-    #student = RecStudent.objects.get(user_id=request.user.id)
-    #applied_jobs = AppliedJob.objects.filter(student_id=student.id)
-    # get student grades
-    #spk_student = SpkStudent.objects.filter(user_id=request.user.id) 
-    try:
-         spk_student = SpkStudent.objects.using('spk').filter(user_id=10550).get() 
-         id = spk_student.id
-         test_attendance_entries = TestAttendance.objects.using('spk').filter( student_id = spk_student.id)
-         for ta in test_attendance_entries :
-             mdl_user_id = ta.mdluser_id
-             mdl_course_id = ta.mdlcourse_id
-             mdl_quiz_id = ta.mdlquiz_id
-             quiz_grade = MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id , quiz=mdl_quiz_id)
-             spk_mdl_course_map = FossMdlCourses.objects.using('spk').get(mdlcourse_id=mdl_course_id)
-             spk_foss = FossCategory.objects.using('spk').get(id=spk_mdl_course_map.foss_id)
-    except Content.DoesNotExist:
-        print("student_homepage failed")
-
     return render(request,'emp/student_homepage.html',context)
 
 def employer_homepage(request):

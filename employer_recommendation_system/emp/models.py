@@ -86,13 +86,13 @@ class Education(models.Model):
 
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
-    phone = models.CharField(max_length=10) #spk
-    address = models.CharField(max_length=400)  #spk
+    phone = models.CharField(max_length=10, null=True) #spk
+    address = models.CharField(max_length=400, null=True)  #spk
     #spk_institute = models.CharField(max_length=200) #spk
-    education = models.ManyToManyField(Education)
-    spk_institute = models.IntegerField()  #spk
+    education = models.ManyToManyField(Education, null=True)
+    spk_institute = models.IntegerField(null=True)  #spk
     #course = models.ForeignKey(Course,null=True,blank=True,on_delete=models.CASCADE)
-    skills = models.ManyToManyField(Skill)
+    skills = models.ManyToManyField(Skill, null=True)
     about = models.TextField(null=True,blank=True) #Short description/introduction about student profile
     experience = models.TextField(null=True,blank=True) #Project/work or internship experience 
     #photo = models.ImageField(null=True,blank=True) #profile photo
@@ -104,12 +104,12 @@ class Student(models.Model):
     date_updated = models.DateTimeField(null=True,blank=True)
     #spoken_score = 
     status = models.BooleanField(default=True) #False to restrict student from accessing
-    spk_usr_id = models.IntegerField()  # spoken student id
-    gender = models.CharField(max_length=10) # autopopulated spk cms profile
+    spk_usr_id = models.IntegerField(null=True)  # spoken student id
+    gender = models.CharField(max_length=10, null=True) # autopopulated spk cms profile
     location = models.CharField(max_length=400,null=True,blank=True)  #spk
-    state = models.CharField(max_length=400)  #spk
-    district = models.CharField(max_length=400)  #spk
-    city = models.CharField(max_length=400)  #spk
+    state = models.CharField(max_length=400, null=True)  #spk
+    district = models.CharField(max_length=400, null=True)  #spk
+    city = models.CharField(max_length=400, null=True)  #spk
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
 

@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
-from spoken.models import SpokenUser, SpokenStudent, TestAttendance
+from spoken.models import SpokenUser, SpokenStudent, TestAttendance, Profile
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import Group
+from emp.models import Student
 
 class SpokenStudentBackend(ModelBackend):
 
@@ -28,8 +29,12 @@ class SpokenStudentBackend(ModelBackend):
                                 user.save()
                                 group = Group.objects.get(name='STUDENT')
                                 user.groups.add(group)
+                                st_profile = Profile.objects.filter(user=sp_user).first()
+                                Student.objects.create(user=user, state=st_profile.state.name if st_profile.state else "", phone=st_profile.phone, address=st_profile.address, spk_usr_id=sp_user.id, gender=student.gender, location=st_profile.location.name if st_profile.location else "", district=st_profile.district.name if st_profile.district else "", city=st_profile.city.name if st_profile.city else "")
+                            else:
+                                return None
                         except SpokenStudent.DoesNotExist:
-                            pass
+                            return None
                 return user
         except SpokenUser.DoesNotExist:
             return None
