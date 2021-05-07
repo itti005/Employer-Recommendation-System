@@ -15,10 +15,19 @@ from spoken.models import SpokenUser as SpkUser
 #from creation.models import FossCategory 
 from django.views.generic import FormView
 from emp.forms import StudentGradeFilterForm
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic.edit import CreateView,UpdateView,ModelFormMixin
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 class StudentUpdateView(UpdateView):
     model = Student
+    template_name = 'emp/student_form.html'
     fields = ['education','skills','about','experience','github','linkedin','cover_letter'] 
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ab'] = 'abghghbh'
+        return context
 def fetch_spk_student_data():
     try:
         user = User.objects.get(id=10)
@@ -58,12 +67,31 @@ def fetch_spk_student_data():
         rec_student.gender = spk_student.gender
         rec_student.save()
         print(rec_student.phone)
-    except Content.DoesNotExist:
+    #except Content.DoesNotExist:
+    except:
         print("fetch except")
 
     
 def student_homepage(request):
     context={}
+    #student = RecStudent.objects.get(user_id=request.user.id)
+    #applied_jobs = AppliedJob.objects.filter(student_id=student.id)
+    # get student grades
+    #spk_student = SpkStudent.objects.filter(user_id=request.user.id) 
+    try:
+         spk_student = SpkStudent.objects.using('spk').filter(user_id=10550).get() 
+         id = spk_student.id
+         test_attendance_entries = TestAttendance.objects.using('spk').filter( student_id = spk_student.id)
+         for ta in test_attendance_entries :
+             mdl_user_id = ta.mdluser_id
+             mdl_course_id = ta.mdlcourse_id
+             mdl_quiz_id = ta.mdlquiz_id
+             quiz_grade = MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id , quiz=mdl_quiz_id)
+             spk_mdl_course_map = FossMdlCourses.objects.using('spk').get(mdlcourse_id=mdl_course_id)
+             spk_foss = FossCategory.objects.using('spk').get(id=spk_mdl_course_map.foss_id)
+    #except Content.DoesNotExist:
+    except:
+        print("student_homepage failed")
     return render(request,'emp/student_homepage.html',context)
 
 def employer_homepage(request):
@@ -90,12 +118,10 @@ class StudentGradeFilter(FormView):
 
     
     def test_func(self):
-        print("*********** test_func ")
         return self.request.user.is_superuser
 
     def form_valid(self, form):
         if form.is_valid:
-            print("*********** form is valid ")
             foss = [x for x in form.cleaned_data['foss']]
             state = [s for s in form.cleaned_data['state']]
             city = [c for c in form.cleaned_data['city']]
@@ -105,13 +131,12 @@ class StudentGradeFilter(FormView):
             from_date = form.cleaned_data['from_date']
             to_date = form.cleaned_data['to_date']
             result=self.filter_student_grades(foss, state, city, grade, institution_type, activation_status, from_date, to_date)
-            print(f'RESULT --------- {result}')
+            # print(f'RESULT --------- {result}')
         else:
-            print("********* form is not valid ")
+            pass
         return self.render_to_response(self.get_context_data(form=form, result=result))
 
     def filter_student_grades(self, foss=None, state=None, city=None, grade=None, institution_type=None, activation_status=None, from_date=None, to_date=None):
-        print("*********** filter_student_grades ")
         if grade:
             try:
                 #get the moodle id for the foss
@@ -120,14 +145,24 @@ class StudentGradeFilter(FormView):
                 user_grade=MdlQuizGrades.objects.using('moodle').values_list('userid', 'quiz', 'grade').filter(quiz__in=[f.mdlquiz_id for f in fossmdl], grade__gte=int(grade))
                 #convert moodle user and grades as key value pairs
                 dictgrade = {i[0]:{i[1]:[i[2],False]} for i in user_grade}
+                print("len(list(dictgrade.keys()))-----------------------> ",len(list(dictgrade.keys())))
                 #get all test attendance for moodle user ids and for a specific moodle quiz ids
-                test_attendance=TestAttendance.objects.using('spk').filter(mdluser_id__in=list(dictgrade.keys()), 
-                        mdlquiz_id__in=[f.mdlquiz_id for f in fossmdl], test__academic__state__in=state if state else State.objects.all(),test__academic__city__in=city if city else City.objects.using('spk').all(), status__gte=3, test__academic__institution_type__in=institution_type if institution_type else InstituteType.objects.using('spk').all(), test__academic__status__in=[activation_status] if activation_status else [1,3])
+                test_attendance=TestAttendance.objects.using('spk').filter(
+                    mdluser_id__in=list(dictgrade.keys()),
+                    mdlquiz_id__in=[f.mdlquiz_id for f in fossmdl],
+                    test__academic__state__in=state if state else State.objects.using('spk').all(),
+                    test__academic__city__in=city if city else City.objects.using('spk').all(),
+                    status__gte=3, 
+                    test__academic__institution_type__in=institution_type if institution_type else InstituteType.objects.using('spk').all(), 
+                    test__academic__status__in=[activation_status] if activation_status else [1,3]
+                    )
+
                 if from_date and to_date:
                     test_attendance = test_attendance.filter(test__tdate__range=[from_date, to_date])
                 elif from_date:
                     test_attendance = test_attendance.filter(test__tdate__gte=from_date)
                 filter_ta=[]
+
                 for i in range(test_attendance.count()):
                     if not dictgrade[test_attendance[i].mdluser_id][test_attendance[i].mdlquiz_id][1]:
                         dictgrade[test_attendance[i].mdluser_id][test_attendance[i].mdlquiz_id][1] = True
@@ -136,4 +171,80 @@ class StudentGradeFilter(FormView):
             except FossMdlCourses.DoesNotExist:
                 return None
         return None
+####################################################################
+# CBV for Create, Detail, List, Update for Company starts
+####################################################################
+class CompanyCreate(SuccessMessageMixin,CreateView):
+    template_name = 'emp/employer_form.html'
+    model = Company
+    fields = ['name','emp_name','emp_contact','state','city','address','phone','email','logo','description','domain','company_size','website'] 
+    success_message ="%(company_name)s was created successfully"
+    def get_success_url(self):
+        return reverse('company-detail', kwargs={'slug': self.object.slug})
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        print(f'slef.user ---- {self.request}')
+        self.object.added_by = self.request.user
+        self.object.save()
+        return super(ModelFormMixin, self).form_valid(form)
+class CompanyDetailView(DetailView):
+    template_name = 'emp/employer_detail.html'
+    model = Company
+    def get_context_data(self, **kwargs):
+        print("inside detail voew *****************")
+        context = super().get_context_data(**kwargs)
+        return context
+class CompanyListView(ListView):
+    template_name = 'emp/employer_list.html'
+    model = Company
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print("************ context : ",context)
+        return context
+class CompanyUpdate(SuccessMessageMixin,UpdateView):
+    template_name = 'emp/employer_update_form.html'
+    model = Company
+    fields = ['name','emp_name','emp_contact','state','city','address','phone','email','logo','description','domain','company_size','website'] 
+    success_message ="%(name)s was updated successfully"
+####################################################################
+# CBV for Create, Detail, List, Update for Jobs starts
+####################################################################
+class JobCreate(SuccessMessageMixin,CreateView):
+    template_name = 'emp/jobs_form.html'
+    model = Job
+    fields = ['company','title','designation','state','city','skills','description','domain','salary_range_min','salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender']
+    
+    success_message ="%(title)s job was created successfully"
+    def get_success_url(self):
+        print("************************* success *********************")
+        return reverse('job-detail', kwargs={'slug': self.object.slug})
 
+    
+    def form_invalid(self, form):
+        print(f"hjklkn-------------{form}")
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        print(f'slef.user ---- -------------------------------------------------')
+        self.object.save()
+        return super(ModelFormMixin, self).form_valid(form)
+class JobDetailView(DetailView):
+    template_name = 'emp/jobs_detail.html'
+    model = Job
+    def get_context_data(self, **kwargs):
+        print("inside job detial view *****************")
+        context = super().get_context_data(**kwargs)
+        return context
+class JobListView(ListView):
+    template_name = 'emp/jobs_list.html'
+    model = Job
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print("************ context : ",context)
+        return context
+class JobUpdate(SuccessMessageMixin,UpdateView):
+    template_name = 'emp/jobs_update_form.html'
+    model = Job
+    fields = ['company','title','designation','state','city','skills','description','domain','salary_range_min','salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender']
+    success_message ="%(title)s was updated successfully"

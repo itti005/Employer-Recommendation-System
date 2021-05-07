@@ -1,0 +1,72 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}{{ object.title}}{% endblock %}
+{% block content %}
+{% for message in messages %}
+    <div class="text-center alert alert-{{ message.tags }}">
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+
+<table class="table table-bordered">
+  <tbody>
+
+    <tr>
+      <th scope="row">Comapny</th>
+      <td>{{object.company}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Sector</th>
+      <td>{{object.domain}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Designation</th>
+      <td>{{object.designation}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Description</th>
+      <td>{{object.description}}</td>
+    </tr>
+    <tr>
+      <th scope="row">State</th>
+      <td>{{object.state}}</td>
+    </tr>
+    <tr>
+      <th scope="row">City</th>
+      <td>{{object.city}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Skills</th>
+      <td>{{object.skills}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Job type</th>
+      <td>{{object.job_type}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Benefits</th>
+      <td>{{object.benefits}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Requirements</th>
+      <td>{{object.requirements}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Key Job Responsibilities</th>
+      <td>{{object.key_job_responsibilities}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Gender</th>
+      <td>{{object.gender}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Address</th>
+      <td>{{object.address}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<a href="{% url 'update-job-detail' slug=object.slug %}">Edit</a>
+{% endblock %}
+
+

@@ -143,7 +143,7 @@ class Company(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
     status = models.BooleanField(default=True)
-    added_by = models.ForeignKey(User,on_delete=models.CASCADE)
+    added_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
 
     def __str__(self):
@@ -171,7 +171,7 @@ class Job(models.Model):
     date_updated = models.DateTimeField(auto_now=True )
     job_type = models.ForeignKey(JobType,on_delete=models.CASCADE)
     benefits = models.TextField(null=True,blank=True) # Additional benefits provided by the company to employee
-    status = models.BooleanField(default=True )#To make if the job is active
+    status = models.BooleanField(default=True,blank=True )#To make if the job is active
     requirements = models.TextField(null=True,blank=True) #Educational qualifications, other criteria
     shift_time = models.CharField(max_length=200)
     key_job_responsibilities = models.TextField(null=True,blank=True)

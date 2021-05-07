@@ -1,0 +1,78 @@
+{% extends 'emp/base.html' %}
+
+{% load crispy_forms_tags %}
+{% block content-header %}{{object.name}}{% endblock %}
+{% block content %}
+{% for message in messages %}
+    <div class="text-center alert alert-{{ message.tags }}">
+                {{ message|safe }}
+    </div>
+        {% endfor %}
+<table class="table table-bordered">
+  <tbody>
+    <tr>
+      <th scope="row">Sector</th>
+      <td>{{object.domain}}</td>
+    </tr>
+    <tr>
+      <th scope="row">State</th>
+      <td>{{object.state}}</td>
+    </tr>
+    <tr>
+      <th scope="row">City</th>
+      <td>{{object.city}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Company Size</th>
+      <td>{{object.company_size}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Website</th>
+      <td>{{object.website}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Representative</th>
+      <td>{{object.emp_name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Contact</th>
+      <td>{{object.emp_contact}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Alternate Contact</th>
+      <td>{{object.phone}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Email</th>
+      <td>{{object.email}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Address</th>
+      <td>{{object.address}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Description</th>
+      <td>{{object.description}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Added By</th>
+      <td>{{object.added_by.user.email}}</td>
+    </tr>
+  </tbody>
+</table>
+{% if object.sector %}
+  <ul>
+    {% for s in object.sector.all %}
+      <li>
+        {{ s.name }}
+        {# recursively include template itself #}
+        
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+<a href="{% url 'update-company-detail' slug=object.slug %}">Edit</a>
+
+{% endblock %}
+
+
