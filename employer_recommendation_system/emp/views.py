@@ -2,23 +2,18 @@ from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 from .models import *
 from emp.models import Student as RecStudent
-#from moodle.models import *
 from spoken.models import TestAttendance, FossMdlCourses,FossCategory,Profile
 from moodle.models import MdlQuizGrades
-
-#from events.models import TestAttendance,FossMdlCourses
 from django.views.generic.edit import UpdateView
-#from events.models import Student as SpkStudent 
 from spoken.models import SpokenStudent as SpkStudent 
-#from events.models import User as SpkUser 
 from spoken.models import SpokenUser as SpkUser 
-#from creation.models import FossCategory 
 from django.views.generic import FormView
 from emp.forms import StudentGradeFilterForm
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import CreateView,UpdateView,ModelFormMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.contrib.auth.mixins import PermissionRequiredMixin
 class StudentUpdateView(UpdateView):
     model = Student
     template_name = 'emp/student_form.html'
@@ -35,7 +30,6 @@ def fetch_spk_student_data():
         spk_student = SpkStudent.objects.using('spk').get(id=user.student.spk_usr_id )
         #spk_user = SpkUser.objects.using('spk').get(id=spk_student.user_id) 
         test_attendance_entries = TestAttendance.objects.using('spk').filter( student_id = spk_student_id)
-        print("1")
         foss_grades_dict = {}
         for ta in test_attendance_entries :
             #mdl_user_id = ta.mdluser_id
@@ -43,21 +37,14 @@ def fetch_spk_student_data():
             #mdl_course_id = ta.mdlcourse_id
             #mdl_quiz_id = ta.mdlquiz_id
             foss_grades = {}
-            print(mdl_user_id,mdl_quiz_id)
             quiz_grade = MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id , quiz=ta.mdlquiz_id)
-            print(quiz_grade.get().grade)
             spk_mdl_course_map = FossMdlCourses.objects.using('spk').get(mdlcourse_id=ta.mdlcourse_id)
             spk_foss = FossCategory.objects.using('spk').get(id=spk_mdl_course_map.foss_id)
-            print(f'spk foss : {spk_foss.foss}')
             foss_grades_dict[spk_foss.foss] = quiz_grade.get().grade
-            print(foss_grades_dict)
-        #phone
         rec_student = RecStudent.objects.get(user_id=user.id)
         #spk_student_profile = Profile.objects.using('spk').get(user_id=spk_user.id) 
         spk_student_profile = Profile.objects.using('spk').values('city__name','location__name','district__name','state__name','phone','address').get(user_id=1054)
     
-        #print(spk_student_profile['phone'])
-        print(spk_student_profile)
         rec_student.phone = spk_student_profile['phone'] 
         rec_student.address = spk_student_profile['address'] 
         rec_student.city = spk_student_profile['city__name'] 
@@ -66,11 +53,9 @@ def fetch_spk_student_data():
         rec_student.state = spk_student_profile['state__name'] 
         rec_student.gender = spk_student.gender
         rec_student.save()
-        print(rec_student.phone)
     #except Content.DoesNotExist:
     except:
         print("fetch except")
-
     
 def student_homepage(request):
     context={}
@@ -131,7 +116,6 @@ class StudentGradeFilter(FormView):
             from_date = form.cleaned_data['from_date']
             to_date = form.cleaned_data['to_date']
             result=self.filter_student_grades(foss, state, city, grade, institution_type, activation_status, from_date, to_date)
-            # print(f'RESULT --------- {result}')
         else:
             pass
         return self.render_to_response(self.get_context_data(form=form, result=result))
@@ -171,11 +155,10 @@ class StudentGradeFilter(FormView):
             except FossMdlCourses.DoesNotExist:
                 return None
         return None
-####################################################################
-# CBV for Create, Detail, List, Update for Company starts
-####################################################################
-class CompanyCreate(SuccessMessageMixin,CreateView):
+#---------------- CBV for Create, Detail, List, Update for Company starts ----------------#
+class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     template_name = 'emp/employer_form.html'
+    permission_required = 'emp.add_company'
     model = Company
     fields = ['name','emp_name','emp_contact','state','city','address','phone','email','logo','description','domain','company_size','website'] 
     success_message ="%(company_name)s was created successfully"
@@ -183,68 +166,68 @@ class CompanyCreate(SuccessMessageMixin,CreateView):
         return reverse('company-detail', kwargs={'slug': self.object.slug})
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        print(f'slef.user ---- {self.request}')
         self.object.added_by = self.request.user
         self.object.save()
         return super(ModelFormMixin, self).form_valid(form)
-class CompanyDetailView(DetailView):
+    def test_func(self):
+        return self.request.user.groups
+class CompanyDetailView(PermissionRequiredMixin,DetailView):
     template_name = 'emp/employer_detail.html'
+    permission_required = 'emp.view_company'
     model = Company
     def get_context_data(self, **kwargs):
-        print("inside detail voew *****************")
         context = super().get_context_data(**kwargs)
         return context
-class CompanyListView(ListView):
+class CompanyListView(PermissionRequiredMixin,ListView):
     template_name = 'emp/employer_list.html'
+    permission_required = 'emp.view_company'
     model = Company
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print("************ context : ",context)
         return context
-class CompanyUpdate(SuccessMessageMixin,UpdateView):
+class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/employer_update_form.html'
+    permission_required = 'emp.change_company'
     model = Company
     fields = ['name','emp_name','emp_contact','state','city','address','phone','email','logo','description','domain','company_size','website'] 
     success_message ="%(name)s was updated successfully"
-####################################################################
-# CBV for Create, Detail, List, Update for Jobs starts
-####################################################################
-class JobCreate(SuccessMessageMixin,CreateView):
+#---------------- CBV for Create, Detail, List, Update for Jobs starts ----------------#
+class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     template_name = 'emp/jobs_form.html'
+    permission_required = 'emp.add_job'
     model = Job
     fields = ['company','title','designation','state','city','skills','description','domain','salary_range_min','salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender']
     
     success_message ="%(title)s job was created successfully"
     def get_success_url(self):
-        print("************************* success *********************")
         return reverse('job-detail', kwargs={'slug': self.object.slug})
-
     
     def form_invalid(self, form):
-        print(f"hjklkn-------------{form}")
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        print(f'slef.user ---- -------------------------------------------------')
         self.object.save()
         return super(ModelFormMixin, self).form_valid(form)
-class JobDetailView(DetailView):
+
+class JobDetailView(PermissionRequiredMixin,DetailView):
     template_name = 'emp/jobs_detail.html'
+    permission_required = 'emp.view_job'
     model = Job
     def get_context_data(self, **kwargs):
-        print("inside job detial view *****************")
         context = super().get_context_data(**kwargs)
         return context
-class JobListView(ListView):
+class JobListView(PermissionRequiredMixin,ListView):
     template_name = 'emp/jobs_list.html'
+    permission_required = 'emp.view_job'
     model = Job
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print("************ context : ",context)
         return context
-class JobUpdate(SuccessMessageMixin,UpdateView):
+class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/jobs_update_form.html'
+    permission_required = 'emp.change_job'
     model = Job
     fields = ['company','title','designation','state','city','skills','description','domain','salary_range_min','salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender']
     success_message ="%(title)s was updated successfully"
+
