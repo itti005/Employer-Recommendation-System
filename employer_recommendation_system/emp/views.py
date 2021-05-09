@@ -77,7 +77,6 @@ def student_homepage(request):
     #except Content.DoesNotExist:
     except:
         print("student_homepage failed")
-
     return render(request,'emp/student_homepage.html',context)
 
 def employer_homepage(request):
