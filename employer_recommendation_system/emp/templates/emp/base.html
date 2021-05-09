@@ -5,14 +5,18 @@
 <head>
 	<title></title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}" />
   {% block css %}
   {% endblock %}
-	<link rel="stylesheet" type="text/css" href="{% static 'emp/css/main.css' %}" />
+	
 </head>
 <body>
 	<div class="container-fluid">
-		<div class="row">
+    {% include "emp/navbar.html" %}
+    {% if not request.user.is_anonymous %}
+		<div class="row" id='main'>
 			<div class="col-md-2 d-none d-md-block bg-light sidebar">
+
         {% if request.user|has_group:"MANAGER" %}
             <!-- <ul class="nav flex-column mt-5">
               <li class="nav-item">
@@ -22,6 +26,7 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="employer_profile">
+        }
       <i class="fas fa-user-tie"></i>
           <span>Add Company</span></a>
               </li>
@@ -66,11 +71,7 @@
       <i class="fas fa-user-tie"></i>
           <span>blogs</span></a>
               </li> -->
-               <li class="nav-item">
-                <a class="nav-link" href="{% url 'logout' %}">
-          <i class="fas fa-user-graduate"></i>
-          <span>Log out</span></a>
-              </li>
+              
             </ul>
             {% endif %}
             {% if request.user|has_group:"EMPLOYER" %}
@@ -93,11 +94,7 @@
       <i class="fas fa-user-tie"></i>
           <span>Payment</span></a>
               </li>
-              <li class="nav-item">
-                 <a class="nav-link" href="{% url 'logout' %}">
-          <i class="fas fa-user-graduate"></i>
-          <span>Log out</span></a>
-              </li>
+              
               
             </ul>
             {% endif %}
@@ -137,24 +134,26 @@
       <i class="fas fa-user-tie"></i>
           <span>Payment</span></a>
               </li> -->
-              <li class="nav-item">
-                 <a class="nav-link" href="{% url 'logout' %}">
-          <i class="fas fa-user-graduate"></i>
-          <span>Log out</span></a>
-              </li>
+              
               
             </ul>
             {% endif %}
         </div>
-			<div class="col-md-9 p-5">
+			<div class="col-md-9">
         <!-- heading for page information -->
-        <div class="alert alert-info" role="alert">
+        
+        <!-- <div class="alert alert-info" role="alert">
           <h4>{% block content-header %}{% endblock %}</h>
         </div>
+        -->
 				{% block content %}
         {% endblock %}
 			</div>
 		</div>
+    {% else %}
+    {% block main %}
+    {% endblock %}
+    {% endif %}
 	</div>
 	
 
