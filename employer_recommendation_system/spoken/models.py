@@ -134,6 +134,8 @@ class AcademicCenter(models.Model):
         managed = False
         db_table = 'events_academiccenter'
 
+    def __str__(self):
+        return self.institution_name
 
 class Organiser(models.Model):
     user = models.OneToOneField(SpokenUser, related_name = 'organiser', on_delete=models.PROTECT )
@@ -177,6 +179,9 @@ class Department(models.Model):
     name = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add = True)
     updated = models.DateTimeField(auto_now = True)
+
+    class Meta:
+        managed = False
 
 class TrainingRequest(models.Model):
     training_planner = models.BigIntegerField()

@@ -1,5 +1,8 @@
 from django import forms
 from spoken.models import *
+from .models import Education,Student
+from django.forms import ModelForm
+
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -17,3 +20,14 @@ class StudentGradeFilterForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+class EducationForm(ModelForm):
+    class Meta:
+        model = Education
+        fields = '__all__'
+
+class StudentForm(ModelForm):
+    class Meta:
+        model = Student
+        fields = ['about','experience','github','linkedin','cover_letter','skills']

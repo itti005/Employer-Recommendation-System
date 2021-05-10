@@ -25,6 +25,8 @@ class SpokenStudentBackend(ModelBackend):
                             if attendance_exists:
                                 user = User(username=sp_user.username)
                                 user.email = sp_user.email
+                                user.first_name = sp_user.first_name
+                                user.last_name = sp_user.last_name
                                 user.is_active = True
                                 user.save()
                                 group = Group.objects.get(name='STUDENT')
