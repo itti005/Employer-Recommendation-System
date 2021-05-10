@@ -5,6 +5,7 @@
 <head>
 	<title></title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
   <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}" />
   {% block css %}
   {% endblock %}
@@ -57,7 +58,7 @@
               </li>
              
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'student_profile' pk=1%}">
+                <a class="nav-link" href="{% url 'student_profile' pk=request.user.student.id %}">
           <i class="fas fa-user-graduate"></i>
           <span>Profile Settings</span></a>
               </li>

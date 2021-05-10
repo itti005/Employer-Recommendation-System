@@ -8,61 +8,16 @@ from django.views.generic.edit import UpdateView
 from spoken.models import SpokenStudent as SpkStudent 
 from spoken.models import SpokenUser as SpkUser 
 from django.views.generic import FormView
-from emp.forms import StudentGradeFilterForm
+from emp.forms import StudentGradeFilterForm, EducationForm,StudentForm
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import CreateView,UpdateView,ModelFormMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import PermissionRequiredMixin
-class StudentUpdateView(UpdateView):
-    model = Student
-    template_name = 'emp/student_form.html'
-    fields = ['education','skills','about','experience','github','linkedin','cover_letter'] 
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['ab'] = 'abghghbh'
-        return context
-def fetch_spk_student_data():
-    try:
-        user = User.objects.get(id=10)
-        #spk_student_id = user.student.spk_usr_id
-        spk_student = SpkStudent.objects.using('spk').get(id=user.student.spk_usr_id )
-        #spk_user = SpkUser.objects.using('spk').get(id=spk_student.user_id) 
-        test_attendance_entries = TestAttendance.objects.using('spk').filter( student_id = spk_student_id)
-        foss_grades_dict = {}
-        for ta in test_attendance_entries :
-            #mdl_user_id = ta.mdluser_id
-            mdl_user_id = 317 
-            #mdl_course_id = ta.mdlcourse_id
-            #mdl_quiz_id = ta.mdlquiz_id
-            foss_grades = {}
-            quiz_grade = MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id , quiz=ta.mdlquiz_id)
-            spk_mdl_course_map = FossMdlCourses.objects.using('spk').get(mdlcourse_id=ta.mdlcourse_id)
-            spk_foss = FossCategory.objects.using('spk').get(id=spk_mdl_course_map.foss_id)
-            foss_grades_dict[spk_foss.foss] = quiz_grade.get().grade
-        rec_student = RecStudent.objects.get(user_id=user.id)
-        #spk_student_profile = Profile.objects.using('spk').get(user_id=spk_user.id) 
-        spk_student_profile = Profile.objects.using('spk').values('city__name','location__name','district__name','state__name','phone','address').get(user_id=1054)
-    
-        rec_student.phone = spk_student_profile['phone'] 
-        rec_student.address = spk_student_profile['address'] 
-        rec_student.city = spk_student_profile['city__name'] 
-        rec_student.location = spk_student_profile['location__name'] 
-        rec_student.district = spk_student_profile['district__name'] 
-        rec_student.state = spk_student_profile['state__name'] 
-        rec_student.gender = spk_student.gender
-        rec_student.save()
-    #except Content.DoesNotExist:
-    except:
-        print("fetch except")
-    
+
+
 def student_homepage(request):
     context={}
-    #student = RecStudent.objects.get(user_id=request.user.id)
-    #applied_jobs = AppliedJob.objects.filter(student_id=student.id)
-    # get student grades
-    #spk_student = SpkStudent.objects.filter(user_id=request.user.id) 
     try:
          spk_student = SpkStudent.objects.using('spk').filter(user_id=10550).get() 
          id = spk_student.id
@@ -74,9 +29,8 @@ def student_homepage(request):
              quiz_grade = MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id , quiz=mdl_quiz_id)
              spk_mdl_course_map = FossMdlCourses.objects.using('spk').get(mdlcourse_id=mdl_course_id)
              spk_foss = FossCategory.objects.using('spk').get(id=spk_mdl_course_map.foss_id)
-    #except Content.DoesNotExist:
     except:
-        print("student_homepage failed")
+        pass
     return render(request,'emp/student_homepage.html',context)
 
 def employer_homepage(request):
@@ -129,7 +83,6 @@ class StudentGradeFilter(FormView):
                 user_grade=MdlQuizGrades.objects.using('moodle').values_list('userid', 'quiz', 'grade').filter(quiz__in=[f.mdlquiz_id for f in fossmdl], grade__gte=int(grade))
                 #convert moodle user and grades as key value pairs
                 dictgrade = {i[0]:{i[1]:[i[2],False]} for i in user_grade}
-                print("len(list(dictgrade.keys()))-----------------------> ",len(list(dictgrade.keys())))
                 #get all test attendance for moodle user ids and for a specific moodle quiz ids
                 test_attendance=TestAttendance.objects.using('spk').filter(
                     mdluser_id__in=list(dictgrade.keys()),
@@ -231,3 +184,38 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     fields = ['company','title','designation','state','city','skills','description','domain','salary_range_min','salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender']
     success_message ="%(title)s was updated successfully"
 
+def student_profile(request,pk):
+    context = {}
+    student = Student.objects.get(user=request.user) 
+    context['skills']=Skill.objects.all()
+    if request.method=='POST':
+        student_form = StudentForm(request.POST)
+        education_form = EducationForm(request.POST)
+        if student_form.is_valid() and education_form.is_valid():
+            student.about = student_form.cleaned_data['about']
+            student.github = student_form.cleaned_data['github']
+            student.experience = student_form.cleaned_data['experience']
+            student.linkedin = student_form.cleaned_data['linkedin']
+            student.save()
+            skills = request.POST['skills_m']
+            skills = skills.split(',')
+            for item in skills:
+                s = Skill.objects.get(name=item)
+                student.skills.add(s)
+            degree = request.POST['degree']
+            degree_obj = Degree.objects.get(id=degree)
+            institute = request.POST['institute']
+            institute_obj = AcademicCenter.objects.get(id=institute)
+            start_year = education_form.cleaned_data['start_year']
+            end_year = education_form.cleaned_data['end_year']
+            gpa = education_form.cleaned_data['gpa']
+            education = Education(degree=degree_obj,institute=institute_obj,start_year=start_year,end_year=end_year,gpa=gpa)
+            education.save()
+            student.education.add(education)
+    else:
+        student_form = StudentForm()
+        education_form = EducationForm()
+    context['form']=student_form
+    context['student']=student
+    context['education_form']=education_form
+    return render(request,'emp/student_form.html',context)

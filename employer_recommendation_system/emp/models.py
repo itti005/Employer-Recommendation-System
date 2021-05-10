@@ -4,6 +4,7 @@ import datetime
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+from spoken.models import AcademicCenter
 import os
 # Create your models here.
 GENDER = [('f','f'),('m','m'),('a','No criteria'),]
@@ -77,22 +78,23 @@ class Skill(models.Model):
 
 class Education(models.Model):
     degree = models.ForeignKey(Degree,null=True,blank=True,on_delete=models.CASCADE)
-    institute = models.CharField(max_length=400) #Institute name
-    start_year = models.IntegerField()
-    end_year = models.IntegerField()
+    # institute = models.CharField(max_length=400) #Institute name
+    institute = models.ForeignKey(AcademicCenter,max_length=400,on_delete=models.CASCADE) #Institute name
+    start_year = models.IntegerField(choices=START_YEAR_CHOICES, default=1)
+    end_year = models.IntegerField(choices=END_YEAR_CHOICES, default=1)
     gpa = models.CharField(max_length=10,null=True,blank=True)
     def __str__(self):
         return self.degree.name+'_'+self.institute
 
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
-    phone = models.CharField(max_length=10, null=True) #spk
-    address = models.CharField(max_length=400, null=True)  #spk
+    phone = models.CharField(max_length=10, null=True,blank=True) #spk
+    address = models.CharField(max_length=400, null=True,blank=True)  #spk
     #spk_institute = models.CharField(max_length=200) #spk
     education = models.ManyToManyField(Education, null=True)
     spk_institute = models.IntegerField(null=True)  #spk
     #course = models.ForeignKey(Course,null=True,blank=True,on_delete=models.CASCADE)
-    skills = models.ManyToManyField(Skill, null=True)
+    skills = models.ManyToManyField(Skill, null=True,blank=True)
     about = models.TextField(null=True,blank=True) #Short description/introduction about student profile
     experience = models.TextField(null=True,blank=True) #Project/work or internship experience 
     #photo = models.ImageField(null=True,blank=True) #profile photo
