@@ -6,7 +6,11 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from spoken.models import AcademicCenter
 import os
+from spoken.models import SpokenUser
+
+
 # Create your models here.
+ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('f','f'),('m','m'),('a','No criteria'),]
 START_YEAR_CHOICES = []
 END_YEAR_CHOICES = []
@@ -40,35 +44,27 @@ class JobType(models.Model):
         return self.type
 
 class State(models.Model):
-  name = models.CharField(max_length=50)
-  latitude = models.DecimalField(
-    null=True,
-    max_digits=10,
-    decimal_places=4,
-    blank=True
-  )
-  longtitude = models.DecimalField(
-    null=True,
-    max_digits=10,
-    decimal_places=4,
-    blank=True
-  )
+    code = models.CharField(max_length=3)
+    name = models.CharField(max_length=50)
+    slug = models.CharField(max_length=100)
+    latitude = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+    longtitude = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+    img_map_area = models.TextField()
+    created = models.DateTimeField(blank=True, null=True)
+    updated = models.DateTimeField(blank=True, null=True)
+    has_map = models.IntegerField()
 
-  def __str__(self):
-    return self.name
+    def __str__(self):
+        return self.name
 
-  
 class City(models.Model):
-  state = models.ForeignKey(State, on_delete=models.PROTECT )
-  name = models.CharField(max_length=200)
-  created = models.DateTimeField(auto_now_add = True, null=True)
-  updated = models.DateTimeField(auto_now = True, null=True)
+    state = models.ForeignKey(State, models.DO_NOTHING)
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(blank=True, null=True)
+    updated = models.DateTimeField(blank=True, null=True)
 
-  def __str__(self):
-    return self.name
-
-  class Meta(object):
-    unique_together = (("name","state"),)
+    def __str__(self):
+        return self.name
 
 class Skill(models.Model):
     name = models.CharField(max_length=240)
@@ -79,7 +75,7 @@ class Skill(models.Model):
 class Education(models.Model):
     degree = models.ForeignKey(Degree,null=True,blank=True,on_delete=models.CASCADE)
     # institute = models.CharField(max_length=400) #Institute name
-    institute = models.ForeignKey(AcademicCenter,max_length=400,on_delete=models.CASCADE) #Institute name
+    institute = models.ForeignKey(AcademicCenter,max_length=400,on_delete=models.CASCADE,null=True,blank=True) #Institute name
     start_year = models.IntegerField(choices=START_YEAR_CHOICES, default=1)
     end_year = models.IntegerField(choices=END_YEAR_CHOICES, default=1)
     gpa = models.CharField(max_length=10,null=True,blank=True)
@@ -109,9 +105,9 @@ class Student(models.Model):
     spk_usr_id = models.IntegerField(null=True)  # spoken student id
     gender = models.CharField(max_length=10, null=True) # autopopulated spk cms profile
     location = models.CharField(max_length=400,null=True,blank=True)  #spk
-    state = models.CharField(max_length=400, null=True)  #spk
-    district = models.CharField(max_length=400, null=True)  #spk
-    city = models.CharField(max_length=400, null=True)  #spk
+    state = models.CharField(max_length=100, null=True)  #spk
+    district = models.CharField(max_length=200, null=True)  #spk
+    city = models.CharField(max_length=200, null=True)  #spk
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
 
@@ -132,14 +128,14 @@ class Company(models.Model):
     name = models.CharField(max_length=200)
     emp_name = models.CharField(max_length=200) #Name of the company representative
     emp_contact = models.CharField(max_length=200) #Contact of the company representative
-    state = models.ForeignKey(State,on_delete=models.CASCADE) #Company Address for correspondence
-    city = models.ForeignKey(City,on_delete=models.CASCADE) #Company Address for correspondence
+    state = models.ForeignKey(State,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
+    city = models.ForeignKey(City,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     address = models.CharField(max_length=250) #Company Address for correspondence
     phone = models.CharField(max_length=15) #Contact of the company representative
     email = models.EmailField(null=True,blank=True) #Email for correspondence
-    logo = models.ImageField(null=True,blank=True)
+    logo = models.ImageField(upload_to='logo/',null=True,blank=True)
     description = models.TextField(null=True,blank=True)
-    domain = models.CharField(max_length=400) #Domain of work . Eg : consultancy, software development, etc
+    domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
     company_size = models.CharField(max_length=25,choices=NUM_OF_EMPS) #Number of employees in company
     website = models.URLField(null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -147,6 +143,7 @@ class Company(models.Model):
     status = models.BooleanField(default=True)
     added_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
+    rating = models.IntegerField(null=True,blank=True)
 
     def __str__(self):
         return self.name
@@ -162,15 +159,15 @@ class Company(models.Model):
 class Job(models.Model):
     title = models.CharField(max_length=250)
     designation = models.CharField(max_length=250)
-    state = models.ForeignKey(State,on_delete=models.CASCADE) #Company Address for correspondence
-    city = models.ForeignKey(City,on_delete=models.CASCADE) #Company Address for correspondence
-    skills = models.CharField(max_length=400)
+    state_job = models.ForeignKey(State,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
+    city_job = models.ForeignKey(City,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
+    skills = models.CharField(max_length=400,null=True,blank=True)
     description = models.TextField(null=True,blank=True)
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
     salary_range_min = models.IntegerField(null=True,blank=True)
     salary_range_max = models.IntegerField(null=True,blank=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True )
+    date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
+    date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
     job_type = models.ForeignKey(JobType,on_delete=models.CASCADE)
     benefits = models.TextField(null=True,blank=True) # Additional benefits provided by the company to employee
     status = models.BooleanField(default=True,blank=True )#To make if the job is active
@@ -180,6 +177,16 @@ class Job(models.Model):
     gender = models.CharField(max_length=10,choices=GENDER)
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
+    last_app_date = models.DateTimeField(null=True,blank=True)
+    rating = models.IntegerField(null=True,blank=True)
+    foss = models.CharField(max_length=200)
+    institute_type = models.CharField(max_length=200)
+    state = models.CharField(max_length=200)
+    city = models.CharField(max_length=200)
+    grade = models.IntegerField()
+    activation_status = models.IntegerField(max_length=10,choices=ACTIVATION_STATUS)
+    from_date = models.DateField(null=True,blank=True)
+    to_date = models.DateField(null=True,blank=True)
 
     def __str__(self):
         return self.title
@@ -191,13 +198,18 @@ class Job(models.Model):
         self.slug = slugify(self.company.name+'_'+self.title)
         super().save(*args, **kwargs)
 
+    class Meta:
+        ordering = [('-date_updated')]
 
-class AppliedJob(models.Model):
-    date_created = models.DateField(auto_now_add=True, null=True,blank=True)
+
+class JobShortlist(models.Model):
+    # user=models.ForeignKey(User,on_delete=models.CASCADE)
+    spk_user=models.ForeignKey(SpokenUser,on_delete=models.CASCADE)
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
-    student=models.ForeignKey(Student,on_delete=models.CASCADE)
+    date_created = models.DateField(auto_now_add=True, null=True,blank=True)
+    status = models.IntegerField(null=True,blank=True)
 
     def __str__(self):
-        return self.student.user.username+'-'+self.job.title
+        return self.spk_user.username+'-'+self.job.title
 
 

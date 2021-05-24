@@ -13,7 +13,7 @@
         <div>
         <form>
             {{filterset.form.as_ul}}    
-            <button type="submit">Search</button>
+            <!-- <button type="submit">Search</button> -->
         </form>
          </div>
     </div>
@@ -38,11 +38,14 @@
   <p>Objects {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
 {% endif %}
         <ul class="list-group">
-        {% for job in object_list %}
+        {% for item in object_list %}
             <li class="list-group-item d-flex justify-content-between">
-                <a href="{% url 'job-detail' slug=job.slug %}">{{ job.title }}</a>
-                
-                <a href="{% url 'job-shortlist' id=job.id %}">Shortlisted ({{job.jobshortlist_set.count}})</a>
+                <a href="{% url 'job-detail' slug=item.job.slug %}">{{ item.job.title }}</a>
+                {% if item.status == APPLIED_SHORTLISTED %}
+                <span class="badge badge-success">In process</span>
+                {% else %}
+                <span class="badge badge-danger">Not Eligible</span>
+                {% endif %}
             </li>
         {% empty %}
             <li>No jobs yet.</li>

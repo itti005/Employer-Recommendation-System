@@ -16,7 +16,7 @@ class CompanyAdmin(admin.ModelAdmin):
     exclude = ('slug',)
 class JobAdmin(admin.ModelAdmin):
     exclude = ('slug',)
-class AppliedJobAdmin(admin.ModelAdmin):
+class JobShortlistAdmin(admin.ModelAdmin):
     pass
 class EducationAdmin(admin.ModelAdmin):
     pass
@@ -31,7 +31,7 @@ admin.site.register(JobType,JobTypeAdmin)
 admin.site.register(Student,StudentAdmin)
 admin.site.register(Company,CompanyAdmin)
 admin.site.register(Job,JobAdmin)
-admin.site.register(AppliedJob,AppliedJobAdmin)
+admin.site.register(JobShortlist,JobShortlistAdmin)
 admin.site.register(Education,EducationAdmin)
 admin.site.register(Skill,SkillAdmin)
 

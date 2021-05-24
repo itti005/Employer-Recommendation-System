@@ -38,11 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
+    'django_crontab',
     'emp',
     'accounts',
     'crispy_forms',
     'moodle',
     'spoken',
+
 ]
 
 MIDDLEWARE = [
@@ -106,6 +109,10 @@ DATABASES = {
         'HOST': MDB_HOST,
         'PORT':'',
     },
+
+    'OPTIONS': {
+         "init_command": "SET foreign_key_checks = 0;",
+    },
 }
 
 
@@ -146,8 +153,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT=os.path.join(BASE_DIR,'static')
-MEDIA_ROOT=os.path.join(BASE_DIR, 'static/images')
+#STATIC_ROOT=os.path.join(BASE_DIR,'static') # uncomment while deploying
+STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')] # comment while deploying
+# MEDIA_ROOT=os.path.join(BASE_DIR, 'static/images')
+MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+# MEDIA_URL = '/static/images/'
 STUDENT_PROFILE_PIC='profile'
 #Define ROLE Constants
 ROLE_NAME = {
@@ -186,3 +197,14 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
     'django.contrib.auth.hashers.CryptPasswordHasher',
 )
+
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR,'backup')}
+CRON_LOG=os.path.join(BASE_DIR,'backup.log')
+CRONJOBS=[('*/1 * * * *', 'emp.cron.backup_closed_jobs','>> ~/cron_job.log')]
+
+
+
+
+

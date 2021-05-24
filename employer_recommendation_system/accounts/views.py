@@ -26,7 +26,7 @@ class LoginViewCustom(LoginView):
 		settings.ROLES['EMPLOYER'][1]:'/employer',
 		}
 		print("************** role_url",role_url)
-		print("************** dic",self.request.user.groups.all()[0].name )
+		# print("************** dic",self.request.user.groups.all()[0].name )
 		url = role_url[self.request.user.groups.all()[0].name]
 		print("************** url",url)
 		print("************** url",url)

@@ -13,9 +13,54 @@
   
     <!-- Security token -->
     {% csrf_token %}
-  
-    <!-- Using the formset -->
-    {{ form | crispy }}
+    <div class="form-row">
+    	<div class="col-12 form-group">
+    		{{ form.name | as_crispy_field }}
+    	</div>
+    	<div class="col-md-6 form-group">
+    		{{ form.emp_name | as_crispy_field }}
+    	</div>
+    	<div class="col-md-6 form-group">
+    		{{ form.emp_contact | as_crispy_field }}
+    	</div>
+    	<div class="col-md-6 form-group">
+    		{{ form.phone | as_crispy_field }}
+    	</div>
+    	<div class="col-md-6 form-group">
+    		{{ form.email | as_crispy_field }}
+    	</div>
+    	<div class="col-md-6 form-group">
+    		{{ form.state | as_crispy_field }}
+    	</div>
+    	<div class="col-md-6 form-group">
+    		{{ form.city | as_crispy_field }}
+    	</div>
+    	<div class="col-12 form-group">
+    		{{ form.address | as_crispy_field }}
+    	</div>
+    	<div class="col-lg-3 col-md-6 form-group">
+    		{{ form.domain | as_crispy_field }}
+    	</div>
+    	<div class="col-lg-3 col-md-6 form-group">
+    		{{ form.company_size | as_crispy_field }}
+    	</div>
+    	<div class="col-lg-3 col-md-6 form-group">
+    		{{ form.website | as_crispy_field }}
+    	</div>
+    	<div class="col-lg-3 col-md-6 form-group">
+    		{{ form.logo | as_crispy_field }}
+    	</div>
+    	<div class="col-12 form-group">
+    		{{ form.description | as_crispy_field }}
+    	</div>
+    	<div class="col-lg-3 col-md-6 form-group">
+    		{{ form.rating | as_crispy_field }}
+    	</div>
+    	<div class="col-lg-3 col-md-6 form-group pb-3">
+    		<br>
+    		{{ form.status | as_crispy_field }}
+    	</div>
+    </div>
       
     <input type="submit" value="Submit">
 </form>

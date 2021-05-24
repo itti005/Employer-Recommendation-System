@@ -1,2 +1,148 @@
 {% extends 'emp/base.html' %}
-student
+{% load helper %}
+{% block css %}
+<style type="text/css">
+  h4{
+    color: #0066A0;
+  }
+</style>
+{% endblock %}
+{% block content %}
+
+<br><br>
+<!--display 5 rated Company-->
+<div class="d-flex justify-content-between">
+    <h4 style="text-decoration: underline;" >In collaboration with : </h4>
+    <button type="button" class="btn btn-info">View all companies</button>
+</div>
+<br>
+<div class="row">
+{% for company in company_display %}
+<div class="col-lg-3 col-sm-6">  
+  <div class="border-top border-bottom d-flex flex-column p-3">
+    <img class="d-block align-self-center m-2" src="{{ company.logo.url|default_if_none:'#' }}" alt="Card image cap" 
+    style=" height: 100px;display: inline;">
+  </div>
+</div>
+{% endfor %}
+</div>
+<!--Jobs fro which the student has not yet applied-->
+<section>
+<div class="d-flex justify-content-between">
+    <h4 style="text-decoration: underline;">Latest posted jobs</h4>
+    <a href="{% url 'job-list' %}" class="btn btn-info">View all jobs</a>
+</div>
+<br>
+<div class="row">
+{% for job in awaiting_jobs %}
+<div class="col-lg-4 col-sm-12">  
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <div class="d-flex justify-content-between">
+      <img class="card-img-top" src="{{ job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" style="width: auto;height: 40px;">
+      <div>
+    <small> </small>
+      </div>
+    </div>
+    <h5 class="card-title">{{job.title}}</h5>
+    <p class="card-text">{{job.description}}</p>
+    <a href="#" class="btn btn-info post-apply disabled" style="display: none;" id="applied_{{job.id}}"><i class="fas fa-check mr-3"></i>Applied</a>
+      
+      
+      
+      <a class="btn btn-info pre-apply" onclick="check_eligibility(this,'{{request.user.student.spk_usr_id}}','{{job.id}}','{{request.user.id}}');" id="apply_{{job.id}}">Apply</a>
+      
+  </div>
+  <div class="card-footer">
+      <small class="text-muted">Posted on {{job.date_updated}}</small><br>
+      <span class="badge badge-danger rejected" id="e_{{job.id}}">Not Eligible</span>
+      <small class="text-muted rejected" id="t_{{job.id}}" >Your profile does not meet the job requirements.
+      </small>
+    </div>
+</div>
+</div>
+{% endfor %}
+</div>  
+</section>
+<section>
+<div class="d-flex justify-content-between">
+    <h4 style="text-decoration: underline;">Applied jobs</h4>
+    <a href="{% url 'job-list' %}" class="btn btn-info">View all applied jobs</a>
+</div>
+<br>
+<div class="row">
+{% for js in applied_jobs %}
+<div class="col-lg-4 col-sm-12">  
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <div class="d-flex justify-content-between">
+      <img class="card-img-top" src="{{ js.job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" style="width: auto;height: 40px;">
+      <div>
+    <small> </small>
+      </div>
+    </div>
+    <h5 class="card-title">{{js.job.title}}</h5>
+    <p class="card-text">{{js.job.description}}</p>
+    <a href="#" class="btn btn-info post-apply" style="display: none;"><i class="fas fa-check mr-3"></i>Applied</a>
+      {% if jjs.ob in applied_job_list %}
+      <a href="#" class="btn btn-info post-apply"><i class="fas fa-check mr-3"></i>Applied</a>
+      {% else %}
+      {% endif %}
+  </div>
+  <div class="card-footer">
+      <small class="text-muted">Posted on {{job.date_updated}}</small><br>
+      {% if js.status == APPLIED_SHORTLISTED %}
+      <span class="badge badge-success ">In process</span>
+      {% else %}
+      <span class="badge badge-danger">Not Eligible </span>
+      <span class="text-muted"><i class="far fa-question-circle ml-1" data-toggle="tooltip" data-placement="right" title="Your profile does not meet the job requirements."></i></span>
+      {% endif %}
+      </small>
+    </div>
+</button>
+</div>
+</div>
+{% endfor %}
+</div>  
+</section>
+{% endblock %}
+{% block js %}
+<script type = "text/javascript">
+  function hide_reject_labels(){
+    $('.rejected').hide();
+  }
+  function job_app_ineligible(id){
+    $('#e_'+id).show();
+    $('#t_'+id).show();
+  }
+  function job_app_eligible(id){
+    $('#apply_'+id).hide();
+    $('#applied_'+id).show();
+  }
+ 
+  function check_eligibility(apply_btn,spk_user_id,job_id,rec_user_id){
+    apply_btn_id = apply_btn.id;
+    $.ajax({
+      url: "/check_student_eligibilty",
+      data: {
+        'job_id' : job_id,
+        'spk_user_id' : spk_user_id
+      },
+      dataType: 'json',
+      success:function(data){
+        var messages = data.is_eligible
+        id=apply_btn_id.split('_');
+        if (data.is_eligible==true) {
+          url = $("#student_profile").attr('href');
+          window.location.href = url+"/"+job_id
+        }else{
+          job_app_ineligible(id[1]);
+        }
+    }});
+  }
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();
+      hide_reject_labels();
+      });
+</script>
+{% endblock %}
