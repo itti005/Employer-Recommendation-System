@@ -29,12 +29,13 @@
 <!--Jobs fro which the student has not yet applied-->
 <section>
 <div class="d-flex justify-content-between">
-    <h4 style="text-decoration: underline;">Latest posted jobs</h4>
+    <h4 style="text-decoration: underline;">Recommended Jobs</h4>
     <a href="{% url 'job-list' %}" class="btn btn-info">View all jobs</a>
 </div>
 <br>
 <div class="row">
-{% for job in awaiting_jobs %}
+{% if rec_jobs %}
+  {% for job in rec_jobs %}
 <div class="col-lg-4 col-sm-12">  
 <div class="card" style="width: 18rem;">
   <div class="card-body">
@@ -47,11 +48,7 @@
     <h5 class="card-title">{{job.title}}</h5>
     <p class="card-text">{{job.description}}</p>
     <a href="#" class="btn btn-info post-apply disabled" style="display: none;" id="applied_{{job.id}}"><i class="fas fa-check mr-3"></i>Applied</a>
-      
-      
-      
       <a class="btn btn-info pre-apply" onclick="check_eligibility(this,'{{request.user.student.spk_usr_id}}','{{job.id}}','{{request.user.id}}');" id="apply_{{job.id}}">Apply</a>
-      
   </div>
   <div class="card-footer">
       <small class="text-muted">Posted on {{job.date_updated}}</small><br>
@@ -62,6 +59,13 @@
 </div>
 </div>
 {% endfor %}
+{% else %}
+<div class="col-lg-4 col-sm-12">  
+<p>No Recommended Jobs Yet.</p>
+</div>
+  
+{% endif %}
+
 </div>  
 </section>
 <section>
