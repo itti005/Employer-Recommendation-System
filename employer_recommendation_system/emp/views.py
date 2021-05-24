@@ -17,10 +17,20 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse, JsonResponse
 from .filterset import CompanyFilterSet,JobFilter
 from .forms import ACTIVATION_STATUS
+import numpy as np
 
 
 APPLIED_SHORTLISTED = 1 # student has applied & is eligible for job
 APPLIED_REJECTED = 0 # student has applied but is not eligible for job
+
+def get_recommended_jobs(student):
+    rec_jobs = []
+    student_foss = set([ x['foss'] for x in fetch_student_scores(student)])
+    jobs = get_awaiting_jobs(student.spk_usr_id)
+    for job in jobs:
+        if not student_foss.isdisjoint(set(map(int, job.foss.split(',')))):
+            rec_jobs.append(job)
+    return rec_jobs
 
 #function to get student spoken test scores
 def fetch_student_scores(student):  #parameter : recommendation student obj
@@ -51,7 +61,8 @@ def get_applied_joblist(spk_user_id):
 def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet applied
 	all_jobs = Job.objects.all()
 	applied_jobs = [x.job for x in get_applied_joblist(spk_user_id)]
-	return set(all_jobs)-set(applied_jobs)
+    # return set(all_jobs)-set(applied_jobs)
+	return list(set(all_jobs)-set(applied_jobs))
 
 def student_homepage(request):
     context={}
@@ -63,6 +74,7 @@ def student_homepage(request):
     context['applied_jobs'] = get_applied_joblist(rec_student.spk_usr_id)
     context['awaiting_jobs'] = get_awaiting_jobs(rec_student.spk_usr_id)[:5]
     context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
+    context['rec_jobs']=get_recommended_jobs(rec_student)
     
     try:
          spk_student = SpokenStudent.objects.using('spk').filter(user_id=rec_student.spk_usr_id).get()
@@ -466,7 +478,7 @@ def check_student_eligibilty(request):
                 if(sorted(set(ta_quizes))==sorted(set(filter_quiz_ids))):
                     print(4)
                     flag = True
-                    data['is_eligible'] = flags
+                    data['is_eligible'] = flag
                     return JsonResponse(data)
 
     except IndexError as e:
