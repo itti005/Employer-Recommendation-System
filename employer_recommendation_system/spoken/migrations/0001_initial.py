@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'events_academiccenter',
-                'managed': False,
+                # 'managed': False,
             },
         ),
         migrations.CreateModel(
@@ -172,7 +172,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'events_city',
-                'managed': False,
+                # 'managed': False,
             },
         ),
         migrations.CreateModel(
@@ -191,7 +191,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'events_state',
-                'managed': False,
+                # 'managed': False,
             },
         ),
         migrations.CreateModel(
