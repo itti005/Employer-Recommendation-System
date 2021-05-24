@@ -41,6 +41,16 @@
         </form>
 </div>
 
+<div>
+
+</div>
+<div>
+  <form method="post">
+    <input type="text" id="user_ids" name="user_ids" value={{result.filter_user_id}} ><br><br>
+    <input type="text" id="job_id" name="job_id"><br><br>
+    <button type="button" id="shortlist" class="btn btn-primary">Notify Student</button>
+  </form>
+</div>
 
   <div class="tab-content">
     <div class="tab-pane active" id="pending">
@@ -91,9 +101,6 @@
       {% endif %}
     </div>
   </div>
-
-
-	<!-- <button type="submit" class="btn btn-primary">Filter</button> -->
 </form>
 {% endblock %}
 {% block js %}
@@ -101,6 +108,21 @@
 <script type = "text/javascript">
     $(document).ready(function(){
         $('#id_student_grade_table').DataTable();
-    });
+
+	$("#shortlist").click(function(){
+    user_ids = $('#user_ids').val() ;
+		job_id = $('#job_id').val() ;
+    $.ajax({
+      url: "/shortlist",
+      data: {
+        'user_ids' : user_ids,
+        'job_id' : job_id
+      },
+      dataType: 'json',
+      success:function(data){
+        var messages = data.msg;
+    }});
+    	});
+    	});
 </script>
 {% endblock %}

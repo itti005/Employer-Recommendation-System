@@ -31,8 +31,16 @@ class SpokenStudentBackend(ModelBackend):
                                 user.save()
                                 group = Group.objects.get(name='STUDENT')
                                 user.groups.add(group)
+                                print("************** getting st_profile")
                                 st_profile = Profile.objects.filter(user=sp_user).first()
-                                Student.objects.create(user=user, state=st_profile.state.name if st_profile.state else "", phone=st_profile.phone, address=st_profile.address, spk_usr_id=sp_user.id, gender=student.gender, location=st_profile.location.name if st_profile.location else "", district=st_profile.district.name if st_profile.district else "", city=st_profile.city.name if st_profile.city else "")
+                                print('***************** st_profile : ',st_profile)
+                                Student.objects.create(user=user, 
+                                    state=st_profile.state.name if st_profile.state else "", 
+                                    phone=st_profile.phone, address=st_profile.address, 
+                                    spk_usr_id=sp_user.id, gender=student.gender, 
+                                    location=st_profile.location.name if st_profile.location else "", 
+                                    district=st_profile.district.name if st_profile.district else "", 
+                                    city=st_profile.city.name if st_profile.city else "")
                             else:
                                 return None
                         except SpokenStudent.DoesNotExist:

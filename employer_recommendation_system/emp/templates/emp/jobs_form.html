@@ -1,6 +1,16 @@
 {% extends 'emp/base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}">
+<style type="text/css">
+  .filter-header{
+    border-bottom: 2px solid blue;
+  }
+</style>
+{% endblock %}
 {% block content-header %}Add Job Details{% endblock %}
 {% block content %}
 {% for message in messages %}
@@ -9,102 +19,153 @@
          </div>
      {% endfor %}
 <form method="POST" enctype="multipart/form-data">
-  
-    <!-- Security token -->
-    {% csrf_token %}
-    {{ form | crispy }}
-    <!-- Using the formset -->
-    <!-- <div class="form-row">
-    	<div class="form-group col-md-12">
-    		{{ form.company | as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-12">
-    		{{ form.title | as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-6">
-    		{{ form.designation | as_crispy_field}}
-    	</div>
-    </div>
-    <div class="form-row">
-    	<div class="form-group col-md-6">
-    		{{ form.state | as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-6">
-    		{{ form.city | as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-12">
-    		{{ form.description | as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-12">
-    		{{ form.domain | as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-12">
-    		{{ form.benefits | as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-12">
-    		{{ form.requirements | as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-12">
-    		{{ form.shift_time| as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-12">
-    		{{ form.key_job_responsibilities | as_crispy_field}}
-    	</div>
-    	<div class="form-group col-md-12">
-    		{{ form.gender| as_crispy_field}}
-    </div>
-    	<div class="form-group col-md-12">
-    		{{ form.salary_range_min | as_crispy_field}}
-    <div>
+  {% csrf_token %}
+        <div class="row">
+          <div class="col-12 form-group">
+            {{ form.title | as_crispy_field }}
+          </div>
+          <div class="col-12 form-group">
+            {{ form.designation | as_crispy_field }}
+          </div>
+          <div class="col-md-6 form-group">
+            {{ form.company | as_crispy_field }}
+          </div>
+          <div class="col-md-6 form-group">
+            {{ form.domain | as_crispy_field }}
+          </div>
+          <div class="col-md-6 form-group">
+            {{ form.state_job | as_crispy_field }}
+          </div>
+          <div class="col-md-6 form-group">
+            {{ form.city_job | as_crispy_field }}
+          </div>
+          <div class="col-md-3 form-group">
+            {{ form.job_type | as_crispy_field }}
+         </div>
+          <div class="col-md-3 form-group">
+            {{ form.shift_time | as_crispy_field }}
+         </div>
+          <div class="col-md-2 form-group">
+            {{ form.salary_range_min | as_crispy_field }}
+         </div>
+          <div class="col-md-2 form-group" >
+            {{ form.salary_range_max | as_crispy_field }}
+         </div>
+         <div class="col-md-2 form-group">
+            {{ form.gender | as_crispy_field }}
+         </div>
 
-    	<div class="form-group col-md-12">
-    		{{ form.salary_range_max | as_crispy_field}}
-    <div>
-</div>
-</div> -->
-    <input type="submit" value="Submit">
+          <div class="col-12 form-group">
+            {{ form.description | as_crispy_field }}
+          </div>
+          <div class="col-12 form-group">
+            {{ form.key_job_responsibilities | as_crispy_field }}
+          </div>
+          <div class="col-12 form-group">
+            {{ form.requirements | as_crispy_field }}
+          </div>
+          <div class="col-12 form-group">
+            {{ form.benefits | as_crispy_field }}
+          </div>
+          <div class="col-md-4 form-group">
+            {{ form.last_app_date | as_crispy_field }}
+          </div>
+          <div class="col-md-4 form-group">
+            {{ form.rating | as_crispy_field }}
+          </div>
+          <div class="col-md-4 form-group">
+            {{ form.status | as_crispy_field }}
+          </div> 
+           
+        </div>
+        
+    <!-- Custom field widgets for Filter -->
+    <div class="row" hidden>
+          {{ form.foss | as_crispy_field }}
+          {{ form.institute_type | as_crispy_field }}
+          {{ form.state | as_crispy_field }}
+          {{ form.city | as_crispy_field }}
+        </div>
+    <div class="filter-header">
+      <p>Student Filter Criteria</p>
+    </div>
+    <div class="row">
+      <div class="col-lg-6">
+         <div class="custom-multi-select form-group">
+          <label>{{filter_form.foss.label }}</label>
+          <select id="foss-select" multiple>
+          {% for foss in filter_form.foss %} 
+          {{ foss }}
+          {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="custom-multi-select form-group">
+          <label>{{filter_form.institution_type.label }}</label>
+          <select class="custom-multi-select" id="insti-select" multiple="multiple">
+          {% for insti in filter_form.institution_type %} 
+          {{ insti }}
+          {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="custom-multi-select form-group">
+        <label>{{filter_form.state.label }}</label>
+        <select class="custom-multi-select" id="state-select" multiple="multiple">
+        {% for foss in filter_form.state %} 
+        {{ foss }}
+        {% endfor %}
+        </select>
+      </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="custom-multi-select form-group">
+          <label>{{filter_form.city.label }}</label>
+          <select class="custom-multi-select"  id="city-select" multiple="multiple">
+          {% for foss in filter_form.city %} 
+          {{ foss }}
+          {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-3 form-group">
+        {{ filter_form.grade | as_crispy_field }}
+      </div>
+      <div class="col-lg-3 form-group">
+        {{ form.activation_status | as_crispy_field }}
+      </div>
+      <div class="col-lg-3 form-group">
+        {{ form.from_date | as_crispy_field }}
+      </div>
+      <div class="col-lg-3 form-group">
+        {{ form.to_date | as_crispy_field }}
+      </div>
+    </div>
+    <!-- Custom field widgets for Filter ends-->
+    <input type="submit" value="Submit" id="job-submit">
 </form>
 
 {% endblock %}
 {% block js %}
-<script  src="{% static 'Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script  src="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
   $( document ).ready(function() {
-
-    $('.demo').dropdown({
-  // options here
-  multipleMode:'label'
+   $('.custom-multi-select').dropdown({multipleMode:'label'});
+   $( "#job-submit" ).click(function() {
+  var foss = $('#foss-select').val(); 
+  var insti_type = $('#insti-select').val(); 
+  var states = $('#state-select').val(); 
+  var cities = $('#city-select').val(); 
+  $('#id_foss').val(foss.toString());
+  $('#id_institute_type').val(insti_type.toString());
+  $('#id_state').val(states.toString());
+  $('#id_city').val(cities.toString());
 
 });
-
-    $( "#b" ).click(function() {
-  alert( "Handler for .click() called." );
-  var res = $('.dropdown-selected').text();
-  console.log(typeof res);
-  console.log( res);
-  var res1 = $('.dropdown-chose').text();
-  console.log(typeof res1);
-  console.log( res1);
-
-  var x =[];
-$('.dropdown-chose').each(function(index, obj)
-{
-  x.push($(this).text());
-});
-
-console.log(x);
-});
-
-    $('select').on('change', function() {
-  console.log('changes');
-    var selectedValues = $(this).val();  
-      var foo = $('#skills').val(); 
-      console.log(selectedValues);
-     console.log(foo);
-});
-//     $('#skills').change(function() {
-      
-// });
    
 });
 </script>

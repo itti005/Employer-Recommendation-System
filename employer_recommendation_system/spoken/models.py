@@ -27,6 +27,8 @@ class SpokenUser(models.Model):
         db_table = 'auth_user'
         #app_label = 'spoken'
 
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
 
 class SpokenStudent(models.Model):
     gender = models.CharField(max_length=15)
@@ -39,9 +41,10 @@ class SpokenStudent(models.Model):
     class Meta:
         db_table = 'events_student'
         #app_label = 'spoken'
+        managed = False
 
 
-class State(models.Model):
+class SpokenState(models.Model):
     code = models.CharField(max_length=3)
     name = models.CharField(max_length=50)
     slug = models.CharField(max_length=100)
@@ -55,11 +58,11 @@ class State(models.Model):
     class Meta:
         managed = False
         db_table = 'events_state'
-        unique_together = (('code', 'name'),)
+        # unique_together = (('code', 'name'),)
     def __str__(self):
         return self.name
 class District(models.Model):
-    state = models.ForeignKey('State', models.DO_NOTHING)
+    state = models.ForeignKey(SpokenState, models.DO_NOTHING)
     code = models.CharField(max_length=3)
     name = models.CharField(max_length=200)
     created = models.DateTimeField(blank=True, null=True)
@@ -84,8 +87,8 @@ class Location(models.Model):
         unique_together = (('name', 'district', 'pincode'),)
 
 
-class City(models.Model):
-    state = models.ForeignKey('State', models.DO_NOTHING)
+class SpokenCity(models.Model):
+    state = models.ForeignKey(SpokenState, models.DO_NOTHING)
     name = models.CharField(max_length=200)
     created = models.DateTimeField(blank=True, null=True)
     updated = models.DateTimeField(blank=True, null=True)
@@ -113,7 +116,7 @@ class InstituteType(models.Model):
 
 class AcademicCenter(models.Model):
     user = models.ForeignKey(SpokenUser, on_delete=models.PROTECT , db_column='user_id')
-    state = models.ForeignKey(State, on_delete=models.PROTECT )
+    state = models.ForeignKey(SpokenState, on_delete=models.PROTECT )
     institution_type = models.ForeignKey(InstituteType, on_delete=models.PROTECT )
     #institute_category = models.ForeignKey(InstituteCategory, on_delete=models.PROTECT )
     #university = models.ForeignKey(University, on_delete=models.PROTECT )
@@ -121,7 +124,7 @@ class AcademicCenter(models.Model):
     institution_name = models.CharField(max_length=200)
     district = models.ForeignKey(District, on_delete=models.PROTECT )
     location = models.ForeignKey(Location, null=True, on_delete=models.PROTECT )
-    city = models.ForeignKey(City, on_delete=models.PROTECT )
+    city = models.ForeignKey(SpokenCity, on_delete=models.PROTECT )
     address = models.TextField()
     pincode = models.PositiveIntegerField()
     resource_center = models.BooleanField()
@@ -163,6 +166,10 @@ class TestCategory(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        managed = False
+        db_table = 'events_testcategory'
+
 class Invigilator(models.Model):
     user = models.OneToOneField(SpokenUser, on_delete=models.PROTECT )
     appoved_by = models.ForeignKey(SpokenUser,related_name = 'invigilator_approved_by',blank=True,null=True,  on_delete=models.PROTECT )
@@ -175,6 +182,10 @@ class Invigilator(models.Model):
     def __str__(self):
         return self.user.username
 
+    class Meta:
+        managed = False
+        db_table = 'events_invigilator'
+
 class Department(models.Model):
     name = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add = True)
@@ -182,6 +193,10 @@ class Department(models.Model):
 
     class Meta:
         managed = False
+
+    class Meta:
+        managed = False
+        db_table = 'events_department'
 
 class TrainingRequest(models.Model):
     training_planner = models.BigIntegerField()
@@ -202,7 +217,9 @@ class TrainingRequest(models.Model):
     created = models.DateTimeField(auto_now_add = True)
     updated = models.DateTimeField(auto_now = True)
 
-
+    class Meta:
+        managed = False
+        db_table = 'events_trainingrequest'
 
 class FossCategory(models.Model):
     foss = models.CharField(unique=True, max_length=255)
@@ -231,11 +248,11 @@ class Test(models.Model):
     # test_category = models.BigIntegerField()
     appoved_by = models.ForeignKey(SpokenUser, models.DO_NOTHING, blank=True, null=True)
     # appoved_by = models.BigIntegerField()
-    invigilator = models.ForeignKey('Invigilator', models.DO_NOTHING, blank=True, null=True)
+    invigilator = models.ForeignKey(Invigilator, models.DO_NOTHING, blank=True, null=True)
     # invigilator = models.BigIntegerField()
     #academic = models.ForeignKey('Academiccenter', models.DO_NOTHING)
     academic = models.ForeignKey(AcademicCenter, on_delete=models.PROTECT ) 
-    training = models.ForeignKey('Trainingrequest', models.DO_NOTHING, blank=True, null=True)
+    training = models.ForeignKey(TrainingRequest, models.DO_NOTHING, blank=True, null=True)
     # training = models.BigIntegerField()
     #foss = models.ForeignKey('CreationFosscategory', models.DO_NOTHING)
     foss = models.ForeignKey(FossCategory, on_delete=models.PROTECT )
@@ -293,9 +310,9 @@ class Profile(models.Model):
     #location_id = models.BigIntegerField()
     district = models.ForeignKey(District, models.DO_NOTHING, blank=True, null=True)
     #district_id = models.BigIntegerField()
-    city = models.ForeignKey(City, models.DO_NOTHING, blank=True, null=True)
+    city = models.ForeignKey(SpokenCity, models.DO_NOTHING, blank=True, null=True)
     #city_id = models.BigIntegerField()
-    state = models.ForeignKey(State, models.DO_NOTHING, blank=True, null=True)
+    state = models.ForeignKey(SpokenState, models.DO_NOTHING, blank=True, null=True)
     #state_id = models.BigIntegerField()
     country = models.CharField(max_length=255, blank=True, null=True)
     pincode = models.PositiveIntegerField(blank=True, null=True)

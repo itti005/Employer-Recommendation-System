@@ -1,5 +1,6 @@
 {% extends 'emp/base.html' %}
 {% load crispy_forms_tags %}
+{% load helper %}
 {% block content-header %}Company List{% endblock %}
 {% block content %}
 {% for message in messages %}
@@ -7,15 +8,67 @@
                 {{ message|safe }}
             </div>
         {% endfor %}
+{% for contact in page_obj %}
+    {# Each "contact" is a Contact model object. #}
+    {{ contact.full_name|upper }}<br>
+    
+{% endfor %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+    {% if is_paginated %}
+  {% if page_obj.has_previous %}
+    <a href="?{% param_replace page=1 %}">First</a>
+    {% if page_obj.previous_page_number != 1 %}
+      <a href="?{% param_replace page=page_obj.previous_page_number %}">Previous</a>
+    {% endif %}
+  {% endif %}
+
+  Page {{ page_obj.number }} of {{ paginator.num_pages }}
+
+  {% if page_obj.has_next %}
+    {% if page_obj.next_page_number != paginator.num_pages %}
+      <a href="?{% param_replace page=page_obj.next_page_number %}">Next</a>
+    {% endif %}
+    <a href="?{% param_replace page=paginator.num_pages %}">Last</a>
+  {% endif %}
+
+  <p>Objects {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
+{% endif %}
+    <a href="?page=2">Goto page 2</a>
+
+<form action="" method="get">
+    {{ filterset.form.as_p }}
+    <input type="submit" />
+  </form>
 <ul class="list-group">
+
 {% for company in object_list %}
     <li class="list-group-item">
     	<a href="{% url 'company-detail' slug=company.slug %}">{{ company.name }}</a>
     </li>
 {% empty %}
     <li>No companies yet.</li>
-{% endfor %}
 </ul>
+
+
+{% endfor %}
 {% endblock %}
 
 

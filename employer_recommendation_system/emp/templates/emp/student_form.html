@@ -16,6 +16,34 @@
 {% endblock %}
 
 {% block content %}
+{% if confirm %}
+<div class="row">
+  <div class="col-sm-8">
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="max-width: 100%;">
+  <div class="toast-header">
+    <img src="{{ job.company.logo.url|default_if_none:'#' }}" class="rounded mr-2" style="width: auto;height: 20px;">
+    <strong class="mr-auto">{{job.title}}</strong>
+    <i class="far fa-check-square" style="color: green;"></i>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+    Your application is successfully submitted !
+  </div>
+</div>
+  </div>
+  
+</div>
+
+<div class="mt-5">
+  <p><b>Below profile details will be sent to the company.</b></p>
+  <div class="row">
+    <div class="col-md-6" id="confirm"><button id="confirm-btn" type="button" class="btn btn-outline-success" onclick="apply_for_job('{{request.user.student.spk_usr_id}}','{{job_id}}');" >Confirm & Apply</button></div>
+    <div class="col-md-6" id="modify"><button type="button" class="btn btn-outline-info" >Modify</button></div>
+  </div>
+</div>
+{% endif %}
 <form class="py-5">
 	<div class="form-row">
 		<div class="col-sm-8">
@@ -96,12 +124,12 @@
 		</div>
 	</div>
 </form>
-<form method="post">
+<form method="post" id="form-student">
 	<div class="form-row">
     	<div class="col-sm-8">
     		<div class="demo mb-3">
           <label>{{ form.skills.label_tag }}</label>
-  			<select multiple>
+  			<select multiple >
   			{% for skill in skills %}	
   			<option value="{{skill.id}}">{{skill.name}}</option>
   			{% endfor %}
@@ -145,9 +173,17 @@
     	<div class="col-sm-2">
       	{{ education_form.gpa | as_crispy_field }}
     	</div>
+      <div class="col-12">
+        <div class="container" >
+          <div class='element' id='div_0'>
+            <span class='add'>Add Education</span>
+          </div>
+        </div>
+      </div>
 	</div>
 	{% csrf_token %}
-	<button type="submit" class="btn btn-primary mb-5" id="update_profile">Update Profile</button>
+
+	<button type="submit" class="btn btn-primary mb-5" id="update_profile" {% if confirm %} style="display: none;" {% endif %}>Update Profile</button>
 </form>
 {% endblock %}
 {% block js %}
@@ -155,40 +191,170 @@
 <script  src="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
 
 <script type="text/javascript">
+
+function apply_for_job(spk_user_id,job_id){
+    $.ajax({
+      url: "/add_student_job_status",
+      data: {
+        'job_id' : job_id,
+        'spk_user_id' : spk_user_id
+      },
+      dataType: 'json',
+      success:function(data){
+        var messages = data.msg
+        $('.toast').toast({'autohide':false});
+        $('.toast').toast('show') ;
+    }});
+  }
+
 $(document).ready(function() {
-	// alert('here')
+  $("#form-student :input").prop("disabled", true);
+    var degree_list = [];
+    var institute_list = [];
+    var start_year_list = [];
+    var end_year_list = [];
+    var current_index = 0;
     $('.js-example-basic-multiple').select2();
-
     $('.demo').dropdown({multipleMode:'label'});
+    $( "#modify" ).click(function() {
+    $("#"+this.id).hide();
+    $("#update_profile").show();
+    $("#form-student :input").prop("disabled", false);
 
+    });
 
     $( "#update_profile" ).click(function() {
-  // alert( "Handler for .click() called." );
 	 var res = $('.dropdown-selected').text();
-	 console.log(typeof res);
-	 console.log( res);
 	 var res1 = $('.dropdown-chose').text();
-	 console.log(typeof res1);
-	 console.log( res1);
 	 var x =[];
 	 $('.dropdown-chose').each(function(index, obj)
 	 {
 	  x.push($(this).text());
 	 });
-	alert(x);
-
 	$('#skills_m').val(x);
 	degree_id = $('#id_degree').val();
 	document.getElementById("id_degree").setAttribute('value',degree_id);
 	d=$('#id_degree option:selected').val();
 	$('select[name="degree"]').val(d);
-	alert(degree_id)
 	$('#id_degree').val(degree_id);
 	institute_id = $('#id_institute').val();
-	// $('#id_institute').val(institute_id);
 	document.getElementById("id_institute").setAttribute('value',institute_id);
-	// alert($('#skills_m').val())
 	});
+
+  // Add new element
+ $(".add").click(function(){
+  // Finding total number of elements added
+  var total_element = $(".element").length;
+  // last <div> with element class id
+  var lastid = $(".element:last").attr("id");
+  var split_id = lastid.split("_");
+  var nextindex = Number(split_id[1]) + 1;
+
+  var max = 5;
+  // Check total number elements
+  if(total_element < max ){
+   // Adding new div container after last occurance of element class
+   $(".element:last").after("<div class='element form-row' id='div_"+ nextindex +"'></div>");
+ 
+   // Adding element to <div>
+   $("#div_" + nextindex).append("" 
+    
+    + "<span id='remove_" 
+    + nextindex 
+    + "' class='remove'>X</span>"
+    + "<div class='col'><select class='form-control degree' id='id_degree_"
+    +nextindex +"' "+"name='degree_"+nextindex+"'"
+    +" '> </select></div>"
+    + "<div class='col'><select class='form-control institute' id='id_institute_"
+    +nextindex +"' "+"name='institute_"+nextindex+"'"
+    +" '> </select></div>"
+    + "<div class='col'><select class='form-control start_year' id='id_start_year_"
+    +nextindex +"' "+"name='start_year_"+nextindex+"'"
+    +" '> </select></div>"
+    + "<div class='col'><select class='form-control end_year' id='id_end_year_"
+    +nextindex +"' "+"name='end_year_"+nextindex+"'"
+    +" '> </select></div>"
+    +"<div class='col'><input type='text' class='form-control gpa' id='id_gpa_"
+    +nextindex +"' "+"name='gpa_"+nextindex+"'"
+    +" '></div>"
+    );
+
+   current_index = nextindex;
+ 
+  }
+  if (total_element==1) {
+    $.ajax({
+      url: "/fetch_education_data",
+      data: {
+        
+      },
+      dataType: 'json',
+      success:function(data){
+        var degrees = data.degrees;
+        degree_list = data.degrees;
+        institute_list = data.institutes;
+        for(i=2000;i<2022;i++){
+          start_year_list.push(i);
+          end_year_list.push(i+1);
+        }
+    }});
+  } 
+ });
+
+$(document).on( 'click', '.degree', function () { 
+var options = '';
+  $.each(degree_list, function (i, item) {
+    options += '<option value="' + item.id + '">' + item.name + '</option>';
+});
+    degree_vals = $(this).val();
+    if (degree_vals==null) {
+      $(this).append(options);
+    }
+    
+ });
+$(document).on( 'click', '.institute', function () { 
+var options = '';
+  $.each(institute_list, function (i, item) {
+    options += '<option value="' + item.id + '">' + item.institution_name + '</option>';
+});
+    institute_vals = $(this).val();
+    if (institute_vals==null) {
+      $(this).append(options);
+    }
+    
+ });
+
+$(document).on( 'click', '.start_year', function () { 
+var options = '';
+  $.each(start_year_list, function (i, item) {
+    options += '<option value="' + item + '">' + item + '</option>';
+});
+    institute_vals = $(this).val();
+    if (institute_vals==null) {
+      $(this).append(options);
+    }
+ });
+
+$(document).on( 'click', '.end_year', function () { 
+var options = '';
+  $.each(end_year_list, function (i, item) {
+    options += '<option value="' + item + '">' + item + '</option>';
+});    
+    institute_vals = $(this).val();
+    if (institute_vals==null) {
+      $(this).append(options);
+    }
+ });
+
+ // Remove element
+ $('.container').on('click','.remove',function(){ 
+  var id = this.id;
+  var split_id = id.split("_");
+  var deleteindex = split_id[1];
+
+  $("#div_" + deleteindex).remove();
+
+ }); 
 
 });
 </script>
