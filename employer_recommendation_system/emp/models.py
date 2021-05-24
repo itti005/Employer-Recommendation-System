@@ -6,7 +6,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from spoken.models import AcademicCenter
 import os
-from spoken.models import SpokenUser
+from spoken.models import SpokenUser, SpokenState, SpokenCity
 
 
 # Create your models here.
@@ -42,29 +42,6 @@ class JobType(models.Model):
     type = models.CharField(max_length=200)
     def __str__(self):
         return self.type
-
-class State(models.Model):
-    code = models.CharField(max_length=3)
-    name = models.CharField(max_length=50)
-    slug = models.CharField(max_length=100)
-    latitude = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
-    longtitude = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
-    img_map_area = models.TextField()
-    created = models.DateTimeField(blank=True, null=True)
-    updated = models.DateTimeField(blank=True, null=True)
-    has_map = models.IntegerField()
-
-    def __str__(self):
-        return self.name
-
-class City(models.Model):
-    state = models.ForeignKey(State, models.DO_NOTHING)
-    name = models.CharField(max_length=200)
-    created = models.DateTimeField(blank=True, null=True)
-    updated = models.DateTimeField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
 
 class Skill(models.Model):
     name = models.CharField(max_length=240)
@@ -128,8 +105,8 @@ class Company(models.Model):
     name = models.CharField(max_length=200)
     emp_name = models.CharField(max_length=200) #Name of the company representative
     emp_contact = models.CharField(max_length=200) #Contact of the company representative
-    state = models.ForeignKey(State,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    city = models.ForeignKey(City,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
+    state_c = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
+    city_c = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     address = models.CharField(max_length=250) #Company Address for correspondence
     phone = models.CharField(max_length=15) #Contact of the company representative
     email = models.EmailField(null=True,blank=True) #Email for correspondence
@@ -159,8 +136,8 @@ class Company(models.Model):
 class Job(models.Model):
     title = models.CharField(max_length=250)
     designation = models.CharField(max_length=250)
-    state_job = models.ForeignKey(State,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    city_job = models.ForeignKey(City,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
+    state_job = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
+    city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     skills = models.CharField(max_length=400,null=True,blank=True)
     description = models.TextField(null=True,blank=True)
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
@@ -204,12 +181,12 @@ class Job(models.Model):
 
 class JobShortlist(models.Model):
     # user=models.ForeignKey(User,on_delete=models.CASCADE)
-    spk_user=models.ForeignKey(SpokenUser,on_delete=models.CASCADE)
+    spk_user=models.IntegerField(null=True)  #spk
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, null=True,blank=True)
     status = models.IntegerField(null=True,blank=True)
 
     def __str__(self):
-        return self.spk_user.username+'-'+self.job.title
+        return self.spk_user+'-'+self.job.title
 
 
