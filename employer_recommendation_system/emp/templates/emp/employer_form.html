@@ -9,7 +9,7 @@
              {{ message|safe }}
          </div>
      {% endfor %}
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" >
   
     <!-- Security token -->
     {% csrf_token %}
@@ -30,10 +30,10 @@
     		{{ form.email | as_crispy_field }}
     	</div>
     	<div class="col-md-6 form-group">
-    		{{ form.state | as_crispy_field }}
+    		{{ form.state_c | as_crispy_field }}
     	</div>
     	<div class="col-md-6 form-group">
-    		{{ form.city | as_crispy_field }}
+    		{{ form.city_c | as_crispy_field }}
     	</div>
     	<div class="col-12 form-group">
     		{{ form.address | as_crispy_field }}
@@ -62,7 +62,24 @@
     	</div>
     </div>
       
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" id="company_form">
 </form>
 
 {% endblock %}
+{% block js %}
+<script type = "text/javascript">
+  
+    $("#company_form").click(function(){
+        state = $('#id_state_c').val();
+        city = $('#id_city_c').val();
+        console.log(state);
+        console.log(city);
+        });
+
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();
+      hide_reject_labels();
+      });
+</script>
+{% endblock %}
+
