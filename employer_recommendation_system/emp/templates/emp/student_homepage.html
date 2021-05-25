@@ -20,8 +20,10 @@
 {% for company in company_display %}
 <div class="col-lg-3 col-sm-6">  
   <div class="border-top border-bottom d-flex flex-column p-3">
+    {% if company.logo %}
     <img class="d-block align-self-center m-2" src="{{ company.logo.url|default_if_none:'#' }}" alt="Card image cap" 
     style=" height: 100px;display: inline;">
+    {% endif %}
   </div>
 </div>
 {% endfor %}
@@ -40,7 +42,9 @@
 <div class="card" style="width: 18rem;">
   <div class="card-body">
     <div class="d-flex justify-content-between">
+      {% if company.logo %}
       <img class="card-img-top" src="{{ job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" style="width: auto;height: 40px;">
+      {% endif %}
       <div>
     <small> </small>
       </div>
@@ -80,7 +84,9 @@
 <div class="card" style="width: 18rem;">
   <div class="card-body">
     <div class="d-flex justify-content-between">
+      {% if company.logo %}
       <img class="card-img-top" src="{{ js.job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" style="width: auto;height: 40px;">
+      {% endif %}
       <div>
     <small> </small>
       </div>

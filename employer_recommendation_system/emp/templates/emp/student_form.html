@@ -163,6 +163,17 @@
     	<div class="col-sm-4">
       	{{ education_form.institute | as_crispy_field }}
     	</div>
+      <!-- <div class="d-none"><input type="text" id="institute" name="institute"></div> -->
+      <div class="col-md-6 form-group">
+            <div class="form-group">
+                <label for="state">Institutes</label>
+                <select class="form-control" id="institute-select">
+                  {% for i in institutes %} 
+                    <option value="{{i.id}}">{{ i.institution_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+      </div>
     	<div class="col-sm-4"></div>
     	<div class="col-sm-3">
       	{{ education_form.start_year | as_crispy_field }}
@@ -208,7 +219,7 @@ function apply_for_job(spk_user_id,job_id){
   }
 
 $(document).ready(function() {
-  $("#form-student :input").prop("disabled", true);
+  // $("#form-student :input").prop("disabled", true);
     var degree_list = [];
     var institute_list = [];
     var start_year_list = [];
@@ -219,11 +230,13 @@ $(document).ready(function() {
     $( "#modify" ).click(function() {
     $("#"+this.id).hide();
     $("#update_profile").show();
-    $("#form-student :input").prop("disabled", false);
+    // $("#form-student :input").prop("disabled", false);
 
     });
 
     $( "#update_profile" ).click(function() {
+      insti = $('#institute-select').val();
+      $('#id_institute').val(parseInt(insti));
 	 var res = $('.dropdown-selected').text();
 	 var res1 = $('.dropdown-chose').text();
 	 var x =[];
@@ -237,8 +250,8 @@ $(document).ready(function() {
 	d=$('#id_degree option:selected').val();
 	$('select[name="degree"]').val(d);
 	$('#id_degree').val(degree_id);
-	institute_id = $('#id_institute').val();
-	document.getElementById("id_institute").setAttribute('value',institute_id);
+	// institute_id = $('#id_institute').val();
+	// document.getElementById("id_institute").setAttribute('value',institute_id);
 	});
 
   // Add new element

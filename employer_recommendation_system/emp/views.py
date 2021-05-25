@@ -75,6 +75,7 @@ def student_homepage(request):
     context['awaiting_jobs'] = get_awaiting_jobs(rec_student.spk_usr_id)[:5]
     context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
     context['rec_jobs']=get_recommended_jobs(rec_student)
+
     
     try:
          spk_student = SpokenStudent.objects.using('spk').filter(user_id=rec_student.spk_usr_id).get()
@@ -170,7 +171,12 @@ class StudentGradeFilter(FormView):
             except FossMdlCourses.DoesNotExist:
                 return None
         return None
+def get_state_city_lst():
+    states = SpokenState.objects.all()
+    cities = SpokenCity.objects.all()
+    return states, cities
 #---------------- CBV for Create, Detail, List, Update for Company starts ----------------#
+
 class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     template_name = 'emp/employer_form.html'
     permission_required = 'emp.add_company'
@@ -186,6 +192,17 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         return super(ModelFormMixin, self).form_valid(form)
     def test_func(self):
         return self.request.user.groups
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        state,city = get_state_city_lst()
+        context['state']=state
+        context['city']=city
+        return context
+    def form_invalid(self, form):
+        print(f"form.errors ------------------- : {form.errors}")
+        return self.render_to_response(self.get_context_data(form=form))
+
+
 
 class CompanyDetailView(PermissionRequiredMixin,DetailView):
     template_name = 'emp/employer_detail.html'
@@ -247,7 +264,9 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         context = super().get_context_data(**kwargs)
         # get data for filters
         filter_form = StudentGradeFilterForm()
-        state = SpokenState.objects.values_list('id','name')
+        state,city = get_state_city_lst()
+        context['state']=state
+        context['city']=city
         context['filter_form']=filter_form
         return context
 
@@ -311,6 +330,7 @@ def save_student_profile(request,student):
         student.github = student_form.cleaned_data['github']
         student.experience = student_form.cleaned_data['experience']
         student.linkedin = student_form.cleaned_data['linkedin']
+        #student.spk_institute = student_form.cleaned_data['spk_institute']
         student.save()
         skills = request.POST['skills_m']
         if skills:
@@ -321,11 +341,11 @@ def save_student_profile(request,student):
         degree = request.POST['degree']
         degree_obj = Degree.objects.get(id=degree)
         institute = request.POST['institute']
-        institute_obj = AcademicCenter.objects.get(id=institute)
+        #institute_obj = AcademicCenter.objects.get(id=institute)
         start_year = education_form.cleaned_data['start_year']
         end_year = education_form.cleaned_data['end_year']
         gpa = education_form.cleaned_data['gpa']
-        education = Education(degree=degree_obj,institute=institute_obj,start_year=start_year,end_year=end_year,gpa=gpa)
+        education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
         for i in range(1,6):
             try:
                 degree = request.POST['degree_'+str(i)]
@@ -371,6 +391,8 @@ def student_profile(request,pk):
         education_form = EducationForm()
     context['form']=student_form
     context['education_form']=education_form
+    institutes = AcademicCenter.objects.values('id','institution_name')
+    context['institutes'] = institutes
     return render(request,'emp/student_form.html',context)
 
 def fetch_education_data(request):
