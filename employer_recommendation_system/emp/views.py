@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 from .models import *
 from emp.models import Student as RecStudent
-from spoken.models import TestAttendance, FossMdlCourses,FossCategory,Profile
+from spoken.models import TestAttendance, FossMdlCourses,FossCategory,Profile, SpokenState, SpokenCity
 from moodle.models import MdlQuizGrades
 from django.views.generic.edit import UpdateView
 from spoken.models import SpokenStudent 
@@ -147,8 +147,8 @@ class StudentGradeFilter(FormView):
                 test_attendance=TestAttendance.objects.using('spk').filter(
                     mdluser_id__in=list(dictgrade.keys()),
                     mdlquiz_id__in=[f.mdlquiz_id for f in fossmdl],
-                    test__academic__state__in=state if state else State.objects.using('spk').all(),
-                    test__academic__city__in=city if city else City.objects.using('spk').all(),
+                    test__academic__state__in=state if state else SpokenState.objects.using('spk').all(),
+                    test__academic__city__in=city if city else SpokenCity.objects.using('spk').all(),
                     status__gte=3, 
                     test__academic__institution_type__in=institution_type if institution_type else InstituteType.objects.using('spk').all(), 
                     test__academic__status__in=[activation_status] if activation_status else [1,3]
@@ -165,10 +165,6 @@ class StudentGradeFilter(FormView):
                         dictgrade[test_attendance[i].mdluser_id][test_attendance[i].mdlquiz_id][1] = True
                         filter_ta.append(test_attendance[i])
                         filter_user_id+=str(test_attendance[i].student.user.id) +','
-                print(filter_user_id)
-                print(filter_user_id[:-1])
-                print(f"--------------------------{len(filter_ta)}")
-                print(filter_ta)
                
                 return {'mdl_user_grade': dictgrade, 'test_attendance': filter_ta, "count":len(filter_ta),"filter_user_id":filter_user_id[:-1]}
             except FossMdlCourses.DoesNotExist:
@@ -190,6 +186,7 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         return super(ModelFormMixin, self).form_valid(form)
     def test_func(self):
         return self.request.user.groups
+
 class CompanyDetailView(PermissionRequiredMixin,DetailView):
     template_name = 'emp/employer_detail.html'
     permission_required = 'emp.view_company'
@@ -197,6 +194,7 @@ class CompanyDetailView(PermissionRequiredMixin,DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
 class CompanyListView(PermissionRequiredMixin,ListView):
     template_name = 'emp/employer_list.html'
     permission_required = 'emp.view_company'
@@ -228,17 +226,21 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status']
     success_message ="%(title)s job was created successfully"
     def get_success_url(self):
+        print(1);
         return reverse('job-detail', kwargs={'slug': self.object.slug})
     
     def form_invalid(self, form):
+        print(2);
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
+        print(3);
         self.object = form.save(commit=False)
         self.object.save()
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_form(self):
+        print(4);
         form = super(JobCreate, self).get_form()
         form.fields['last_app_date'].widget = DateInput()
         form.fields['from_date'].widget = DateInput()
@@ -246,10 +248,11 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         return form
 
     def get_context_data(self, **kwargs):
+        print(5);
         context = super().get_context_data(**kwargs)
         # get data for filters
         filter_form = StudentGradeFilterForm()
-        state = State.objects.values_list('id','name')
+        state = SpokenState.objects.values_list('id','name')
         context['filter_form']=filter_form
         return context
 
@@ -469,8 +472,8 @@ def check_student_eligibilty(request):
                 test_attendance=TestAttendance.objects.filter(
                         student=student,
                         mdlquiz_id__in=filter_quiz_ids,
-                        test__academic__state__in=state if state else State.objects.using('spk').all(),
-                        test__academic__city__in=city if city else City.objects.using('spk').all(), 
+                        test__academic__state__in=state if state else SpokenState.objects.using('spk').all(),
+                        test__academic__city__in=city if city else SpokenCity.objects.using('spk').all(), 
                         test__academic__institution_type__in=institution_type if institution_type else InstituteType.objects.using('spk').all(), 
                         test__academic__status__in=[activation_status] if activation_status else [1,3]
                         )
