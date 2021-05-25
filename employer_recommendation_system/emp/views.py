@@ -175,7 +175,7 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     template_name = 'emp/employer_form.html'
     permission_required = 'emp.add_company'
     model = Company
-    fields = ['name','emp_name','emp_contact','state','city','address','phone','email','logo','description','domain','company_size','website','rating','status'] 
+    fields = ['name','emp_name','emp_contact','state_c','city_c','address','phone','email','logo','description','domain','company_size','website','rating','status'] 
     success_message ="%(company_name)s was created successfully"
     def get_success_url(self):
         return reverse('company-detail', kwargs={'slug': self.object.slug})
@@ -214,7 +214,7 @@ class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/employer_update_form.html'
     permission_required = 'emp.change_company'
     model = Company
-    fields = ['name','emp_name','emp_contact','state','city','address','phone','email','logo','description','domain','company_size','website'] 
+    fields = ['name','emp_name','emp_contact','state_c','city_c','address','phone','email','logo','description','domain','company_size','website'] 
     success_message ="%(name)s was updated successfully"
 #---------------- CBV for Create, Detail, List, Update for Jobs starts ----------------#
 class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
@@ -226,21 +226,17 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status']
     success_message ="%(title)s job was created successfully"
     def get_success_url(self):
-        print(1);
         return reverse('job-detail', kwargs={'slug': self.object.slug})
     
     def form_invalid(self, form):
-        print(2);
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
-        print(3);
         self.object = form.save(commit=False)
         self.object.save()
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_form(self):
-        print(4);
         form = super(JobCreate, self).get_form()
         form.fields['last_app_date'].widget = DateInput()
         form.fields['from_date'].widget = DateInput()
@@ -248,7 +244,6 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         return form
 
     def get_context_data(self, **kwargs):
-        print(5);
         context = super().get_context_data(**kwargs)
         # get data for filters
         filter_form = StudentGradeFilterForm()
@@ -479,13 +474,11 @@ def check_student_eligibilty(request):
                         )
                 ta_quizes = [ ta.mdlquiz_id for ta in test_attendance]
                 if(sorted(set(ta_quizes))==sorted(set(filter_quiz_ids))):
-                    print(4)
                     flag = True
                     data['is_eligible'] = flag
                     return JsonResponse(data)
 
     except IndexError as e:
-        print(5)
         print(e)
 
     data['is_eligible'] = flag
