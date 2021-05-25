@@ -33,11 +33,31 @@
           <div class="col-md-6 form-group">
             {{ form.domain | as_crispy_field }}
           </div>
-          <div class="col-md-6 form-group">
+          <div class="col-md-6 form-group d-none">
             {{ form.state_job | as_crispy_field }}
           </div>
-          <div class="col-md-6 form-group">
+          <div class="col-md-6 form-group d-none">
             {{ form.city_job | as_crispy_field }}
+          </div>
+          <div class="col-md-6 form-group">
+            <div class="form-group">
+                <label for="state">State</label>
+                <select class="form-control" id="state">
+                  {% for s in state %} 
+                    <option value="{{s.id}}">{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+          </div>
+          <div class="col-md-6 form-group">
+            <div class="form-group">
+                    <label for="city">City</label>
+                    <select class="form-control" id="city">
+                      {% for c in city %} 
+                        <option value="{{c.id}}">{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
           </div>
           <div class="col-md-3 form-group">
             {{ form.job_type | as_crispy_field }}
@@ -153,6 +173,9 @@
 <script  src="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
+  $("#company_form").click(function(){
+        
+        });
   $( document ).ready(function() {
    $('.custom-multi-select').dropdown({multipleMode:'label'});
    $( "#job-submit" ).click(function() {
@@ -164,6 +187,11 @@
   $('#id_institute_type').val(insti_type.toString());
   $('#id_state').val(states.toString());
   $('#id_city').val(cities.toString());
+
+  state = $('#state').val();
+  city = $('#city').val();
+  $('#id_state_job').val(parseInt(state));
+  $('#id_city_job').val(parseInt(city));
 
 });
    
