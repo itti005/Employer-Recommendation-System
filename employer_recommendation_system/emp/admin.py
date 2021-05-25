@@ -34,7 +34,3 @@ admin.site.register(Job,JobAdmin)
 admin.site.register(JobShortlist,JobShortlistAdmin)
 admin.site.register(Education,EducationAdmin)
 admin.site.register(Skill,SkillAdmin)
-
-
-admin.site.register(State)
-admin.site.register(City)

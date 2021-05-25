@@ -23,7 +23,7 @@ class SpokenUser(models.Model):
     date_joined = models.DateTimeField()
 
     class Meta:
-        # managed = False
+        managed = False
         db_table = 'auth_user'
         #app_label = 'spoken'
 
@@ -190,9 +190,6 @@ class Department(models.Model):
     name = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add = True)
     updated = models.DateTimeField(auto_now = True)
-
-    class Meta:
-        managed = False
 
     class Meta:
         managed = False
