@@ -11,16 +11,20 @@
 <table class="table table-bordered">
   <tbody>
     <tr>
+      <th scope="row">Company Name</th>
+      <td>{{object.name}}</td>
+    </tr>
+    <tr>
       <th scope="row">Sector</th>
       <td>{{object.domain}}</td>
     </tr>
     <tr>
       <th scope="row">State</th>
-      <td>{{object.state}}</td>
+      <td>{{company_state}}</td>
     </tr>
     <tr>
       <th scope="row">City</th>
-      <td>{{object.city}}</td>
+      <td>{{company_city}}</td>
     </tr>
     <tr>
       <th scope="row">Company Size</th>
@@ -56,7 +60,7 @@
     </tr>
     <tr>
       <th scope="row">Added By</th>
-      <td>{{object.added_by.user.email}}</td>
+      <td>{{object.added_by}}</td>
     </tr>
   </tbody>
 </table>

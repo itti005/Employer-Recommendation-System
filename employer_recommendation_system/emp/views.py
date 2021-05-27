@@ -18,6 +18,7 @@ from django.http import HttpResponse, JsonResponse
 from .filterset import CompanyFilterSet,JobFilter
 from .forms import ACTIVATION_STATUS
 import numpy as np
+from django.views.decorators.csrf import csrf_exempt
 
 
 APPLIED_SHORTLISTED = 1 # student has applied & is eligible for job
@@ -190,14 +191,17 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         self.object.added_by = self.request.user
         self.object.save()
         return super(ModelFormMixin, self).form_valid(form)
+    
     def test_func(self):
         return self.request.user.groups
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         state,city = get_state_city_lst()
         context['state']=state
         context['city']=city
         return context
+    
     def form_invalid(self, form):
         print(f"form.errors ------------------- : {form.errors}")
         return self.render_to_response(self.get_context_data(form=form))
@@ -210,6 +214,10 @@ class CompanyDetailView(PermissionRequiredMixin,DetailView):
     model = Company
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        company_state = SpokenState.objects.get(id=self.object.state_c)
+        company_city = SpokenCity.objects.get(id=self.object.city_c)
+        context['company_state']=company_state.name
+        context['company_city']=company_city.name
         return context
 
 class CompanyListView(PermissionRequiredMixin,ListView):
@@ -217,15 +225,22 @@ class CompanyListView(PermissionRequiredMixin,ListView):
     permission_required = 'emp.view_company'
     model = Company
     filterset_class = CompanyFilterSet
-    paginate_by = 2
+    paginate_by = 10
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filterset'] = self.filterset
+        context['filterset'] = self.collection
+        context['form'] = self.collection.form
         return context
+    
     def get_queryset(self):
         queryset = super().get_queryset()
-        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
-        return self.filterset.qs.distinct()
+        print("#############################",queryset, self.request.GET)
+        self.collection = self.filterset_class(self.request.GET, queryset=queryset)
+        print(self.collection.qs)
+        print("########################1")
+        return self.collection.qs.distinct()
+
 
 class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/employer_update_form.html'
@@ -506,3 +521,17 @@ def check_student_eligibilty(request):
     data['is_eligible'] = flag
     update_job_app_status(spk_user_id,job,flag)
     return JsonResponse(data)
+
+@csrf_exempt
+def ajax_state_city(request):
+    """ Ajax: Get the Colleges (Academic) based on District selected """
+    if request.method == 'POST':
+        print("$$$$$$$$$$$$  here")
+        state = request.POST.get('state')
+        cities = SpokenCity.objects.filter(id=state).order_by('name')
+        tmp = '<option value = None> --------- </option>'
+        if cities:
+            for i in cities:
+                tmp +='<option value='+str(i.id)+'>'+i.name+'</option>'
+        return HttpResponse(json.dumps(tmp), content_type='application/json')
+
