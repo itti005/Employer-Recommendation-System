@@ -89,6 +89,29 @@
 {% endblock %}
 {% block js %}
 <script type = "text/javascript">
+    $state = $('#state');
+    $state.change(function() {
+            var state = $(this).val();
+            alert(state)
+            if(state){
+                $.ajax({
+                    url: "/ajax-state-city/",
+                    type: "POST",
+                    data: {
+                        state : state
+                    },
+                    success: function(data) {
+                        if(data){
+                            $city.html(data);
+                            $city.removeAttr("disabled");
+                        } else{
+                            $city.attr("disabled", "disabled");
+                        }
+                    }
+                });
+            }
+        });
+
     $("#company_form").click(function(){
         state = $('#state').val();
         city = $('#city').val();

@@ -33,4 +33,5 @@ urlpatterns = [
     path('applied_jobs/', AppliedJobListView.as_view(), name='applied-job-list'),
     path('job/<slug:slug>/', JobDetailView.as_view(), name='job-detail'),
     path('job/<int:id>/status', JobShortlistListView.as_view(), name='job-shortlist'),
+    path('ajax-state-city/', views.ajax_state_city, name='ajax_state_city'),
         ]

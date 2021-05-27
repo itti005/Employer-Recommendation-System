@@ -5,7 +5,7 @@ class CompanyFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Company
-        fields = ['date_created']
+        fields = ['name']
 
     def __init__(self, data, *args, **kwargs):
         data = data.copy()
