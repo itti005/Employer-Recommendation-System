@@ -1,28 +1,58 @@
 {% extends 'emp/base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% load helper %}
 {% block content-header %}Job List{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}">
+<style type="text/css">
+  .scrollarea {
+    /*max-height: 100vh!important;*/
+  overflow-y: auto;
+}
+.main-c {
+  max-height: 100vh!important;
+  overflow-y: auto;
+  /*max-height: 100vh!important;*/
+  /*min-height: -webkit-fill-available;*/
+}
+.highlights{
+  min-height: 100%;
+}
+.job-pagination a,.job-num{
+  text-decoration: none;
+  border: 1px solid rgba(0,0,0,0.2);
+  padding:8px;
+  color: #0066A0;
+}
+.list-group-item.active{
+  background-color: #fff!important;
+  border: 1px solid #0066A0!important
+  
+}
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link{
+  color:black!important;
+}
+</style>
+{% endblock %}
 {% block content %}
-{% for message in messages %}
+<div class="main-c">
+  {% for message in messages %}
     <div class="text-center alert alert-{{ message.tags }}">
                 {{ message|safe }}
             </div>
         {% endfor %}
-<div class="row">
-    <div class="col-md-3">
-        <div>
-        <form>
-            {{filterset.form.as_ul}}    
-            <button type="submit">Search</button>
-        </form>
-         </div>
-    </div>
-    <div class="col-md-9">
+<div class="container-fluid">
+    
+ <div class="job-pagination mt-5">
 {% if is_paginated %}
-  {% if page_obj.has_previous %}
-    <a href="?{% param_replace page=1 %}">First</a>
+<div class="d-flex justify-content-between">
+  <div>
+    {% if page_obj.has_previous %}
+    <a href="?{% param_replace page=1 %}" >First</a>
     {% if page_obj.previous_page_number != 1 %}
-      <a href="?{% param_replace page=page_obj.previous_page_number %}">Previous</a>
+      <a class="page-item" href="?{% param_replace page=page_obj.previous_page_number %}"><span aria-hidden="true">&laquo;</span></a>
     {% endif %}
   {% endif %}
 
@@ -30,30 +60,237 @@
 
   {% if page_obj.has_next %}
     {% if page_obj.next_page_number != paginator.num_pages %}
-      <a href="?{% param_replace page=page_obj.next_page_number %}">Next</a>
+      <a href="?{% param_replace page=page_obj.next_page_number %}"><span aria-hidden="true">&raquo;</span></a>
     {% endif %}
     <a href="?{% param_replace page=paginator.num_pages %}">Last</a>
   {% endif %}
-
-  <p>Objects {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
+  </div>
+  <div class="job-num"><span>Jobs {{ page_obj.start_index }} — {{ page_obj.end_index }}</span></div>
+</div>
 {% endif %}
-        <ul class="list-group">
+</div>   
+  <!-- search filter  -->
+  <div>
+    <form method="get">
+    <div class="d-flex justify-content-between">
+      <div class="form-group ">
+      <label>FOSS or Job Title</label><br>
+      <select class="custom-single-select" id="keyword">
+        <option value="">All</option>
+        {% for kw in form.keyword %}
+        {{ kw }}
+        {% endfor %}
+      </select>
+    </div>
+      <div class="form-group ">
+        <label>Location</label><br>
+        <select class="custom-single-select" id="place">
+        <option value="">All</option>
+        {% for p in form.place %}
+        {{ p }}
+        {% endfor %}
+      </select>
+      </div>
+    <div class="form-group ">
+      <label>Company</label><br>
+      <select class="custom-single-select"  id="company">
+        <option value="">All</option>
+        {% for com in form.company %}
+        {{ com }}
+        {% endfor %}
+      </select>
+    </div>
+    <!-- <button type="button" class="btn btn-outline-success">Success</button> -->
+    <div>
+      <br>
+      <button type="submit" class="btn btn-outline-success btn-sm" id="search-job" >
+      <span><i class="bi bi-search"></i>Search</span>
+    </button>
+    </div>
+    
+    </div>
+      <input type="text" id="id_place" name="place" class="d-none">
+      <input type="text" id="id_keyword" name="keyword" class="d-none">
+      <input type="text" id="id_company" name="company" class="d-none">
+      <!-- <button type="submit" class="btn btn-primary" id="search-job" >Search</button> -->
+  </form>
+  </div>
+  
+  <!-- search filter  ends-->
+  <div class="row">
+  <div class="col-3">
+    <div class="nav flex-column nav-pills list-group" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+      {% for job in object_list %}
+      <a class="nav-link list-group-item list-group-item-action" id="job-tab-{{job.id}}" data-toggle="pill" href="#job-detail-{{job.id}}" role="tab" aria-controls="v-pills-{{job.id}}" aria-selected="false">{{job.title}}</a>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-9">
+    <div class="tab-content" id="v-pills-tabContent">
+      {% for job in object_list %}
+      <div class="tab-pane fade" id="job-detail-{{job.id}}" role="tabpanel" aria-labelledby="job-tab-{{job.id}}">{{job.description}}</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<div class="row">
+  <!-- <div class="d-flex align-items-start"> -->
+    <div class="row align-items-start">
+  <div class="col-4 nav  nav-pills me-3 list-group list-group-flush border-bottom scrollarea" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+    {% for job in object_list %}
+            <a class="nav-link list-group-item list-group-item list-group-item-action  py-3 lh-tight" id="v-pills-home-tab" data-bs-toggle="pill" href="#job_detail_{{job.id}}"  role="tab" aria-controls="v-pills-home" aria-selected="true"><div class="d-flex w-100 align-items-center justify-content-between">
+          {% if job.company.logo %}
+    <img class="d-block align-self-center m-2" src="{{ job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" 
+    style=" height: 50px;display: inline;">
+    {% endif %}
+          <div><strong class="mb-1">{{job.title}}</strong>
+            <div class="col-10 mb-1 small">{{job.company.name}}<br>{{job.state}} , {{job.city}}</div>
+          </div>
+          <small><i class="bi bi-bookmark"></i></small>
+        </div>
+        </a>
+        {% empty %}
+            <li>No jobs yet.</li>
+        {% endfor %}
+  </div>
+  <div class="col-6 tab-content flex-fill ">
+    {% for job in object_list %}
+            <div class="tab-pane fade show " id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
+              <div class="d-flex">
+                <div class="">
+                  {% if job.company.logo %}
+    <img class="d-block align-self-center m-2" src="{{ job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" 
+    style=" height: 50px;display: inline;">
+    {% endif %}
+                </div>
+                <div class="">
+                  <p>{{job.company.name}}<br>
+              {{job.title}}<br>
+              {{job.state}} , {{job.city}}</p>
+                </div>
+                
+              </div>
+              
+              <div class="row">
+                <div class="col-sm-6 ">
+                  <div class="card highlights">
+                    <div class="card-body">
+                      <p class="card-title">Job Highlights</p>
+                      <ul class="p-0 my-0 small" style="list-style-type: none;">
+                        
+                        <li>Type : {{job.job_type}}</li>
+                        <li>Salary : {{job.salary_range_min}} - {{job.salary_range_min}}</li>
+                        
+                      </ul>
+                      
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 ">
+                  <div class="card highlights">
+                    <div class="card-body">
+                      <p class="card-title">Company</p>
+                      <ul class="p-0 my-0 small" style="list-style-type: none;">
+                        <li>Domain : {{job.company.domain}}</li>
+                        <li>Employees : {{job.company.company_size}}</li>
+                        <li>Website : {{job.company.website}}</li>
+                      </ul>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-1">
+                <div class="col">
+                  <div class="card">
+  <div class="card-body">
+    <p><i class="bi bi-calendar-event"></i> Last Application Date : {{job.last_app_date}}<br>
+    <i class="bi bi-clipboard-data"></i> Skills : {{job.foss}}</p>
+  </div>
+</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <p><b>Description</b></p>
+              <p>{{job.description}}</p>
+              <p><b>Requirements</b></p>
+              <p>{{job.requirements}}</p>
+              <p><b>Key Job Responsibilities</b></p>
+              <p>{{job.key_job_responsibilities}}</p>
+              <p><b>Benefits</b></p>
+              <p>{{job.benefits}}</p>
+
+              
+
+              
+
+              
+                </div>
+                
+              </div>
+            </div>
+        {% empty %}
+            <li>No jobs yet.</li>
+        {% endfor %}
+  </div>
+</div>
+  
+</div>
+
+        <!-- <ul class="list-group">
         {% for job in object_list %}
             <li class="list-group-item d-flex justify-content-between">
                 <a href="{% url 'job-detail' slug=job.slug %}">{{ job.title }}</a>
-                
                 <a href="{% url 'job-shortlist' id=job.id %}">Shortlisted ({{job.jobshortlist_set.count}})</a>
             </li>
         {% empty %}
             <li>No jobs yet.</li>
         {% endfor %}
-        </ul>
-    </div>
+        </ul> -->
+    
     
 </div>
 
-
-
+</div>
 {% endblock %}
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script  src="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+  $('#search-job').on('click', function() {
+    // get the location
+    
+    keyword = $('#keyword').find(':selected').text();
+    place = $('#place').find(':selected').text();
+    company = $('#company').find(':selected').text();
+    console.log( place);
+    console.log( keyword);
+    console.log( company);
+    if (keyword=='All') {
+      $('#id_keyword').val('');
+    }else{
+      $('#id_keyword').val(keyword);
+    }
+    if (place=='All') {
+      $('#id_place').val('');
+    }else{
+      $('#id_place').val(place);
+    }
+    if (company=='All') {
+      $('#id_company').val('');
+    }else{
+      $('#id_company').val(company);
+    }
+  });
+  $( document ).ready(function() {
+   $('.custom-single-select').select2();
+   $('.demo').dropdown({});
+   
+});
+</script>
+{% endblock %}
+
 
 

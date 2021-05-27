@@ -17,4 +17,6 @@ class CompanyFilterSet(django_filters.FilterSet):
 class JobFilter(django_filters.FilterSet):
 	class Meta:
 		model = Job
-		fields = '__all__'
+        #fields = '__all__'
+		fields = {'title':['icontains',],
+            'state_job':['exact'],}

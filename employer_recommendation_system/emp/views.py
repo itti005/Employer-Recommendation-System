@@ -10,14 +10,16 @@ from spoken.models import SpokenUser as SpkUser
 from django.views.generic import FormView
 from emp.forms import StudentGradeFilterForm, EducationForm,StudentForm,DateInput
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic.edit import CreateView,UpdateView,ModelFormMixin
+from django.views.generic.edit import CreateView,UpdateView,ModelFormMixin,FormMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse, JsonResponse
 from .filterset import CompanyFilterSet,JobFilter
-from .forms import ACTIVATION_STATUS
+from .forms import ACTIVATION_STATUS, JobSearchForm
 import numpy as np
+from django.db.models import Q
+from django.db.models.expressions import RawSQL
 
 
 APPLIED_SHORTLISTED = 1 # student has applied & is eligible for job
@@ -277,20 +279,46 @@ class JobDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         return context
 
-class JobListView(ListView):
+class JobListView(FormMixin,ListView):
     template_name = 'emp/jobs_list.html'
     model = Job
-    filterset_class = JobFilter
+    #filterset_class = JobFilter
     paginate_by = 2
+    form_class = JobSearchForm
     def get_context_data(self, **kwargs):
+        print("HERE ******************* ")
+        
+            
         context = super().get_context_data(**kwargs)
         context['a']='ab'
-        context['filterset'] = self.filterset
+        # context['filterset'] = self.filterset
+        #job_filter_form = JobSearchForm()
+        #context['job_filter_form']=job_filter_form
         return context
     def get_queryset(self):
         queryset = super().get_queryset()
-        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
-        return self.filterset.qs.distinct()
+        place = self.request.GET.get('place', '')
+        keyword = self.request.GET.get('keyword', '')
+        company = self.request.GET.get('company', '')
+        queries =[place,keyword,company]
+        if keyword or company or place:
+            q_kw=q_place=q_com=Job.objects.all()
+            if keyword:
+                fossc = FossCategory.objects.filter(foss=keyword)
+                if fossc:
+                    foss_id = str(fossc[0].id)
+                    l_kw = Job.objects.raw('select * from emp_job where find_in_set('+foss_id+',foss) <> 0')
+                    q_kw = Job.objects.filter(id__in=[ job.id for job in l_kw])
+                else:
+                    q_kw = Job.objects.filter(title__icontains=keyword)
+            if place:
+                place = SpokenState.objects.filter(name=place) or SpokenCity.objects.filter(name=place)
+                place_id = place[0].id
+                q_place = Job.objects.filter(Q(state_job=place_id) | Q(city_job=place_id))
+            if company:
+                q_com = Job.objects.filter(company__name=company)
+            queryset = (q_kw & q_place & q_com)
+        return queryset
 
 class AppliedJobListView(ListView):
     template_name = 'emp/applied_jobs_list.html'
@@ -506,3 +534,10 @@ def check_student_eligibilty(request):
     data['is_eligible'] = flag
     update_job_app_status(spk_user_id,job,flag)
     return JsonResponse(data)
+
+
+
+
+
+
+
