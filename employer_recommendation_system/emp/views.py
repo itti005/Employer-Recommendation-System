@@ -20,6 +20,8 @@ from .forms import ACTIVATION_STATUS, JobSearchForm
 import numpy as np
 from django.db.models import Q
 from django.db.models.expressions import RawSQL
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 APPLIED_SHORTLISTED = 1 # student has applied & is eligible for job
@@ -192,16 +194,18 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         self.object.added_by = self.request.user
         self.object.save()
         return super(ModelFormMixin, self).form_valid(form)
+    
     def test_func(self):
         return self.request.user.groups
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         state,city = get_state_city_lst()
         context['state']=state
         context['city']=city
         return context
+    
     def form_invalid(self, form):
-        print(f"form.errors ------------------- : {form.errors}")
         return self.render_to_response(self.get_context_data(form=form))
 
 
@@ -212,6 +216,10 @@ class CompanyDetailView(PermissionRequiredMixin,DetailView):
     model = Company
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        company_state = SpokenState.objects.get(id=self.object.state_c)
+        company_city = SpokenCity.objects.get(id=self.object.city_c)
+        context['company_state']=company_state.name
+        context['company_city']=company_city.name
         return context
 
 class CompanyListView(PermissionRequiredMixin,ListView):
@@ -219,15 +227,19 @@ class CompanyListView(PermissionRequiredMixin,ListView):
     permission_required = 'emp.view_company'
     model = Company
     filterset_class = CompanyFilterSet
-    paginate_by = 2
+    paginate_by = 10
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filterset'] = self.filterset
+        context['filterset'] = self.collection
+        context['form'] = self.collection.form
         return context
+    
     def get_queryset(self):
         queryset = super().get_queryset()
-        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
-        return self.filterset.qs.distinct()
+        self.collection = self.filterset_class(self.request.GET, queryset=queryset)
+        return self.collection.qs.distinct()
+
 
 class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/employer_update_form.html'
@@ -283,23 +295,40 @@ class JobListView(FormMixin,ListView):
     template_name = 'emp/jobs_list.html'
     model = Job
     #filterset_class = JobFilter
-    paginate_by = 2
+    paginate_by = 5
     form_class = JobSearchForm
     def get_context_data(self, **kwargs):
-        print("HERE ******************* ")
-        
-            
         context = super().get_context_data(**kwargs)
         context['a']='ab'
+        if self.request.user.groups.filter(name='STUDENT'):
+            jobShortlist = JobShortlist.objects.filter(spk_user=self.request.user.student.spk_usr_id)
+            job_short_list = get_applied_joblist(self.request.user.student.spk_usr_id)
+            applied_jobs = [x.job for x in job_short_list]
+            accepted_jobs = [x.job for x in job_short_list if x.status==1]
+            rejected_jobs = [x.job for x in job_short_list if x.status==0]
+            reccomended_jobs = get_recommended_jobs(self.request.user.student)
+        # accepted_jobs = [x.job if x.status == 1 else x+5 for x in job_short_list]
+        # rejected_jobs = [x.job if x.status==0 for x in job_short_list]
+
+            context['applied_jobs'] = applied_jobs
+            context['accepted_jobs'] = accepted_jobs
+            context['rejected_jobs'] = rejected_jobs
+            context['reccomended_jobs'] = reccomended_jobs
+
         # context['filterset'] = self.filterset
         #job_filter_form = JobSearchForm()
         #context['job_filter_form']=job_filter_form
+
         return context
     def get_queryset(self):
         queryset = super().get_queryset()
         place = self.request.GET.get('place', '')
         keyword = self.request.GET.get('keyword', '')
         company = self.request.GET.get('company', '')
+        job_id = self.request.GET.get('id', '')
+        if job_id:
+            queryset = Job.objects.filter(id=job_id)
+            return queryset
         queries =[place,keyword,company]
         if keyword or company or place:
             q_kw=q_place=q_com=Job.objects.all()
@@ -444,12 +473,11 @@ def shortlist(request):
     return JsonResponse(data) 
 
 def update_job_app_status(spk_user_id,job,flag):
-	#if flag == True : status:1 -> student eligible for job
-	#if flag == False : status:0 -> student has applied & is not eligible for job
+
 	if flag:
-		job_shortlist = JobShortlist.objects.create(job=job,spk_user_id=spk_user_id,status=APPLIED_SHORTLISTED) #student has applied & is eligible for job
+		job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,status=APPLIED_SHORTLISTED) #student has applied & is eligible for job
 	else:
-		job_shortlist = JobShortlist.objects.create(job=job,spk_user_id=spk_user_id,status=APPLIED_REJECTED) #student has applied & is not eligible for job
+		job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,status=APPLIED_REJECTED) #student has applied & is not eligible for job
 	return True
 	
 class JobShortlistListView(PermissionRequiredMixin,ListView):
@@ -531,13 +559,21 @@ def check_student_eligibilty(request):
     except IndexError as e:
         print(e)
 
-    data['is_eligible'] = flag
-    update_job_app_status(spk_user_id,job,flag)
+    flag = True     #Temp keep
+    data['is_eligible'] = flag 
+
+    # update_job_app_status(spk_user_id,job,flag)    #Temp remove
     return JsonResponse(data)
 
-
-
-
-
-
+@csrf_exempt
+def ajax_state_city(request):
+    """ Ajax: Get the Colleges (Academic) based on District selected """
+    if request.method == 'POST':
+        state = request.POST.get('state')
+        cities = SpokenCity.objects.filter(id=state).order_by('name')
+        tmp = '<option value = None> --------- </option>'
+        if cities:
+            for i in cities:
+                tmp +='<option value='+str(i.id)+'>'+i.name+'</option>'
+        return HttpResponse(json.dumps(tmp), content_type='application/json')
 

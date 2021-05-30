@@ -113,7 +113,7 @@
       <div class="col-lg-6">
          <div class="custom-multi-select form-group">
           <label>{{filter_form.foss.label }}</label>
-          <select id="foss-select" multiple>
+          <select class="custom-multi-select" id="foss-select" multiple>
           {% for foss in filter_form.foss %} 
           {{ foss }}
           {% endfor %}
@@ -171,6 +171,7 @@
 {% block js %}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script  src="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
   $("#company_form").click(function(){
