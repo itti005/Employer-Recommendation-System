@@ -1,6 +1,6 @@
 from django import forms
 from spoken.models import *
-from .models import Education,Student
+from .models import Education,Student,Job,Company
 from django.forms import ModelForm
 
 class DateInput(forms.DateInput):
@@ -34,3 +34,21 @@ class StudentForm(ModelForm):
 
 class DateInput(forms.DateInput):
     input_type = 'date'
+
+class JobSearchForm(forms.Form):
+    keyword = forms.ChoiceField(choices=[]) # give foss names, company names & job titles in dropdown
+    place = forms.ChoiceField(choices=[])
+    company = forms.ChoiceField(choices=[])
+    def __init__(self, choices=(), *args, **kwargs):
+        super(JobSearchForm, self).__init__(*args, **kwargs)
+        self.fields['place'].choices = [x for x in SpokenState.objects.values_list('id','name')]+[x for x in SpokenCity.objects.values_list('id','name')]
+        titles_foss_lst=[]
+        #get job title & fosses
+        self.fields['keyword'].choices = [x for x in Job.objects.values_list('id','title')] + [x for x in FossCategory.objects.values_list('id','foss')]
+        self.fields['company'].choices = [x for x in Company.objects.values_list('id','name')]
+        print('success')
+
+        
+        #foss
+
+        #get company

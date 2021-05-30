@@ -56,13 +56,13 @@ def param_replace(context, **kwargs):
 
 @property
 def image_url(self):
-    print("INdie***********************")
-    print("Before IF ")
     if self.logo and hasattr(self.logos, 'url'):
-        print("After IF ")
         return self.logo.url
 
 @register.filter()
 def to_int(value):
-    print(f"value is --------------->{value}. TYpe is ---------> {type(value)} ")
     return int(value)
+
+@register.simple_tag(takes_context=True)
+def job_accepted(value, args):
+    return True

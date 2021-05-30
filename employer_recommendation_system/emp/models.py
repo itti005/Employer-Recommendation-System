@@ -137,14 +137,14 @@ class Company(models.Model):
         super().save(*args, **kwargs)
 
 class Job(models.Model):
-    title = models.CharField(max_length=250)
-    designation = models.CharField(max_length=250)
-    state_job = models.IntegerField(null=True)  #spk
+    title = models.CharField(max_length=250) #filter
+    designation = models.CharField(max_length=250) 
+    state_job = models.IntegerField(null=True)  #spk #filter
     #state_job = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    city_job = models.IntegerField(null=True)  #spk
+    city_job = models.IntegerField(null=True)  #spk #filter
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    skills = models.CharField(max_length=400,null=True,blank=True)
-    description = models.TextField(null=True,blank=True)
+    skills = models.CharField(max_length=400,null=True,blank=True) 
+    description = models.TextField(null=True,blank=True) 
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
     salary_range_min = models.IntegerField(null=True,blank=True)
     salary_range_max = models.IntegerField(null=True,blank=True)
