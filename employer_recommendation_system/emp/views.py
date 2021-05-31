@@ -27,14 +27,54 @@ from django.views.decorators.csrf import csrf_exempt
 APPLIED_SHORTLISTED = 1 # student has applied & is eligible for job
 APPLIED_REJECTED = 0 # student has applied but is not eligible for job
 
+
+#show job application status to HR
+def get_job_app_status(job):
+    job_shortlist = JobShortlist.objects.filter(job=job)
+
+
+
 def get_recommended_jobs(student):
+    #get jobs having status 0 & last app submission date greater than equal to today
+    jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=1)
+    scores = fetch_student_scores(student)
+    if scores:
+        mdl_user_id = scores[0]['mdl'].userid
+    student_foss = [d['foss'] for d in scores]  #fosses for which student grade is available
     rec_jobs = []
-    student_foss = set([ x['foss'] for x in fetch_student_scores(student)])
-    jobs = get_awaiting_jobs(student.spk_usr_id)
+    spk_student = SpokenStudent.objects.get(user_id=student.spk_usr_id)
     for job in jobs:
-        if not student_foss.isdisjoint(set(map(int, job.foss.split(',')))):
-            rec_jobs.append(job)
+        fosses = list(map(int,job.foss.split(',')))
+        states = '' if job.state=='0' else list(map(int,job.state.split(',')))
+        cities = '' if job.city=='0' else list(map(int,job.city.split(',')))
+        insti_type = '' if job.institute_type=='0' else list(map(int,job.institute_type.split(',')))
+        valid_fosses = [   d['foss'] for d in scores if str(d['foss']) in job.foss and int(d['grade'])>=job.grade]
+        if valid_fosses:
+            mdl_quiz_ids = [x.mdlquiz_id for x in FossMdlCourses.objects.filter(foss_id__in=valid_fosses)] #Student passes 1st foss & grade criteria
+            test_attendance = TestAttendance.objects.filter(student=spk_student, 
+                                                mdlquiz_id__in=mdl_quiz_ids,
+                                                test__academic__state__in=states if states!='' else SpokenState.objects.all(),
+                                                test__academic__city__in=cities if cities!='' else SpokenCity.objects.all(),
+                                                status__gte=3,
+                                                test__academic__institution_type__in=insti_type,
+                                                test__academic__status__in=[job.activation_status] if job.activation_status else [1,3],
+                                                )
+            if job.from_date and job.to_date:
+                test_attendance = test_attendance.filter(test__tdate__range=[job.from_date, job.to_date])
+            elif job.from_date:
+                test_attendance = test_attendance.filter(test__tdate__gte=job.from_date)
+            if test_attendance:
+                rec_jobs.append(job)
     return rec_jobs
+
+# def get_recommended_jobs(student):
+#     rec_jobs = []
+#     student_foss = set([ x['foss'] for x in fetch_student_scores(student)])
+#     jobs = get_awaiting_jobs(student.spk_usr_id)
+#     for job in jobs:
+#         if not student_foss.isdisjoint(set(map(int, job.foss.split(',')))):
+#             rec_jobs.append(job)
+#     return rec_jobs
 
 #function to get student spoken test scores
 def fetch_student_scores(student):  #parameter : recommendation student obj
@@ -79,7 +119,6 @@ def student_homepage(request):
     context['awaiting_jobs'] = get_awaiting_jobs(rec_student.spk_usr_id)[:5]
     context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
     context['rec_jobs']=get_recommended_jobs(rec_student)
-
     
     try:
          spk_student = SpokenStudent.objects.using('spk').filter(user_id=rec_student.spk_usr_id).get()
@@ -307,18 +346,10 @@ class JobListView(FormMixin,ListView):
             accepted_jobs = [x.job for x in job_short_list if x.status==1]
             rejected_jobs = [x.job for x in job_short_list if x.status==0]
             reccomended_jobs = get_recommended_jobs(self.request.user.student)
-        # accepted_jobs = [x.job if x.status == 1 else x+5 for x in job_short_list]
-        # rejected_jobs = [x.job if x.status==0 for x in job_short_list]
-
             context['applied_jobs'] = applied_jobs
             context['accepted_jobs'] = accepted_jobs
             context['rejected_jobs'] = rejected_jobs
             context['reccomended_jobs'] = reccomended_jobs
-
-        # context['filterset'] = self.filterset
-        #job_filter_form = JobSearchForm()
-        #context['job_filter_form']=job_filter_form
-
         return context
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -480,19 +511,53 @@ def update_job_app_status(spk_user_id,job,flag):
 		job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,status=APPLIED_REJECTED) #student has applied & is not eligible for job
 	return True
 	
-class JobShortlistListView(PermissionRequiredMixin,ListView):
-    permission_required = 'emp.view_job'
-    model = JobShortlist
+# class JobShortlistListView(PermissionRequiredMixin,ListView):
+class JobAppStatusListView(ListView):
+    #permission_required = 'emp.view_job'
+    template_name='emp/job_app_status_list.html'
+    model = Job
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        job = Job.objects.get(id=self.kwargs['id'])
+        # job = Job.objects.get(id=self.kwargs['id'])
+        # context['job']=job
+        return context
+
+def job_app_details(request,id):
+    context = {}
+    job = Job.objects.get(id=id)
+    students_applied = [x.student for x in JobShortlist.objects.filter(job_id=id)]
+
+    context['job'] = job
+    context['students_applied'] = students_applied
+    return render(request,'emp/job_app_status_detail.html',context)
+
+
+class JobShortlistDetailView(DetailView):
+    model = JobShortlist
+    template_name='emp/job_app_status_detail.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        job = Job.objects.get(id=self.kwargs['slug'])
         context['job']=job
         return context
 
-    def get_queryset(self):
-        id = self.kwargs['id']
-        l = JobShortlist.objects.filter(job_id=id)
-        return l
+
+
+
+
+class JobShortlistListView(ListView):
+    #permission_required = 'emp.view_job'
+    model = JobShortlist
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # job = Job.objects.get(id=self.kwargs['id'])
+        # context['job']=job
+        return context
+
+    # def get_queryset(self):
+    #     id = self.kwargs['id']
+    #     l = JobShortlist.objects.filter(job_id=id)
+    #     return l
 
 def add_student_job_status(request):
     spk_user_id = int(request.GET.get('spk_user_id'))

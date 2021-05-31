@@ -32,6 +32,11 @@ urlpatterns = [
     path('job_list/', JobListView.as_view(), name='job-list'),
     path('applied_jobs/', AppliedJobListView.as_view(), name='applied-job-list'),
     path('job/<slug:slug>/', JobDetailView.as_view(), name='job-detail'),
-    path('job/<int:id>/status', JobShortlistListView.as_view(), name='job-shortlist'),
+    # path('job/<int:id>/status', JobShortlistListView.as_view(), name='job-shortlist'),
     path('ajax-state-city/', views.ajax_state_city, name='ajax_state_city'),
+    ################### jobshortlist
+    path('job_application_status/', JobAppStatusListView.as_view(), name='job-app-status'),
+    # path('job/<int:id>/status', JobShortlistDetail.as_view(), name='job-app-detail'),
+    path('job_application_status/<int:id>/', views.job_app_details, name='job-app-detail'),
+
         ]
