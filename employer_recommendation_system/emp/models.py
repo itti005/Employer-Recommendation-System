@@ -195,6 +195,8 @@ class JobShortlist(models.Model):
     student=models.ForeignKey(Student,on_delete=models.CASCADE)  #spk
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, null=True,blank=True)
+    #0 : awaiting for further shortlist
+    #1 : shortlisted
     status = models.IntegerField(null=True,blank=True)
 
     def __str__(self):

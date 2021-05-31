@@ -503,6 +503,21 @@ def shortlist(request):
     JobShortlist.objects.bulk_create(l)
     return JsonResponse(data) 
 
+def shortlist_student(request):
+    data = {'msg':'true'}
+    students = request.GET.get('students', None)
+    student_ids = [ int(x) for x in students[:-1].split(',') ]
+    job_id = int(request.GET.get('job_id', None))
+    job = Job.objects.get(id=job_id)
+    try:
+        JobShortlist.objects.filter(job=job,student_id__in=student_ids).update(status=1)
+        data['updated']=True
+    except:
+        data['updated']=False
+    return JsonResponse(data) 
+
+
+
 def update_job_app_status(spk_user_id,job,flag):
 
 	if flag:
@@ -525,10 +540,12 @@ class JobAppStatusListView(ListView):
 def job_app_details(request,id):
     context = {}
     job = Job.objects.get(id=id)
-    students_applied = [x.student for x in JobShortlist.objects.filter(job_id=id)]
+    students_awaiting = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
+    students_shortlisted = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==1]
 
     context['job'] = job
-    context['students_applied'] = students_applied
+    context['students_awaiting'] = students_awaiting
+    context['students_shortlisted'] = students_shortlisted
     return render(request,'emp/job_app_status_detail.html',context)
 
 

@@ -19,6 +19,7 @@ urlpatterns = [
     path('student_grade_filter', StudentGradeFilter.as_view(), name='student_grade_filter'),
     path('shortlist/',views.shortlist,name='shortlist'),
     path('update_job_app_status/',views.update_job_app_status,name='update_job_app_status'),
+    path('shortlist_student/',views.shortlist_student,name='shortlist_student'),
 
     
     ################### company urls
