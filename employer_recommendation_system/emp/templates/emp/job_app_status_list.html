@@ -1,5 +1,6 @@
 {% extends 'emp/base.html' %}
 {% load crispy_forms_tags %}
+{% load helper %}
 {% block content-header %}Job List{% endblock %}
 {% block css %}
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
@@ -11,29 +12,36 @@
             </div>
         {% endfor %}
 <br>
-<h5>{{job}} , {{job.company.name}}</h5>
+
 <table class="table table-striped" id="shortlisted">
   <thead>
     <tr>
-      <th scope="col">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Email</th>
+      <!-- <th scope="col">#Sr</th> -->
+      <th scope="col">Job Id</th>
+      <th scope="col">Job Title</th>
+      <th scope="col">Company</th>
+      <th scope="col">#Applications</th>
+      <th scope="col">Last Application Date</th>
       <th scope="col">Status</th>
     </tr>
   </thead>
   <tbody>
-  	{% for item in object_list %}
+  	{% for job in object_list %}
   	<tr>
-      <th scope="row">1</th>
-      <td>{{item.spk_user}}</td>
-      <td>{{item.spk_user.email}}</td>
-      <td>
+      <!-- <td scope="row">{{forloop.counter}}</td> -->
+      <td>{{job.id}}</td>
+      <td><a href="{% url 'job-app-detail' id=job.id  %}">{{job.title}}</a></td>
+      <td>{{job.company.name}}</td>
+      <td><a href="{% url 'job-app-detail' id=job.id  %}">{% application_count job %}</a></td>
+      <td>{{job.last_app_date}}</td>
+      <td>{{job.status}}</td>
+      <!-- <td>
       	{% if item.status == 1 %}
       	<span style="color: orange;"><i class="far fa-clock"></i></span>
       	{% else %}
       	<span style="color: green;"><i class="far fa-check-circle"></i></span>
       	{% endif %}
-      </td>
+      </td> -->
     </tr>
 	{% empty %}
     <!-- <li>No jobs yet.</li> -->

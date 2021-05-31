@@ -1,6 +1,7 @@
 from django import template
 from django.conf import settings
 from moodle.models import *
+from emp.models import JobShortlist
 
 
 register = template.Library()
@@ -66,3 +67,8 @@ def to_int(value):
 @register.simple_tag(takes_context=True)
 def job_accepted(value, args):
     return True
+
+@register.simple_tag
+def application_count(job):
+    return JobShortlist.objects.filter(job=job).count()
+

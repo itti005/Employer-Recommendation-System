@@ -152,7 +152,12 @@ class Job(models.Model):
     date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
     job_type = models.ForeignKey(JobType,on_delete=models.CASCADE)
     benefits = models.TextField(null=True,blank=True) # Additional benefits provided by the company to employee
-    status = models.BooleanField(default=True,blank=True )#To make if the job is active
+    # 0: Job is inactive(added but not visible to students)
+    # 1: Job is active(added & available to students for apply)
+    # 2: Job Application Date is over
+    # 3: Job Application is in process with HR & Company
+    # 4: Student selected & job closed.
+    status = models.IntegerField(default=1,blank=True)
     requirements = models.TextField(null=True,blank=True) #Educational qualifications, other criteria
     shift_time = models.CharField(max_length=200)
     key_job_responsibilities = models.TextField(null=True,blank=True)
@@ -187,8 +192,11 @@ class Job(models.Model):
 class JobShortlist(models.Model):
     # user=models.ForeignKey(User,on_delete=models.CASCADE)
     spk_user=models.IntegerField(null=True)  #spk
+    student=models.ForeignKey(Student,on_delete=models.CASCADE)  #spk
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, null=True,blank=True)
+    #0 : awaiting for further shortlist
+    #1 : shortlisted
     status = models.IntegerField(null=True,blank=True)
 
     def __str__(self):

@@ -1,0 +1,162 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% load helper %}
+{% block content-header %}Job List{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+<style type="text/css">
+  .tab-pane{
+    padding-top: 15px;
+  }
+</style>
+{% endblock %}
+{% block content %}
+{% for message in messages %}
+    <div class="text-center alert alert-{{ message.tags }}">
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+<br>
+<div>
+  <div class="d-flex">
+    <div >
+      {% if job.company.logo %}
+    <img class="d-block align-self-center m-2" src="{{ job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" 
+    style=" height: 100px;display: inline;">
+    {% endif %}
+    </div>
+    <div>
+      <strong>Job Id : </strong>{{job.id}}<br>
+      <strong class="mb-1">Job Title : </strong><a href="{% url 'job-detail' slug=job.slug %}" target="_blank">{{ job.title }}</a><br>
+      <span><b>Company : </b>   <a href="{% url 'company-detail' slug=job.company.slug %}" target="_blank">{{ job.company.name }}</a><br>{{job.state}} , {{job.city}}</span>
+    </div>
+    <div ></div>
+  </div>
+</div>
+<div>
+  <nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-awaiting" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Awaiting Shortlist</button>
+    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-shortlisted" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Shortlisted</button>
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade show active" id="nav-awaiting" role="tabpanel" aria-labelledby="nav-home-tab">
+    
+    <table class="table table-striped" id="tb-awaiting">
+  <thead>
+    <tr>
+      <th scope="col"><input class="form-check-input" type="checkbox" value="" id="select-all" > <button type="button" class="btn btn-outline-success btn-sm" style="display: none;" id="btn-shortlist" onclick="shortlist_student(this,'{{job.id}}');">Shortlist</button></th>
+      <th scope="col">Student</th>
+      <th scope="col">Spoken User Id</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for student in students_awaiting %}
+    <tr>
+      <td><input class="form-check-input select-student" type="checkbox" value="" id="student_{{student.id}}" ></td>
+      <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td>
+      <td>{{student.spk_usr_id}}</td>
+    </tr>
+  {% empty %}
+  {% endfor %}
+  </tbody>
+</table>
+  </div>
+  <div class="tab-pane fade" id="nav-shortlisted" role="tabpanel" aria-labelledby="nav-profile-tab">
+    <table class="table table-striped pt-3" id="tb-shortlisted">
+  <thead>
+    <tr>
+      <th scope="col">#Sr No.</th>
+      <th scope="col">Student</th>
+      <th scope="col">Spoken User Id</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for student in students_shortlisted %}
+    <tr>
+      <td>{{forloop.counter}}</td>
+      <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td>
+      <td>{{student.spk_usr_id}}</td>
+    </tr>
+  {% empty %}
+  {% endfor %}
+  </tbody>
+</table>
+  </div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+
+<script type = "text/javascript">
+
+  var tb_s;
+  var tb_a;
+  function shortlist_student(apply_btn,job_id){
+    apply_btn_id = apply_btn.id;
+    var student_ids = [];
+    var students = '';
+        $('input.select-student:checked').each(function() {
+          id = $(this).attr("id");
+          students+=id.split('_')[1]+','
+     });
+    $.ajax({
+      url: "/shortlist_student",
+      data: {
+        'job_id' : job_id,
+        'students' : students,
+      },
+      dataType: 'json',
+      success:function(data){
+        var messages = data.msg
+        id=apply_btn_id.split('_');
+        if (data.updated==true) {
+          location.reload();
+        }
+    }});
+  }
+    $(document).ready(function (){
+      tb_s = $('#tb-shortlisted').DataTable();  
+      tb_a = $('#tb-awaiting').DataTable();
+
+      var selected = [];
+
+    $('#select-all').change(function() {
+      
+        if(this.checked) {
+            $(':checkbox').prop('checked', true);
+            $('#btn-shortlist').show();
+        }else{
+          $(':checkbox').prop('checked', false);
+          $('#btn-shortlist').hide();
+        }
+        $('#textbox1').val(this.checked);        
+    });
+    $('input.select-student:checkbox').change(function() {
+        var allVals = [];
+        $('input.select-student:checked').each(function() {
+          console.log('here');
+       allVals.push($(this).val());
+     });
+        if (allVals.length) {
+          $('#btn-shortlist').show();
+          var x = document.getElementsByClassName("select-student");
+          if (allVals.length==x.length) {
+            $(':checkbox').prop('checked', true);
+          };
+          
+        }else{
+          $('#btn-shortlist').hide();
+          $('#select-all:checkbox').prop('checked', false);
+        }
+     $('#t').val(allVals);
+    });
+});
+</script>
+{% endblock %}
+
+
