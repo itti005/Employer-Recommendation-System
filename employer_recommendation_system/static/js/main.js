@@ -33,8 +33,6 @@
     }});
   }
     $(document).ready(function(){
-      alert('here');
-
       $('#select-state').change(function() {
             var state = $(this).val();
             // alert(state)
