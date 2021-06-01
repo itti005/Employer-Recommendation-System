@@ -649,13 +649,14 @@ def check_student_eligibilty(request):
 
 @csrf_exempt
 def ajax_state_city(request):
-    """ Ajax: Get the Colleges (Academic) based on District selected """
     if request.method == 'POST':
+        data = {}
         state = request.POST.get('state')
-        cities = SpokenCity.objects.filter(id=state).order_by('name')
+        cities = SpokenCity.objects.filter(state=state).order_by('name')
         tmp = '<option value = None> --------- </option>'
         if cities:
             for i in cities:
                 tmp +='<option value='+str(i.id)+'>'+i.name+'</option>'
-        return HttpResponse(json.dumps(tmp), content_type='application/json')
+        data['cities']=tmp
+        return JsonResponse(data)
 
