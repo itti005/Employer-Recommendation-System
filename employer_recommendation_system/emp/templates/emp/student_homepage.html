@@ -28,7 +28,6 @@
 </div>
 {% endfor %}
 </div>
-<!--Jobs fro which the student has not yet applied-->
 <section>
 <div class="d-flex justify-content-between">
     <h4 style="text-decoration: underline;">Recommended Jobs</h4>
@@ -50,7 +49,7 @@
       </div>
     </div>
     <h5 class="card-title">{{job.title}}</h5>
-    <p class="card-text">{{job.description}}</p>
+    <p class="card-text">{{job.description | slice:":255"}}...</p>
     <a href="#" class="btn btn-info post-apply disabled" style="display: none;" id="applied_{{job.id}}"><i class="fas fa-check mr-3"></i>Applied</a>
       <a class="btn btn-info pre-apply" onclick="check_eligibility(this,'{{request.user.student.spk_usr_id}}','{{job.id}}','{{request.user.id}}');" id="apply_{{job.id}}">Apply</a>
   </div>

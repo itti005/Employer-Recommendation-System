@@ -33,6 +33,29 @@
     }});
   }
     $(document).ready(function(){
+      alert('here');
+
+      $('#select-state').change(function() {
+            var state = $(this).val();
+            // alert(state)
+            if(state){
+                $.ajax({
+                    url: "/ajax-state-city/",
+                    type: "POST",
+                    data: {
+                        state : state
+                    },
+                    success: function(data) {
+                        if(data){
+                            $('#select-city').html(data.cities);
+                            $( "#select-city" ).prop( "disabled", false );
+                        } else{
+                            $( "#select-city" ).prop( "disabled", true );
+                        }
+                    }
+                });
+            }
+        });
       
       hide_reject_labels();
       });
