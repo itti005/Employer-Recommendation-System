@@ -39,6 +39,8 @@ def get_job_app_status(job):
 def get_recommended_jobs(student):
     #get jobs having status 0 & last app submission date greater than equal to today
     jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=1)
+    applied_jobs = [x.job for x in get_applied_joblist(student.spk_usr_id)]
+    jobs = [x for x in jobs if x not in applied_jobs ]
     scores = fetch_student_scores(student)
     if scores:
         mdl_user_id = scores[0]['mdl'].userid
@@ -117,10 +119,13 @@ def student_homepage(request):
     company_display = Company.objects.filter(rating=5).order_by('-date_updated')[:5]
     context['company_display']=company_display
     rec_student = Student.objects.get(user=request.user)
-    context['applied_jobs'] = get_applied_joblist(rec_student.spk_usr_id)
-    context['awaiting_jobs'] = get_awaiting_jobs(rec_student.spk_usr_id)[:5]
+    applied_jobs = get_applied_joblist(rec_student.spk_usr_id)
+    awaiting_jobs = get_awaiting_jobs(rec_student.spk_usr_id)[:5]
+    rec_jobs = get_recommended_jobs(rec_student)
+    context['applied_jobs'] = applied_jobs if len(applied_jobs)<3 else applied_jobs[:3]
+    context['awaiting_jobs'] = awaiting_jobs if len(applied_jobs)<3 else awaiting_jobs[:]
     context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
-    context['rec_jobs']=get_recommended_jobs(rec_student)
+    context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
     
     try:
          spk_student = SpokenStudent.objects.using('spk').filter(user_id=rec_student.spk_usr_id).get()
@@ -419,6 +424,7 @@ def add_education(student,degree,institute,start_year,end_year,gpa):
 def save_student_profile(request,student):
     student_form = StudentForm(request.POST)
     education_form = EducationForm(request.POST)
+    print(f"student form : {student_form}")
     if student_form.is_valid() and education_form.is_valid():
         student.about = student_form.cleaned_data['about']
         student.github = student_form.cleaned_data['github']
@@ -439,23 +445,49 @@ def save_student_profile(request,student):
         start_year = education_form.cleaned_data['start_year']
         end_year = education_form.cleaned_data['end_year']
         gpa = education_form.cleaned_data['gpa']
-        education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
-        for i in range(1,6):
-            try:
-                degree = request.POST['degree_'+str(i)]
-                institute = request.POST['institute_'+str(i)]
-                start_year = request.POST['start_year_'+str(i)]
-                end_year = request.POST['end_year_'+str(i)]
-                gpa = request.POST['gpa_'+str(i)]
-                add_education(student,degree,institute,start_year,end_year,gpa)
-            except Exception as e:
-                print(e)
+        
+        try:
+            e = Education.objects.filter(student=student)
+            if e:
+                print("INSIDE IF ******************************")
+                education = e[0]
+                education.degree = degree_obj
+                education.institute = institute
+                education.start_year = start_year
+                education.end_year = end_year
+                education.gpa = gpa
+                education.save()
+            else:
+                print("INSIDE ELSE ******************************")
+                education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
+                education.save()
+                student.education.add(education)
+        except IndexError as e:
+            print("HERE****************************")
+            education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
+            education.save()
+            student.education.add(education)
+            print(e)
+        except Exception as e:
+            print(e)
+        #education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
+        # for i in range(1,6):
+        #     try:
+        #         degree = request.POST['degree_'+str(i)]
+        #         institute = request.POST['institute_'+str(i)]
+        #         start_year = request.POST['start_year_'+str(i)]
+        #         end_year = request.POST['end_year_'+str(i)]
+        #         gpa = request.POST['gpa_'+str(i)]
+        #         add_education(student,degree,institute,start_year,end_year,gpa)
+        #     except Exception as e:
+        #         print(e)
 
-        education.save()
-        student.education.add(education)
+        #education.save()
+        #student.education.add(education)
         return student_form,education_form
 
 def student_profile_confirm(request,pk,job):
+    
     context = {}
     context['confirm']=True
     context['job_id']=job
@@ -472,6 +504,9 @@ def student_profile_confirm(request,pk,job):
     context['form']=student_form
     context['education_form']=education_form
     context['jobApplicationForm']=jobApplicationForm
+    # return reverse('student_profile_confirm',kwargs={'pk':request.user.student.id,'job':job})
+    # return HttpResponseRedirect(reverse('student_profile_confirm',kwargs={'pk':request.user.student.id,'job':job}))
+    # return HttpResponse(str(reverse('student_profile_confirm',kwargs={'pk':request.user.student.id,'job':job})))
     return render(request,'emp/student_form.html',context)
 
 
@@ -481,10 +516,21 @@ def student_profile(request,pk):
     context['student']=student
     context['skills']=Skill.objects.all()
     if request.method=='POST':
-        student_form,education_form = save_student_profile(request,student)
+        student_form = StudentForm(request.POST)
+        education_form = EducationForm(request.POST)
+        if student_form.is_valid() and education_form.is_valid():
+            student_form,education_form = save_student_profile(request,student)
+            messages.success(request, 'Profile uodated successfully')
+        else:
+            messages.danger(request, 'Error in updating profile')
     else:
         student_form = StudentForm(instance = student)
-        education_form = EducationForm()
+        try:
+            e = Education.objects.filter(student=student).order_by('-end_year')[0]
+            education_form = EducationForm(instance = e)
+        except IndexError as e:
+            education_form = EducationForm()
+            print(e)
     context['form']=student_form
     context['education_form']=education_form
     institutes = AcademicCenter.objects.values('id','institution_name')

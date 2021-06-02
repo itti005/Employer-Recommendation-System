@@ -20,8 +20,18 @@
 {% endblock %}
 
 {% block content %}
-
+<div class="row">
+  <div class="col-md-8">
+    {% for message in messages %}
+         <div class="text-center alert {{ message.tags }}">
+             {{ message|safe }}
+         </div>
+{% endfor %}
+  </div>
+  
+</div>
 {% if confirm %}
+<p id="disable-form" class="d-none">diable form</p>
 <div class="row d-toast" style="display: none;">
   <div class="col-sm-8">
     <div class="toast w-100" role="alert" aria-live="assertive" aria-atomic="true">
@@ -42,13 +52,11 @@
   <p><b>Below profile details will be sent to the company.</b></p>
   <div class="row">
     <div class="col-md-4">
-      <!-- <span><button type="submit" form="form-job-app" formaction="{% url 'add_student_job_status' %}" class="btn btn-outline-secondary" type="submit">Confirm & Apply</button></span> -->
-      <span><button type="submit" form="form-job-app" class="btn btn-outline-secondary" type="submit">Confirm & Apply</button></span>
-      <span><button type="button" class="btn btn-outline-secondary" style="display: none;">Cancel</button></span>
+      <span><button type="submit" form="form-job-app" class="btn btn-outline-secondary" type="submit" id="confirm_apply">Confirm & Apply</button></span>
     </div>
     <div class="col-md-4">
-      <span><button type="button" class="btn btn-outline-secondary">Modify</button></span>
-      <span><button type="button" class="btn btn-outline-secondary" style="display: none;">Save changes & proceed</button></span>
+      <!-- <span><button type="button" class="btn btn-outline-secondary" id="modify">Modify</button></span> -->
+      <span><a target="_blank" class="btn btn-outline-secondary" href="{% url 'student_profile' pk=request.user.student.id %}">Modify</a></span>
     </div>
     <div class="col-md-8"><hr></div>
     
@@ -71,7 +79,7 @@
 
 
 
-    <div class="col-md-6" id="modify"><button type="button" class="btn btn-outline-info" >Modify</button></div>
+    <!-- <div class="col-md-6" id="modify"><button type="button" class="btn btn-outline-info" >Modify</button></div> -->
   </div>
 </div>
 {% endif %}
@@ -84,7 +92,8 @@
           <input type="text" class="form-control" value="{{student.user.get_full_name | default_if_none:'' | format_char}}" readonly>
         </div>
       </div>
-      <div class="col-6 mb-3">
+      <div class="row">
+        <div class="col-6 mb-3">
         <div class="input-group">
           <div class="input-group-text"><i class="bi bi-envelope"></i></i></div>
           <input type="text" class="form-control" value="{{student.user.email | default_if_none:''}}" readonly>
@@ -96,6 +105,8 @@
           <input type="text" class="form-control" value="{{student.phone | default_if_none:'' }}" readonly>
         </div>
       </div>
+      </div>
+      
       <div class="col-12 mb-3">
         <div class="input-group">
           <div class="input-group-text"><i class="bi bi-house"></i></div>
@@ -111,11 +122,11 @@
 		</div>
 	</div>
 </form>
-<form method="post" id="form-student">
+<form method="post" id="form-student" readonly>
 
 	<div class="row">
     	<div class="col-sm-8">
-        <label>{{ form.skills.label_tag }}</label>
+        <!-- <label>{{ form.skills.label_tag }}</label>
     		<div class="demo mb-3">
           
   			<select style="display: none;" multiple >
@@ -123,9 +134,9 @@
   			<option value="{{skill.id}}">{{skill.name}}</option>
   			{% endfor %}
   			</select>
-		</div>
+		</div> -->
     	</div>
-		<input type="hidden" id="skills_m" name="skills_m">
+		<input type="hidden" id="skills_m" name="skills_m" >
     	<div class="col-sm-8 mb-3">
       		{{ form.about | as_crispy_field }}
     	</div>
@@ -149,7 +160,7 @@
     	<div class="col-sm-4 mb-3">
       	{{ education_form.degree | as_crispy_field }}
     	</div>
-    	<div class="col-sm-4">
+    	<div class="col-sm-4 d-none" >
       	{{ education_form.institute | as_crispy_field }}
     	</div>
       <!-- <div class="d-none"><input type="text" id="institute" name="institute"></div> -->
@@ -173,17 +184,17 @@
     	<div class="col-sm-2 mb-3">
       	{{ education_form.gpa | as_crispy_field }}
     	</div>
-      <div class="col-12 mb-3">
+      <!-- <div class="col-12 mb-3">
         <div class="container" >
           <div class='element' id='div_0'>
             <span class='add'>Add Education</span>
           </div>
         </div>
-      </div>
+      </div> -->
 	</div>
 	{% csrf_token %}
 
-	<button type="submit" class="btn btn-primary mb-5" id="update_profile" {% if confirm %} style="display: none;" {% endif %}>Update Profile</button>
+	<button type="submit" class="btn btn-success mb-5" id="update_profile" {% if confirm %} style="display: none;" {% endif %}>Update Profile</button>
 </form>
 {% endblock %}
 {% block js %}
@@ -211,7 +222,11 @@ function apply_for_job(spk_user_id,job_id,student_id){
   }
 
 $(document).ready(function() {
-  // $("#form-student :input").prop("disabled", true);
+    if ($('#disable-form').html()) {
+      $("#form-student :input").prop("disabled", true);
+    }
+    insti = $('#id_institute').val();
+    $('#institute-select').val(parseInt(insti));
     var degree_list = [];
     var institute_list = [];
     var start_year_list = [];
@@ -220,8 +235,26 @@ $(document).ready(function() {
     // $('.js-example-basic-multiple').select2();
     $('.demo').dropdown({});
     $( "#modify" ).click(function() {
-    $("#"+this.id).hide();
-    $("#update_profile").show();
+      $("#"+this.id).hide();
+      $('#confirm_apply').hide();
+      $('#save_changes_btn').show();
+      $('#cancel_btn').show();
+      $("#form-student :input").prop("disabled", false);
+    
+    // $("#update_profile").show();
+    // $("#form-student :input").prop("disabled", false);
+
+    });
+    $( "#cancel_btn" ).click(function() {
+      $("#"+this.id).hide();
+      $('#cancel_btn').hide();
+      $('#save_changes_btn').hide();
+      $('#confirm_apply').show();
+      $('#modify').show();
+      $("#form-student :input").prop("disabled", true);
+      
+    
+    // $("#update_profile").show();
     // $("#form-student :input").prop("disabled", false);
 
     });
