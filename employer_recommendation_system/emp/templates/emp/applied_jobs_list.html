@@ -4,59 +4,56 @@
 {% block content-header %}Job List{% endblock %}
 {% block content %}
 {% for message in messages %}
-    <div class="text-center alert alert-{{ message.tags }}">
+    <div class="text-center alert {{ message.tags }}" role="alert">
                 {{ message|safe }}
-            </div>
-        {% endfor %}
+    </div>
+{% endfor %}
 <div class="row">
-    <div class="col-md-3">
-        <div>
-        <form>
-            {{filterset.form.as_ul}}    
-            <!-- <button type="submit">Search</button> -->
-        </form>
-         </div>
-    </div>
-    <div class="col-md-9">
-{% if is_paginated %}
-  {% if page_obj.has_previous %}
-    <a href="?{% param_replace page=1 %}">First</a>
-    {% if page_obj.previous_page_number != 1 %}
-      <a href="?{% param_replace page=page_obj.previous_page_number %}">Previous</a>
-    {% endif %}
-  {% endif %}
+  <div class="col">
+    <table class="table" id="tb-applied-jobs">
+  <thead>
+    <tr>
+      <th scope="col">Job Id</th>
+      <th scope="col">Company</th>
+      <th scope="col">Job Title</th>
+      <th scope="col">Application Date</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for object in object_list %}
+    <tr>
+      <td>{{object.job.id}}</td>
+      <td><a href="{% url 'company-detail' slug=object.job.company.slug %}" target="_blank">{{ object.job.company.name }}</a></td>
+      <td><a href="{% url 'job-detail' slug=object.job.slug %}" target="_blank">{{ object.job.title }}</a></td>
+      <td>{{object.date_created}}</td>
+      <td>
+        {% if object.status == APPLIED_SHORTLISTED %}
+        <span class="badge bg-warning text-dark">In process</span>
+        {% endif %}
+        {% if object.status == APPLIED %}
+        <span class="badge bg-success">Shortlisted</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table> 
 
-  Page {{ page_obj.number }} of {{ paginator.num_pages }}
+    {% for job in applied_jobs %}
 
-  {% if page_obj.has_next %}
-    {% if page_obj.next_page_number != paginator.num_pages %}
-      <a href="?{% param_replace page=page_obj.next_page_number %}">Next</a>
-    {% endif %}
-    <a href="?{% param_replace page=paginator.num_pages %}">Last</a>
-  {% endif %}
-
-  <p>Objects {{ page_obj.start_index }}—{{ page_obj.end_index }}</p>
-{% endif %}
-        <ul class="list-group">
-        {% for item in object_list %}
-            <li class="list-group-item d-flex justify-content-between">
-                <a href="{% url 'job-detail' slug=item.job.slug %}">{{ item.job.title }}</a>
-                {% if item.status == APPLIED_SHORTLISTED %}
-                <span class="badge badge-success">In process</span>
-                {% else %}
-                <span class="badge badge-danger">Not Eligible</span>
-                {% endif %}
-            </li>
-        {% empty %}
-            <li>No jobs yet.</li>
-        {% endfor %}
-        </ul>
-    </div>
-    
+    {% endfor %}
+  </div>
+  
 </div>
+{% endblock %}
+{% block js %}
 
-
-
+<script type = "text/javascript">
+    $(document).ready(function(){
+      $('#tb-applied-jobs').DataTable();
+      });
+</script>
 {% endblock %}
 
 

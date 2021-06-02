@@ -16,16 +16,18 @@ from django.views.generic.list import ListView
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse, JsonResponse
 from .filterset import CompanyFilterSet,JobFilter
-from .forms import ACTIVATION_STATUS, JobSearchForm
+from .forms import ACTIVATION_STATUS, JobSearchForm, JobApplicationForm
 import numpy as np
 from django.db.models import Q
 from django.db.models.expressions import RawSQL
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 
 
+APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
+APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
 
-APPLIED_SHORTLISTED = 1 # student has applied & is eligible for job
-APPLIED_REJECTED = 0 # student has applied but is not eligible for job
 
 
 #show job application status to HR
@@ -37,6 +39,8 @@ def get_job_app_status(job):
 def get_recommended_jobs(student):
     #get jobs having status 0 & last app submission date greater than equal to today
     jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=1)
+    applied_jobs = [x.job for x in get_applied_joblist(student.spk_usr_id)]
+    jobs = [x for x in jobs if x not in applied_jobs ]
     scores = fetch_student_scores(student)
     if scores:
         mdl_user_id = scores[0]['mdl'].userid
@@ -100,7 +104,7 @@ def fetch_student_scores(student):  #parameter : recommendation student obj
 
 
 def get_applied_joblist(spk_user_id):
-	return JobShortlist.objects.filter(spk_user=spk_user_id,status__in=[APPLIED_SHORTLISTED,APPLIED_REJECTED])
+	return JobShortlist.objects.filter(spk_user=spk_user_id,status__in=[APPLIED,APPLIED_SHORTLISTED])
 
 def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet applied
 	all_jobs = Job.objects.all()
@@ -115,10 +119,13 @@ def student_homepage(request):
     company_display = Company.objects.filter(rating=5).order_by('-date_updated')[:5]
     context['company_display']=company_display
     rec_student = Student.objects.get(user=request.user)
-    context['applied_jobs'] = get_applied_joblist(rec_student.spk_usr_id)
-    context['awaiting_jobs'] = get_awaiting_jobs(rec_student.spk_usr_id)[:5]
+    applied_jobs = get_applied_joblist(rec_student.spk_usr_id)
+    awaiting_jobs = get_awaiting_jobs(rec_student.spk_usr_id)[:5]
+    rec_jobs = get_recommended_jobs(rec_student)
+    context['applied_jobs'] = applied_jobs if len(applied_jobs)<3 else applied_jobs[:3]
+    context['awaiting_jobs'] = awaiting_jobs if len(applied_jobs)<3 else awaiting_jobs[:]
     context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
-    context['rec_jobs']=get_recommended_jobs(rec_student)
+    context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
     
     try:
          spk_student = SpokenStudent.objects.using('spk').filter(user_id=rec_student.spk_usr_id).get()
@@ -334,7 +341,7 @@ class JobListView(FormMixin,ListView):
     template_name = 'emp/jobs_list.html'
     model = Job
     #filterset_class = JobFilter
-    paginate_by = 5
+    paginate_by = 8
     form_class = JobSearchForm
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -383,11 +390,15 @@ class JobListView(FormMixin,ListView):
 class AppliedJobListView(ListView):
     template_name = 'emp/applied_jobs_list.html'
     model = JobShortlist
-    paginate_by = 2
+    # paginate_by = 2
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
+        context['APPLIED']=APPLIED
         return context
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return JobShortlist.objects.filter(student=self.request.user.student)
 
 class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/jobs_update_form.html'
@@ -413,6 +424,7 @@ def add_education(student,degree,institute,start_year,end_year,gpa):
 def save_student_profile(request,student):
     student_form = StudentForm(request.POST)
     education_form = EducationForm(request.POST)
+    print(f"student form : {student_form}")
     if student_form.is_valid() and education_form.is_valid():
         student.about = student_form.cleaned_data['about']
         student.github = student_form.cleaned_data['github']
@@ -433,23 +445,49 @@ def save_student_profile(request,student):
         start_year = education_form.cleaned_data['start_year']
         end_year = education_form.cleaned_data['end_year']
         gpa = education_form.cleaned_data['gpa']
-        education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
-        for i in range(1,6):
-            try:
-                degree = request.POST['degree_'+str(i)]
-                institute = request.POST['institute_'+str(i)]
-                start_year = request.POST['start_year_'+str(i)]
-                end_year = request.POST['end_year_'+str(i)]
-                gpa = request.POST['gpa_'+str(i)]
-                add_education(student,degree,institute,start_year,end_year,gpa)
-            except Exception as e:
-                print(e)
+        
+        try:
+            e = Education.objects.filter(student=student)
+            if e:
+                print("INSIDE IF ******************************")
+                education = e[0]
+                education.degree = degree_obj
+                education.institute = institute
+                education.start_year = start_year
+                education.end_year = end_year
+                education.gpa = gpa
+                education.save()
+            else:
+                print("INSIDE ELSE ******************************")
+                education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
+                education.save()
+                student.education.add(education)
+        except IndexError as e:
+            print("HERE****************************")
+            education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
+            education.save()
+            student.education.add(education)
+            print(e)
+        except Exception as e:
+            print(e)
+        #education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
+        # for i in range(1,6):
+        #     try:
+        #         degree = request.POST['degree_'+str(i)]
+        #         institute = request.POST['institute_'+str(i)]
+        #         start_year = request.POST['start_year_'+str(i)]
+        #         end_year = request.POST['end_year_'+str(i)]
+        #         gpa = request.POST['gpa_'+str(i)]
+        #         add_education(student,degree,institute,start_year,end_year,gpa)
+        #     except Exception as e:
+        #         print(e)
 
-        education.save()
-        student.education.add(education)
+        #education.save()
+        #student.education.add(education)
         return student_form,education_form
 
 def student_profile_confirm(request,pk,job):
+    
     context = {}
     context['confirm']=True
     context['job_id']=job
@@ -462,8 +500,13 @@ def student_profile_confirm(request,pk,job):
     else:
         student_form = StudentForm(instance = student)
         education_form = EducationForm()
+        jobApplicationForm = JobApplicationForm()
     context['form']=student_form
     context['education_form']=education_form
+    context['jobApplicationForm']=jobApplicationForm
+    # return reverse('student_profile_confirm',kwargs={'pk':request.user.student.id,'job':job})
+    # return HttpResponseRedirect(reverse('student_profile_confirm',kwargs={'pk':request.user.student.id,'job':job}))
+    # return HttpResponse(str(reverse('student_profile_confirm',kwargs={'pk':request.user.student.id,'job':job})))
     return render(request,'emp/student_form.html',context)
 
 
@@ -473,10 +516,21 @@ def student_profile(request,pk):
     context['student']=student
     context['skills']=Skill.objects.all()
     if request.method=='POST':
-        student_form,education_form = save_student_profile(request,student)
+        student_form = StudentForm(request.POST)
+        education_form = EducationForm(request.POST)
+        if student_form.is_valid() and education_form.is_valid():
+            student_form,education_form = save_student_profile(request,student)
+            messages.success(request, 'Profile uodated successfully')
+        else:
+            messages.danger(request, 'Error in updating profile')
     else:
         student_form = StudentForm(instance = student)
-        education_form = EducationForm()
+        try:
+            e = Education.objects.filter(student=student).order_by('-end_year')[0]
+            education_form = EducationForm(instance = e)
+        except IndexError as e:
+            education_form = EducationForm()
+            print(e)
     context['form']=student_form
     context['education_form']=education_form
     institutes = AcademicCenter.objects.values('id','institution_name')
@@ -518,13 +572,17 @@ def shortlist_student(request):
 
 
 
-def update_job_app_status(spk_user_id,job,flag):
+# def update_job_app_status(spk_user_id,job,flag,student_id):
+def update_job_app_status(job,student,spk_user_id):
+    job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,student=student,status=APPLIED_SHORTLISTED)
+    
 
-	if flag:
-		job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,status=APPLIED_SHORTLISTED) #student has applied & is eligible for job
-	else:
-		job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,status=APPLIED_REJECTED) #student has applied & is not eligible for job
-	return True
+ #    student = Student.objects.get(id=student_id)
+	# if flag:
+	# 	job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,student=student,status=APPLIED_SHORTLISTED) #student has applied & is eligible for job
+	# else:
+	# 	job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,student=student,status=APPLIED_REJECTED) #student has applied & is not eligible for job
+	# return True
 	
 # class JobShortlistListView(PermissionRequiredMixin,ListView):
 class JobAppStatusListView(ListView):
@@ -563,30 +621,28 @@ class JobShortlistDetailView(DetailView):
 
 
 class JobShortlistListView(ListView):
-    #permission_required = 'emp.view_job'
     model = JobShortlist
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # job = Job.objects.get(id=self.kwargs['id'])
-        # context['job']=job
         return context
 
-    # def get_queryset(self):
-    #     id = self.kwargs['id']
-    #     l = JobShortlist.objects.filter(job_id=id)
-    #     return l
-
 def add_student_job_status(request):
-    spk_user_id = int(request.GET.get('spk_user_id'))
-    job_id = int(request.GET.get('job_id'))
-    job = Job.objects.get(id=job_id)
-    flag = True
-    r=update_job_app_status(spk_user_id,job,flag)
-    data = {'msg':True}
-    return JsonResponse(data)
+    context={}
+    form = JobApplicationForm(request.POST)
+    if form.is_valid():
+        job_id = form.cleaned_data['job_id']
+        spk_user_id = form.cleaned_data['spk_user_id']
+        student_id = form.cleaned_data['student']
+        student = Student.objects.get(id=student_id)
+        job = Job.objects.get(id=job_id)
+        r=update_job_app_status(job,student,spk_user_id)
+        messages.success(request, 'Job Application Submitted Successfully!')
+        context['applied_jobs'] = [x.job for x in JobShortlist.objects.filter(student=student)]
+    else:
+        print(form.errors)
+    return HttpResponseRedirect(reverse('applied-job-list'))
 
 def check_student_eligibilty(request):
-    # spk_user_id = int(request.GET.get('spk_user_id', None))
     flag = False
     spk_user_id = int(request.GET.get('spk_user_id'))
     job_id = int(request.GET.get('job_id'))

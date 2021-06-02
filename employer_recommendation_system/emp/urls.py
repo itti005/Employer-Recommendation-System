@@ -39,5 +39,5 @@ urlpatterns = [
     path('job_application_status/', JobAppStatusListView.as_view(), name='job-app-status'),
     # path('job/<int:id>/status', JobShortlistDetail.as_view(), name='job-app-detail'),
     path('job_application_status/<int:id>/', views.job_app_details, name='job-app-detail'),
-
-        ]
+    # path('applied_jobs/', JobAppStatusListView.as_view(), name='job-app-status'),
+]
