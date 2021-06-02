@@ -28,7 +28,7 @@
 }
 .list-group-item.active{
   background-color: #fff!important;
-  border: 1px solid #0066A0!important
+  border: 1px solid orange!important;
   
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link{
@@ -38,6 +38,38 @@
   border-bottom: 1px solid #0066A0;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
+}
+.border-o{
+  border: 1px solid orange!important;
+}
+#v-pills-tab{
+  /*height: 400px;
+  overflow-y: scroll!important;
+  overflow-x: scroll!important;
+  /*overflow: scroll;*/
+  
+
+  /*background: #4CAF50;
+  color: white;
+  padding: 15px;
+  width: 50%;
+  height: 400px;
+  overflow-y: scroll;
+  border: 1px solid #ccc;*/
+}
+.job-lst{
+  
+  height: 70vh;
+  overflow-y: scroll!important;
+  overflow-x: scroll!important;
+  /*overflow: scroll;*/
+  border-left: 1px solid rgba(0,0,0,0.2);
+}
+.job-details{
+  border: 1px solid rgba(0,0,0,0.2);
+  height: 70vh;
+  overflow-y: scroll!important;
+  overflow-x: scroll!important;
 }
 </style>
 {% endblock %}
@@ -130,9 +162,16 @@
 <div class="row">
   <!-- <div class="d-flex align-items-start"> -->
     <div class="row align-items-start">
-  <div class="col-4 nav  nav-pills me-3 list-group list-group-flush border-bottom scrollarea" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+      <div class="col-4 job-lst">
+  <div class="nav  nav-pills me-3 list-group list-group-flush border-bottom scrollarea" id="v-pills-tab" role="tablist" aria-orientation="vertical">
     {% for job in object_list %}
-            <a class="nav-link list-group-item list-group-item list-group-item-action  py-3 lh-tight" id="v-pills-home-tab" data-bs-toggle="pill" href="#job_detail_{{job.id}}"  role="tab" aria-controls="v-pills-home" aria-selected="true"><div class="d-flex w-100 align-items-center justify-content-between">
+    {% if forloop.first %}
+    <a class="nav-link list-group-item list-group-item list-group-item-action  py-3 lh-tight active" id="v-pills-home-tab" data-bs-toggle="pill" href="#job_detail_{{job.id}}"  role="tab" aria-controls="v-pills-home" aria-selected="true">
+      {% else %}
+      <a class="nav-link list-group-item list-group-item list-group-item-action  py-3 lh-tight" id="v-pills-home-tab" data-bs-toggle="pill" href="#job_detail_{{job.id}}"  role="tab" aria-controls="v-pills-home" aria-selected="true">
+    {% endif %}
+            
+            <div class="d-flex w-100 align-items-center justify-content-between">
           {% if job.company.logo %}
     <img class="d-block align-self-center m-2" src="{{ job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" 
     style=" height: 50px;display: inline;">
@@ -148,9 +187,15 @@
             <li>No jobs yet.</li>
         {% endfor %}
   </div>
-  <div class="col-6 tab-content flex-fill ">
+  </div>
+  <div class="col-6 tab-content flex-fill job-details">
     {% for job in object_list %}
-            <div class="tab-pane fade show " id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
+    {% if forloop.first %}
+    <div class="tab-pane fade show active" id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
+    {% else %}
+    <div class="tab-pane fade show " id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
+    {% endif %}
+            
               <div class="d-flex">
                 <div class="">
                   {% if job.company.logo %}
@@ -188,7 +233,6 @@
               {% endif %} 
               
             {% else %}
-            <!-- <a href="#" class="btn btn-success" onclick="check_eligibility(this,'{{request.user.student.spk_usr_id}}','{{job.id}}','{{request.user.id}}');" id="apply_{{job.id}}"><i class="bi bi-cursor "></i> Apply</a> -->
             <span></span>
             {% endif %}
           {% endif %}
@@ -199,7 +243,7 @@
                 <div class="col-sm-6 ">
                   <div class="card highlights">
                     <div class="card-body">
-                      <p class="card-title">Job Highlights</p>
+                      <p class="card-title"><b>Job Highlights</b></p>
                       <ul class="p-0 my-0 small" style="list-style-type: none;">
                         <li>Type : {{job.job_type}}</li>
                         <li>Salary : {{job.salary_range_min}} - {{job.salary_range_min}}</li>
@@ -212,11 +256,11 @@
                 <div class="col-sm-6 ">
                   <div class="card highlights">
                     <div class="card-body">
-                      <p class="card-title">Company</p>
+                      <p class="card-title"><b>Company</b></p>
                       <ul class="p-0 my-0 small" style="list-style-type: none;">
                         <li>Domain : {{job.company.domain}}</li>
                         <li>Employees : {{job.company.company_size}}</li>
-                        <li>Website : {{job.company.website}}</li>
+                        <li>Website : <a class="c-link" href="{{job.company.website}}" target="_blank">{{job.company.website}}</a></li>
                       </ul>
                       
                     </div>
@@ -225,7 +269,7 @@
               </div>
               <div class="row mt-1">
                 <div class="col">
-                  <div class="card">
+                  <div class="card border-o">
   <div class="card-body">
     <p><i class="bi bi-calendar-event"></i> Last Application Date : {{job.last_app_date}}<br>
     <i class="bi bi-clipboard-data"></i> Skills : {{job.foss}}</p>

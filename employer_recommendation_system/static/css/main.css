@@ -4,3 +4,12 @@
 #main .sidebar{
 	height: 100vh;
 }
+
+a{
+	color: #0066A0;
+	opacity: 90%;
+	text-decoration: none;
+}
+a:hover{
+	opacity: 100%;
+}

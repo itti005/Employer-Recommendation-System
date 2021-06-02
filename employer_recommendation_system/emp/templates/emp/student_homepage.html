@@ -51,7 +51,11 @@
     <h5 class="card-title">{{job.title}}</h5>
     <p class="card-text">{{job.description | slice:":255"}}...</p>
     <a href="#" class="btn btn-info post-apply disabled" style="display: none;" id="applied_{{job.id}}"><i class="fas fa-check mr-3"></i>Applied</a>
-      <a class="btn btn-info pre-apply" onclick="check_eligibility(this,'{{request.user.student.spk_usr_id}}','{{job.id}}','{{request.user.id}}');" id="apply_{{job.id}}">Apply</a>
+      <!-- <a class="btn btn-info pre-apply" onclick="check_eligibility(this,'{{request.user.student.spk_usr_id}}','{{job.id}}','{{request.user.student.id}}');" id="apply_{{job.id}}">Apply</a> -->
+      <a class="btn btn-info pre-apply" href="{% url 'student_profile_confirm' pk=request.user.student.id job=job.id %}" id="apply_{{job.id}}">Apply</a>
+
+
+
   </div>
   <div class="card-footer">
       <small class="text-muted">Posted on {{job.date_updated}}</small><br>
@@ -119,35 +123,6 @@
 <script type = "text/javascript">
   function hide_reject_labels(){
     $('.rejected').hide();
-  }
-  function job_app_ineligible(id){
-    $('#e_'+id).show();
-    $('#t_'+id).show();
-  }
-  function job_app_eligible(id){
-    $('#apply_'+id).hide();
-    $('#applied_'+id).show();
-  }
- 
-  function check_eligibility(apply_btn,spk_user_id,job_id,rec_user_id){
-    apply_btn_id = apply_btn.id;
-    $.ajax({
-      url: "/check_student_eligibilty",
-      data: {
-        'job_id' : job_id,
-        'spk_user_id' : spk_user_id
-      },
-      dataType: 'json',
-      success:function(data){
-        var messages = data.is_eligible
-        id=apply_btn_id.split('_');
-        if (data.is_eligible==true) {
-          url = $("#student_profile").attr('href');
-          window.location.href = url+"/"+job_id
-        }else{
-          job_app_ineligible(id[1]);
-        }
-    }});
   }
     $(document).ready(function(){
       $('[data-toggle="tooltip"]').tooltip();

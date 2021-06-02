@@ -21,6 +21,13 @@ class StudentGradeFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+class JobApplicationForm(forms.Form):
+    job_id = forms.IntegerField()
+    student = forms.IntegerField()
+    spk_user_id = forms.IntegerField()
+
+    
+
 
 class EducationForm(ModelForm):
     class Meta:

@@ -72,3 +72,13 @@ def job_accepted(value, args):
 def application_count(job):
     return JobShortlist.objects.filter(job=job).count()
 
+@register.filter()
+def format_char(value):
+    s=''
+    for val in value.split():
+        if len(val)>1:
+            s+=val[0].capitalize()+val[1:].lower()+' '
+        else:
+            s+=val[0].capitalize()+' '
+    print(f"value*******************{s}")
+    return s
