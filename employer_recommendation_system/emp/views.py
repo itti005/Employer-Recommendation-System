@@ -23,7 +23,7 @@ from django.db.models.expressions import RawSQL
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-
+from django.conf import settings
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
@@ -604,6 +604,7 @@ def job_app_details(request,id):
     context['job'] = job
     context['students_awaiting'] = students_awaiting
     context['students_shortlisted'] = students_shortlisted
+    context['mass_mail']=settings.MASS_MAIL
     return render(request,'emp/job_app_status_detail.html',context)
 
 
