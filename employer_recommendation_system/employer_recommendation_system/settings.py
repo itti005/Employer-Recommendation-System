@@ -205,7 +205,7 @@ DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR,'backup')}
 CRON_LOG=os.path.join(BASE_DIR,'backup.log')
 CRONJOBS=[('*/1 * * * *', 'emp.cron.backup_closed_jobs','>> ~/cron_job.log')]
 
-
+MASS_MAIL=MASS_MAIL
 
 
 
