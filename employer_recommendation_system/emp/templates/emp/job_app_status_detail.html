@@ -1,5 +1,6 @@
 {% extends 'emp/base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% load helper %}
 {% block content-header %}Job List{% endblock %}
 {% block css %}
@@ -33,19 +34,17 @@
     <div ></div>
   </div>
 </div>
-<div class="row mb-3">
-  <div class="col-md-2"><button type="button" class="btn btn-outline-success">Send Mass Mail</button></div>
-  <div class="col-md-10 border p-1">
-    <span>Some info regarding mass mail.</span>
+<div class="row mb-3" id="mass-mail" style="display: none;">
+  <div class="col-md-2"><button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#taskModal">Create Mass Mail</button></div>
+  <div class="col-md-10 border p-2">
+    <span>Please make sure that you are logged in <a href="https://spoken-tutorial.org/" target="_blank">https://spoken-tutorial.org/</a></span>
   </div>
-  
-  
 </div>
 <div>
   <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
-    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-awaiting" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Awaiting Shortlist</button>
-    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-shortlisted" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Shortlisted</button>
+    <button class="nav-link active" id="nav-awaiting-tab" data-bs-toggle="tab" data-bs-target="#nav-awaiting" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Awaiting Shortlist</button>
+    <button class="nav-link" id="nav-shortlisted-tab" data-bs-toggle="tab" data-bs-target="#nav-shortlisted" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Shortlisted</button>
   </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
@@ -97,15 +96,55 @@
 </div>
 </div>
 
+<!-- Modal -->
+<center>
+  <div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="taskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="exampleModalTitle">Subject:</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          
+        </div>
+        <div class="modal-body">
+          <form method='post' action="">
+          {% csrf_token %}
+            <div class="form-group">
+              <label for="recipient-name" class="control-label">Subject:</label>
+              <input type="text" class="form-control" id="task_subject" name = "task_subject" required>
+            </div>
+            <div class="form-group">
+              <label for="job-id" class="control-label">Job Id:</label>
+              <input type="text" class="form-control" id="task_job" name = "task_job" required>
+            </div>
+            <div class="form-group">
+              <label for="message-text" class="control-label">Message:</label>
+              <textarea class="form-control" id="task_message" name = "task_message"></textarea>
+            </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary " id ="task_submit" onclick="send_mass_mail(event)">Create</button>
+          </div>
+        </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  </center>
+
+  {{ mass_mail|json_script:'name' }}
 {% endblock %}
 
 {% block js %}
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 
 <script type = "text/javascript">
-
+  // var mass_mail_url;
   var tb_s;
   var tb_a;
+  var mass_mail_url;
   function shortlist_student(apply_btn,job_id){
     apply_btn_id = apply_btn.id;
     var student_ids = [];
@@ -130,11 +169,10 @@
     }});
   }
     $(document).ready(function (){
+      mass_mail_url = JSON.parse(document.getElementById('name').textContent);
       tb_s = $('#tb-shortlisted').DataTable();  
       tb_a = $('#tb-awaiting').DataTable();
-
       var selected = [];
-
     $('#select-all').change(function() {
       
         if(this.checked) {
@@ -149,7 +187,6 @@
     $('input.select-student:checkbox').change(function() {
         var allVals = [];
         $('input.select-student:checked').each(function() {
-          console.log('here');
        allVals.push($(this).val());
      });
         if (allVals.length) {
@@ -165,7 +202,54 @@
         }
      $('#t').val(allVals);
     });
+    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+      var target = $(e.target).attr("id"); // activated tab
+      if (target=='nav-shortlisted-tab'){
+        $('#mass-mail').show();
+      }else{
+        $('#mass-mail').hide();
+      }
+  });
+    
 });
+</script>
+<script>
+
+
+function send_mass_mail(event) {
+        event.preventDefault();
+        
+        table = $('#tb-shortlisted').DataTable()
+        if (table.data().any() == false){
+          alert('Email list is empty. Please filter emails for mass mail.')
+          return
+        }
+         
+        emails = table.column(3).data()
+        data = []
+        for (i = 0; i < emails.length; i++) {
+              data.push([emails[i]])
+            }
+            alert(data);
+      modal = $('#taskModal').modal()
+      subject = modal.find('.modal-body input[name="task_subject"]').val()
+      job = modal.find('.modal-body input[name="task_job"]').val()
+      message = CKEDITOR.instances['task_message'].getData()
+      data = JSON.stringify({ 'data': data });
+      m_url = mass_mail_url;
+      $.post(m_url,{'subject': subject,'job': job, 'message': message, 'data': data},
+      function(success_url){
+        window.location = success_url
+        }
+      );
+      }
+</script>
+<script type="text/javascript" src="{% static '/ckeditor/ckeditor-init.js' %}"></script>
+<script type="text/javascript" src="{% static '/ckeditor/ckeditor/ckeditor.js' %}"></script>
+<script>
+  // Replace the <textarea id="editor1"> with a CKEditor
+  // instance, using default configuration.
+  CKEDITOR.replace( 'task_message' );
 </script>
 {% endblock %}
 

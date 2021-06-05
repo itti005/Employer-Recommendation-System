@@ -50,15 +50,16 @@ class Skill(models.Model):
         return self.name
 
 class Education(models.Model):
-    degree = models.ForeignKey(Degree,null=True,blank=True,on_delete=models.CASCADE)
+    degree = models.ForeignKey(Degree,null=True,on_delete=models.CASCADE)
     # institute = models.CharField(max_length=400) #Institute name
     #institute = models.ForeignKey(AcademicCenter,max_length=400,on_delete=models.CASCADE,null=True,blank=True) #Institute name
     institute = models.IntegerField(null=True)
     start_year = models.IntegerField(choices=START_YEAR_CHOICES, default=1)
     end_year = models.IntegerField(choices=END_YEAR_CHOICES, default=1)
     gpa = models.CharField(max_length=10,null=True,blank=True)
+    
     def __str__(self):
-        return self.degree.name+'_'+self.institute
+        return self.degree.name+'_'+str(self.institute)
 
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
@@ -192,7 +193,7 @@ class Job(models.Model):
 class JobShortlist(models.Model):
     # user=models.ForeignKey(User,on_delete=models.CASCADE)
     spk_user=models.IntegerField(null=True)  #spk
-    student=models.ForeignKey(Student,on_delete=models.CASCADE)  #spk
+    student=models.ForeignKey(Student,on_delete=models.CASCADE)  #rec
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, null=True,blank=True)
     #0 : awaiting for further shortlist
@@ -200,6 +201,6 @@ class JobShortlist(models.Model):
     status = models.IntegerField(null=True,blank=True)
 
     def __str__(self):
-        return self.spk_user+'-'+self.job.title
+        return str(self.spk_user)+'-'+self.job.title
 
 

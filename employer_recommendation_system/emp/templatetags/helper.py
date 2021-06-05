@@ -81,3 +81,13 @@ def get_statedetails(stateid):
 def get_citydetails(cityid):
     return SpokenCity.objects.get(id=cityid)
 
+@register.filter()
+def format_char(value):
+    s=''
+    for val in value.split():
+        if len(val)>1:
+            s+=val[0].capitalize()+val[1:].lower()+' '
+        else:
+            s+=val[0].capitalize()+' '
+    print(f"value*******************{s}")
+    return s

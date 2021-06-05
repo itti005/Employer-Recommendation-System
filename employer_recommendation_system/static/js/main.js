@@ -9,14 +9,16 @@
     $('#apply_'+id).hide();
   }
  
-  function check_eligibility(apply_btn,spk_user_id,job_id,rec_user_id){
+  function check_eligibility(apply_btn,spk_user_id,job_id,rec_student_id){
+    alert('here 1');
     console.log(apply_btn,spk_user_id,job_id,rec_user_id)
     apply_btn_id = apply_btn.id;
     $.ajax({
       url: "/check_student_eligibilty",
       data: {
         'job_id' : job_id,
-        'spk_user_id' : spk_user_id
+        'spk_user_id' : spk_user_id,
+        'student_id' : rec_student_id
       },
       dataType: 'json',
       success:function(data){

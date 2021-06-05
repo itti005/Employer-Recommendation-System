@@ -1,9 +1,10 @@
 {% extends 'emp/base.html' %}
 {% load static %}
+{% load helper %}
 {% load crispy_forms_tags %}
 {% block css %}
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}">
+<!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
+<link rel="stylesheet" type="text/css" href="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}">
 <style type="text/css">
 	.select2-container{
 		width: 100%!important;
@@ -12,161 +13,160 @@
 		border: none!important;
 		border: 1px solid #ced4da!important;
 	}
+  i{
+    color: #0066A0;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-{% if confirm %}
 <div class="row">
+  <div class="col-md-8">
+    {% for message in messages %}
+         <div class="text-center alert {{ message.tags }}">
+             {{ message|safe }}
+         </div>
+{% endfor %}
+  </div>
+  
+</div>
+{% if confirm %}
+<p id="disable-form" class="d-none">diable form</p>
+<div class="row d-toast" style="display: none;">
   <div class="col-sm-8">
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="max-width: 100%;">
+    <div class="toast w-100" role="alert" aria-live="assertive" aria-atomic="true">
   <div class="toast-header">
-    <img src="{{ job.company.logo.url|default_if_none:'#' }}" class="rounded mr-2" style="width: auto;height: 20px;">
-    <strong class="mr-auto">{{job.title}}</strong>
-    <i class="far fa-check-square" style="color: green;"></i>
-    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+    <img src="{{ job.company.logo.url|default_if_none:'#' }}" class="rounded mr-2" style="width: auto;height: 40px;">
+    <strong class="me-auto"><span class="mx-3">{{job.company.name}}</span></strong>
+    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
   </div>
   <div class="toast-body">
-    Your application is successfully submitted !
+    <span style="font-size: 1rem;margin-right: 1rem;"><i class="bi bi-check-all"></i></span>Your application is successfully submitted for <b>{{job.title}}</b>
   </div>
 </div>
   </div>
   
 </div>
 
-<div class="mt-5">
+<div class="">
   <p><b>Below profile details will be sent to the company.</b></p>
   <div class="row">
-    <div class="col-md-6" id="confirm"><button id="confirm-btn" type="button" class="btn btn-outline-success" onclick="apply_for_job('{{request.user.student.spk_usr_id}}','{{job_id}}');" >Confirm & Apply</button></div>
-    <div class="col-md-6" id="modify"><button type="button" class="btn btn-outline-info" >Modify</button></div>
+    <div class="col-md-4">
+      <span><button type="submit" form="form-job-app" class="btn btn-outline-secondary" type="submit" id="confirm_apply">Confirm & Apply</button></span>
+    </div>
+    <div class="col-md-4">
+      <!-- <span><button type="button" class="btn btn-outline-secondary" id="modify">Modify</button></span> -->
+      <span><a target="_blank" class="btn btn-outline-secondary" href="{% url 'student_profile' pk=request.user.student.id %}">Modify</a></span>
+    </div>
+    <div class="col-md-8"><hr></div>
+    
+  </div>
+  <div class="d-none">
+    <form id="form-job-app" action="{% url 'add_student_job_status' %}" method="post">
+      {% csrf_token %}
+    <input type="number" name="job_id" required="" id="id_job_id" value="{{job.id}}">
+    <input type="number" name="student" required="" id="id_student" value="{{request.user.student.id}}">
+    <input type="number" name="spk_user_id" required="" id="id_spk_user_id" value="{{request.user.student.spk_usr_id}}">
+    </form> 
+  </div>
+  
+  <div class="row">
+    <!-- <div class="col-md-6" id="confirm"><button id="confirm-btn" type="button" class="btn btn-outline-success" onclick="apply_for_job('{{request.user.student.spk_usr_id}}','{{job_id}}','{{request.user.student.id}}');" >Confirm & Apply</button></div> -->
+    <!-- <div class="col-md-6" id="confirm"><a id="confirm-btn" type="button" class="btn btn-outline-success" 
+      href="{% url 'add_student_job_status' %}" 
+     >Confirm & Apply</a></div> -->
+
+
+
+
+    <!-- <div class="col-md-6" id="modify"><button type="button" class="btn btn-outline-info" >Modify</button></div> -->
   </div>
 </div>
 {% endif %}
 <form class="py-5">
 	<div class="form-row">
 		<div class="col-sm-8">
-			<div class="form-group">
-	    		<div class="input-group mb-2">
-        			<div class="input-group-prepend">
-          				<div class="input-group-text"><i class="fas fa-user"></i></div>
-        			</div>
-        			<input class="form-control" id="" value="{{student.user.get_full_name | default_if_none:''}}" readonly>
-      			</div>
-  			</div>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="col-lg-4 col-sm-6">
-			<div class="form-group">
-	    		<div class="input-group mb-2">
-        			<div class="input-group-prepend">
-          				<div class="input-group-text"><i class="fas fa-envelope"></i></div>
-        			</div>
-        			<input class="form-control" id="" value="{{student.user.email | default_if_none:''}}" readonly>
-      			</div>
-  			</div>
-		</div>
-		<div class="col-lg-4 col-sm-6">
-			<div class="form-group">
-	    		<div class="input-group mb-2">
-        			<div class="input-group-prepend">
-          				<div class="input-group-text"><i class="fas fa-phone-alt"></i></div>
-        			</div>
-        			<input class="form-control" id="" value="{{student.phone | default_if_none:''}}" readonly>
-      			</div>
-  			</div>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="col-sm-8">
-			<div class="form-group">
-	    		<div class="input-group mb-2">
-        			<div class="input-group-prepend">
-          				<div class="input-group-text"><i class="fas fa-home"></i></div>
-        			</div>
-        			<input class="form-control" id="" value="{{student.address | default_if_none:''}}" readonly>
-      			</div>
-  			</div>
-		</div>
-		<div class="col-sm-8">
-			<div class="form-group">
-	    		<div class="input-group mb-2">
-        			<div class="input-group-prepend">
-          				<div class="input-group-text"><i class="fas fa-map-marker-alt"></i></div>
-        			</div>
-        			<input class="form-control" id="" value="{{location}}" readonly></input>
-      			</div>
-  			</div>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="col-sm-8">
-			<div class="form-group">
-	    		<div class="input-group mb-2">
-        			<div class="input-group-prepend">
-          				<div class="input-group-text"><i class="fas fa-landmark"></i></div>
-        			</div>
-        			<input class="form-control" id="" value="{{student.spk_institute | default_if_none:''}}" readonly>
-      			</div>
-  			</div>
-		</div>
-		<div class="col-sm-8">
-			<div class="form-group">
-	    		<div class="input-group mb-2">
-        			<div class="input-group-prepend">
-          				<div class="input-group-text"><i class="fas fa-map-marker-alt"></i></div>
-        			</div>
-        			<input class="form-control" id="" value="{{location}}" readonly></input>
-      			</div>
-  			</div>
+      <div class="col-12 mb-3">
+        <div class="input-group">
+          <div class="input-group-text"><i class="bi bi-person-fill"></i></div>
+          <input type="text" class="form-control" value="{{student.user.get_full_name | default_if_none:'' | format_char}}" readonly>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6 mb-3">
+        <div class="input-group">
+          <div class="input-group-text"><i class="bi bi-envelope"></i></i></div>
+          <input type="text" class="form-control" value="{{student.user.email | default_if_none:''}}" readonly>
+        </div>
+      </div>
+      <div class="col-6 mb-3">
+        <div class="input-group">
+          <div class="input-group-text"><i class="bi bi-telephone"></i></div>
+          <input type="text" class="form-control" value="{{student.phone | default_if_none:'' }}" readonly>
+        </div>
+      </div>
+      </div>
+      
+      <div class="col-12 mb-3">
+        <div class="input-group">
+          <div class="input-group-text"><i class="bi bi-house"></i></div>
+          <input type="text" class="form-control" value="{{student.address | default_if_none:'' }}" readonly>
+        </div>
+      </div>
+      <div class="col-12 mb-3">
+        <div class="input-group">
+          <div class="input-group-text"><i class="fas fa-landmark"></i></div>
+          <input type="text" class="form-control" value="{{student.user.phone | default_if_none:'' }}" readonly>
+        </div>
+      </div>
 		</div>
 	</div>
 </form>
-<form method="post" id="form-student">
-	<div class="form-row">
+<form method="post" id="form-student" readonly>
+
+	<div class="row">
     	<div class="col-sm-8">
+        <!-- <label>{{ form.skills.label_tag }}</label>
     		<div class="demo mb-3">
-          <label>{{ form.skills.label_tag }}</label>
-  			<select multiple >
+          
+  			<select style="display: none;" multiple >
   			{% for skill in skills %}	
   			<option value="{{skill.id}}">{{skill.name}}</option>
   			{% endfor %}
   			</select>
-		</div>
+		</div> -->
     	</div>
-		<input type="hidden" id="skills_m" name="skills_m">
-    	<div class="col-sm-8">
+		<input type="hidden" id="skills_m" name="skills_m" >
+    	<div class="col-sm-8 mb-3">
       		{{ form.about | as_crispy_field }}
     	</div>
-    	<div class="col-sm-8">
+    	<div class="col-sm-8 mb-3">
       		{{ form.experience | as_crispy_field }}
     	</div>
-    	<div class="col-sm-4">
+    	<div class="col-sm-4 mb-3">
     	</div>
-    	<div class="col-sm-4">
+    	<div class="col-sm-4 mb-3">
       		{{ form.linkedin | as_crispy_field }}
     	</div>
-		<div class="col-sm-4">
+		<div class="col-sm-4 mb-3">
       		{{ form.github | as_crispy_field }}
     	</div>
-    	<div class="col-sm-8">
+    	<div class="col-sm-8 mb-3">
       	{{ form.cover_letter | as_crispy_field }}
     	</div>
 
     	<!-- Add Education -->
-    	<div class="col-sm-4"></div>
-    	<div class="col-sm-4">
+    	<div class="col-sm-4 mb-3"></div>
+    	<div class="col-sm-4 mb-3">
       	{{ education_form.degree | as_crispy_field }}
     	</div>
-    	<div class="col-sm-4">
+    	<div class="col-sm-4 d-none" >
       	{{ education_form.institute | as_crispy_field }}
     	</div>
       <!-- <div class="d-none"><input type="text" id="institute" name="institute"></div> -->
-      <div class="col-md-6 form-group">
-            <div class="form-group">
-                <label for="state">Institutes</label>
+      <div class="col-md-4 mb-3">
+            <div>
+                <label for="state">Institute</label>
                 <select class="form-control" id="institute-select">
                   {% for i in institutes %} 
                     <option value="{{i.id}}">{{ i.institution_name }}</option>
@@ -174,62 +174,87 @@
                 </select>
             </div>
       </div>
-    	<div class="col-sm-4"></div>
-    	<div class="col-sm-3">
+    	<div class="col-sm-4 mb-3"></div>
+    	<div class="col-sm-3 mb-3">
       	{{ education_form.start_year | as_crispy_field }}
     	</div>
-    	<div class="col-sm-3">
+    	<div class="col-sm-3 mb-3">
       	{{ education_form.end_year | as_crispy_field }}
     	</div>
-    	<div class="col-sm-2">
+    	<div class="col-sm-2 mb-3">
       	{{ education_form.gpa | as_crispy_field }}
     	</div>
-      <div class="col-12">
+      <!-- <div class="col-12 mb-3">
         <div class="container" >
           <div class='element' id='div_0'>
             <span class='add'>Add Education</span>
           </div>
         </div>
-      </div>
+      </div> -->
 	</div>
 	{% csrf_token %}
 
-	<button type="submit" class="btn btn-primary mb-5" id="update_profile" {% if confirm %} style="display: none;" {% endif %}>Update Profile</button>
+	<button type="submit" class="btn btn-success mb-5" id="update_profile" {% if confirm %} style="display: none;" {% endif %}>Update Profile</button>
 </form>
 {% endblock %}
 {% block js %}
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script  src="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
+
+<script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
 
 <script type="text/javascript">
 
-function apply_for_job(spk_user_id,job_id){
+function apply_for_job(spk_user_id,job_id,student_id){
     $.ajax({
       url: "/add_student_job_status",
       data: {
         'job_id' : job_id,
-        'spk_user_id' : spk_user_id
+        'spk_user_id' : spk_user_id,
+        'student_id' : student_id  //rec student
       },
       dataType: 'json',
       success:function(data){
         var messages = data.msg
         $('.toast').toast({'autohide':false});
         $('.toast').toast('show') ;
+        $('.d-toast').show() ;
     }});
   }
 
 $(document).ready(function() {
-  // $("#form-student :input").prop("disabled", true);
+    if ($('#disable-form').html()) {
+      $("#form-student :input").prop("disabled", true);
+    }
+    insti = $('#id_institute').val();
+    $('#institute-select').val(parseInt(insti));
     var degree_list = [];
     var institute_list = [];
     var start_year_list = [];
     var end_year_list = [];
     var current_index = 0;
-    $('.js-example-basic-multiple').select2();
-    $('.demo').dropdown({multipleMode:'label'});
+    // $('.js-example-basic-multiple').select2();
+    $('.demo').dropdown({});
     $( "#modify" ).click(function() {
-    $("#"+this.id).hide();
-    $("#update_profile").show();
+      $("#"+this.id).hide();
+      $('#confirm_apply').hide();
+      $('#save_changes_btn').show();
+      $('#cancel_btn').show();
+      $("#form-student :input").prop("disabled", false);
+    
+    // $("#update_profile").show();
+    // $("#form-student :input").prop("disabled", false);
+
+    });
+    $( "#cancel_btn" ).click(function() {
+      $("#"+this.id).hide();
+      $('#cancel_btn').hide();
+      $('#save_changes_btn').hide();
+      $('#confirm_apply').show();
+      $('#modify').show();
+      $("#form-student :input").prop("disabled", true);
+      
+    
+    // $("#update_profile").show();
     // $("#form-student :input").prop("disabled", false);
 
     });
