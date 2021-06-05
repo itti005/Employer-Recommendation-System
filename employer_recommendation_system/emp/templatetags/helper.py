@@ -2,6 +2,7 @@ from django import template
 from django.conf import settings
 from moodle.models import *
 from emp.models import JobShortlist
+from spoken.models import *
 
 
 register = template.Library()
@@ -71,4 +72,12 @@ def job_accepted(value, args):
 @register.simple_tag
 def application_count(job):
     return JobShortlist.objects.filter(job=job).count()
+
+@register.simple_tag
+def get_statedetails(stateid):
+    return SpokenState.objects.get(id=stateid)
+
+@register.simple_tag
+def get_citydetails(cityid):
+    return SpokenCity.objects.get(id=cityid)
 
