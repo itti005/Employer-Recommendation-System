@@ -3,15 +3,12 @@
     $('.rejected').hide();
   }
   function job_app_ineligible(id){
-    console.log("SHOW STATUSS");
     $('#e_'+id).show();
     $('#t_'+id).show();
     $('#apply_'+id).hide();
   }
  
   function check_eligibility(apply_btn,spk_user_id,job_id,rec_student_id){
-    alert('here 1');
-    console.log(apply_btn,spk_user_id,job_id,rec_user_id)
     apply_btn_id = apply_btn.id;
     $.ajax({
       url: "/check_student_eligibilty",
@@ -37,7 +34,6 @@
     $(document).ready(function(){
       $('#select-state').change(function() {
             var state = $(this).val();
-            // alert(state)
             if(state){
                 $.ajax({
                     url: "/ajax-state-city/",

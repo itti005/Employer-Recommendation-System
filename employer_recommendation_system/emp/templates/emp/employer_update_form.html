@@ -4,7 +4,48 @@
 {% block content %}
 <form method="post" enctype="multipart/form-data">{% csrf_token %}
     {{ form | crispy }}
-    <input type="submit" value="Update">
+    <div class="col-md-6 form-group">
+            <div class="form-group">
+                <label for="state">State</label>
+                <select class="form-control" id="select-state">
+                  {% for s in state %} 
+                    <option value="{{s.id}}">{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    	</div>
+    	<div class="col-md-6 form-group">
+    		<div class="form-group">
+                <label for="city">City</label>
+                <select class="form-control" id="select-city" disabled>
+                  {% for c in city %} 
+                    <option value="{{c.id}}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+</div>
+<button type="submit" class="btn btn-success mt-3" id="company-update">Update</button>
+    <!-- <input type="submit" value="Update" id="company-update"> -->
 </form>
+
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+	$( document ).ready(function() {
+		$('#select-state').val($('#id_state_c').val());
+		$('#select-city').val($('#id_city_c').val());
+   		$( "#company-update" ).click(function() {
+		  state = $('#select-state').val();
+		  city = $('#select-city').val();
+		  $('#id_state_c').val(parseInt(state));
+		  $('#id_city_c').val(parseInt(city));
+		});
+	});
+</script>
+
 {% endblock %}
 
