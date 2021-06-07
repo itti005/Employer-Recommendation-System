@@ -404,10 +404,34 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/jobs_update_form.html'
     permission_required = 'emp.change_job'
     model = Job
-    fields = ['company','title','designation','state_job','city_job','skills','description','domain',
-    'salary_range_min','salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities',
-    'gender','state','city','from_date','to_date','activation_status','status']
+    fields = ['company','title','designation','state_job','city_job','skills','description','domain','salary_range_min',
+    'salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender',
+    'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status']
     success_message ="%(title)s was updated successfully"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # get data for filters
+        job = Job.objects.get(id=self.kwargs['slug'])
+        context['state']=SpokenState.objects.all()
+        context['city']=SpokenCity.objects.all()
+        context['job']=job
+        context['filter_foss']=list(map(int,job.foss.split(',')))
+        filter_form = StudentGradeFilterForm({'foss':job.foss,'state':job.state,
+            'city':job.city,'grade':job.grade,'institution_type':job.institute_type,
+            'activation_status':job.activation_status,'from_date':job.from_date,'to_date':job.to_date})
+        context['filter_form']=filter_form
+        return context
+
+    filter_form = StudentGradeFilterForm()
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.save()
+        return super(ModelFormMixin, self).form_valid(form)
 
 def add_education(student,degree,institute,start_year,end_year,gpa):
     degree_obj = Degree.objects.get(id=degree)

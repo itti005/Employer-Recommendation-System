@@ -2,9 +2,13 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block css %}
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
 
-<link rel="stylesheet" href="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}">
+
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.0.0.min.js"></script> -->
+<script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
+<link rel="stylesheet" href="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}">
 <style type="text/css">
   .filter-header{
     border-bottom: 2px solid blue;
@@ -21,79 +25,78 @@
 <form method="POST" enctype="multipart/form-data">
   {% csrf_token %}
         <div class="row">
-          <div class="col-12 form-group">
+          <div class="col-12 mb-3">
             {{ form.title | as_crispy_field }}
           </div>
-          <div class="col-12 form-group">
+          <div class="col-12 mb-3">
             {{ form.designation | as_crispy_field }}
           </div>
-          <div class="col-md-6 form-group">
+          <div class="col-md-6 mb-3">
             {{ form.company | as_crispy_field }}
           </div>
-          <div class="col-md-6 form-group">
+          <div class="col-md-6 mb-3">
             {{ form.domain | as_crispy_field }}
           </div>
-          <div class="col-md-6 form-group d-none">
+          <div class="col-md-6 mb-3 d-none">
             {{ form.state_job | as_crispy_field }}
           </div>
-          <div class="col-md-6 form-group d-none">
+          <div class="col-md-6 mb-3 d-none">
             {{ form.city_job | as_crispy_field }}
           </div>
-          <div class="col-md-6 form-group">
-            <div class="form-group">
+          <div class="col-md-6 mb-3 d-none">
+            {{ form.skills | as_crispy_field }}
+          </div>
+          <div class="col-md-6 mb-3">
                 <label for="state">State</label>
                 <select class="form-control" id="select-state">
                   {% for s in state %} 
                     <option value="{{s.id}}">{{ s }}</option>
                     {% endfor %}
                 </select>
-            </div>
           </div>
-          <div class="col-md-6 form-group">
-            <div class="form-group">
+          <div class="col-md-6 mb-3">
                     <label for="city">City</label>
                     <select class="form-control" id="select-city" disabled>
                       {% for c in city %} 
                         <option value="{{c.id}}">{{ c }}</option>
                         {% endfor %}
                     </select>
-                </div>
           </div>
-          <div class="col-md-3 form-group">
+          <div class="col-md-3 mb-3">
             {{ form.job_type | as_crispy_field }}
          </div>
-          <div class="col-md-3 form-group">
+          <div class="col-md-3 mb-3">
             {{ form.shift_time | as_crispy_field }}
          </div>
-          <div class="col-md-2 form-group">
+          <div class="col-md-2 mb-3">
             {{ form.salary_range_min | as_crispy_field }}
          </div>
-          <div class="col-md-2 form-group" >
+          <div class="col-md-2 mb-3" >
             {{ form.salary_range_max | as_crispy_field }}
          </div>
-         <div class="col-md-2 form-group">
+         <div class="col-md-2 mb-3">
             {{ form.gender | as_crispy_field }}
          </div>
 
-          <div class="col-12 form-group">
+          <div class="col-12 mb-3">
             {{ form.description | as_crispy_field }}
           </div>
-          <div class="col-12 form-group">
+          <div class="col-12 mb-3">
             {{ form.key_job_responsibilities | as_crispy_field }}
           </div>
-          <div class="col-12 form-group">
+          <div class="col-12 mb-3">
             {{ form.requirements | as_crispy_field }}
           </div>
-          <div class="col-12 form-group">
+          <div class="col-12 mb-3">
             {{ form.benefits | as_crispy_field }}
           </div>
           <div class="col-md-4 form-group">
             {{ form.last_app_date | as_crispy_field }}
           </div>
-          <div class="col-md-4 form-group">
+          <div class="col-md-4 mb-3">
             {{ form.rating | as_crispy_field }}
           </div>
-          <div class="col-md-4 form-group">
+          <div class="col-md-4 mb-3">
             {{ form.status | as_crispy_field }}
           </div> 
            
@@ -111,9 +114,9 @@
     </div>
     <div class="row">
       <div class="col-lg-6">
-         <div class="custom-multi-select form-group">
+         <div class="custom-multi-select form-group mb-3">
           <label>{{filter_form.foss.label }}</label>
-          <select class="custom-multi-select" id="foss-select" multiple>
+          <select class="custom-multi-select form-control" id="foss-select" multiple>
           {% for foss in filter_form.foss %} 
           {{ foss }}
           {% endfor %}
@@ -121,9 +124,9 @@
         </div>
       </div>
       <div class="col-lg-6">
-        <div class="custom-multi-select form-group">
+        <div class="custom-multi-select form-group mb-3">
           <label>{{filter_form.institution_type.label }}</label>
-          <select class="custom-multi-select" id="insti-select" multiple="multiple">
+          <select class="custom-multi-select form-control" id="insti-select" multiple="multiple">
           {% for insti in filter_form.institution_type %} 
           {{ insti }}
           {% endfor %}
@@ -131,9 +134,9 @@
         </div>
       </div>
       <div class="col-lg-6">
-        <div class="custom-multi-select form-group">
+        <div class="custom-multi-select form-group mb-3">
         <label>{{filter_form.state.label }}</label>
-        <select class="custom-multi-select" id="state-select" multiple="multiple">
+        <select class="custom-multi-select form-control" id="state-select" multiple="multiple">
         {% for foss in filter_form.state %} 
         {{ foss }}
         {% endfor %}
@@ -141,42 +144,41 @@
       </div>
       </div>
       <div class="col-lg-6">
-        <div class="custom-multi-select form-group">
+        <div class="custom-multi-select form-group mb-3">
           <label>{{filter_form.city.label }}</label>
-          <select class="custom-multi-select"  id="city-select" multiple="multiple">
+          <select class="custom-multi-select form-control"  id="city-select" multiple="multiple">
           {% for foss in filter_form.city %} 
           {{ foss }}
           {% endfor %}
           </select>
         </div>
       </div>
-      <div class="col-lg-3 form-group">
+      <div class="col-lg-3 form-group mb-3">
         {{ filter_form.grade | as_crispy_field }}
       </div>
-      <div class="col-lg-3 form-group">
+      <div class="col-lg-3 form-group mb-3">
         {{ form.activation_status | as_crispy_field }}
       </div>
-      <div class="col-lg-3 form-group">
+      <div class="col-lg-3 form-group mb-3">
         {{ form.from_date | as_crispy_field }}
       </div>
-      <div class="col-lg-3 form-group">
+      <div class="col-lg-3 form-group mb-3">
         {{ form.to_date | as_crispy_field }}
       </div>
     </div>
     <!-- Custom field widgets for Filter ends-->
     <input type="submit" value="Submit" id="job-submit">
+    
 </form>
+
 
 {% endblock %}
 {% block js %}
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script  src="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script> -->
+<!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
 <script type="text/javascript">
-  $("#company_form").click(function(){
-        
-        });
   $( document ).ready(function() {
    $('.custom-multi-select').dropdown({multipleMode:'label'});
    $( "#job-submit" ).click(function() {
@@ -189,8 +191,8 @@
   $('#id_state').val(states.toString());
   $('#id_city').val(cities.toString());
 
-  state = $('#state').val();
-  city = $('#city').val();
+  state = $('#state-select').val();
+  city = $('#city-select').val();
   $('#id_state_job').val(parseInt(state));
   $('#id_city_job').val(parseInt(city));
 

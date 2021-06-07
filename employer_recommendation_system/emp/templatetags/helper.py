@@ -1,6 +1,7 @@
 from django import template
 from django.conf import settings
 from moodle.models import *
+from spoken.models import *
 from emp.models import JobShortlist
 from spoken.models import *
 
@@ -89,5 +90,10 @@ def format_char(value):
             s+=val[0].capitalize()+val[1:].lower()+' '
         else:
             s+=val[0].capitalize()+' '
-    print(f"value*******************{s}")
     return s
+
+@register.filter()
+def display_foss(value):
+    foss = FossCategory.objects.get(id=int(value)).foss
+    return foss
+
