@@ -134,7 +134,8 @@ class Company(models.Model):
 
     def save(self, *args, **kwargs):
         #s = '{} {}'.format(self.company_name)
-        self.slug = slugify(self.name)
+        # self.slug = slugify(self.name)
+        self.slug = slugify(self.id)
         super().save(*args, **kwargs)
 
 class Job(models.Model):
@@ -183,7 +184,8 @@ class Job(models.Model):
         return reverse('job-detail', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.company.name+'_'+self.title)
+        # self.slug = slugify(self.company.name+'_'+self.title)
+        self.slug = slugify(self.id)
         super().save(*args, **kwargs)
 
     class Meta:

@@ -208,9 +208,11 @@
              <b>{{job.title}}</b> <br>
               {{job.state}} , {{job.city}}</p>
                 </div>
-                <div>
+                <div class="mt-1">
                   {% if request.user|has_group:"MANAGER" %}
+
           <a href="https://spoken-tutorial.org/accounts/login/?next=/software-training/student-grade-filter/?id={{job.id}}" class="btn btn-success" target="_blank"><i class="bi bi-cursor "></i> Notify</a>
+          <a class="btn btn-warning" href="{% url 'update-job-detail' slug=job.slug %}">Edit</a>
           {% endif %}
 
           {% if request.user|has_group:"STUDENT" %}
