@@ -24,6 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from django.forms import HiddenInput
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
@@ -293,6 +294,19 @@ class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     model = Company
     fields = ['name','emp_name','emp_contact','state_c','city_c','address','phone','email','logo','description','domain','company_size','website'] 
     success_message ="%(name)s was updated successfully"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['state']=SpokenState.objects.all()
+        context['city']=SpokenCity.objects.all()
+        return context
+
+    def get_form(self):
+        form = super(CompanyUpdate, self).get_form()
+        form.fields['state_c'].widget = HiddenInput()
+        form.fields['city_c'].widget = HiddenInput()
+        return form
+
 #---------------- CBV for Create, Detail, List, Update for Jobs starts ----------------#
 class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     template_name = 'emp/jobs_form.html'
@@ -409,6 +423,7 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status']
     success_message ="%(title)s was updated successfully"
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # get data for filters
@@ -433,6 +448,7 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         self.object.save()
         return super(ModelFormMixin, self).form_valid(form)
 
+
 def add_education(student,degree,institute,start_year,end_year,gpa):
     degree_obj = Degree.objects.get(id=degree)
     institute_obj = AcademicCenter.objects.get(id=institute)
@@ -448,7 +464,7 @@ def add_education(student,degree,institute,start_year,end_year,gpa):
 def save_student_profile(request,student):
     student_form = StudentForm(request.POST)
     education_form = EducationForm(request.POST)
-    print(f"student form : {student_form}")
+    
     if student_form.is_valid() and education_form.is_valid():
         student.about = student_form.cleaned_data['about']
         student.github = student_form.cleaned_data['github']
@@ -473,7 +489,6 @@ def save_student_profile(request,student):
         try:
             e = Education.objects.filter(student=student)
             if e:
-                print("INSIDE IF ******************************")
                 education = e[0]
                 education.degree = degree_obj
                 education.institute = institute
@@ -482,12 +497,10 @@ def save_student_profile(request,student):
                 education.gpa = gpa
                 education.save()
             else:
-                print("INSIDE ELSE ******************************")
                 education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
                 education.save()
                 student.education.add(education)
         except IndexError as e:
-            print("HERE****************************")
             education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
             education.save()
             student.education.add(education)

@@ -38,7 +38,7 @@
 
     	<div class="col-md-6 form-group">
             <div class="form-group">
-                <label for="state">State123</label>
+                <label for="state">State</label>
                 <select class="form-control" id="select-state">
                   {% for s in state %} 
                     <option value="{{s.id}}">{{ s.name }}</option>
@@ -87,6 +87,10 @@
 </form>
 
 {% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+
 {% block js %}
 <script type = "text/javascript">
     $("#company_form").click(function(){
