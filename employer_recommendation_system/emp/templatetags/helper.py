@@ -3,6 +3,7 @@ from django.conf import settings
 from moodle.models import *
 from spoken.models import *
 from emp.models import JobShortlist
+from spoken.models import *
 
 
 register = template.Library()
@@ -73,6 +74,14 @@ def job_accepted(value, args):
 def application_count(job):
     return JobShortlist.objects.filter(job=job).count()
 
+@register.simple_tag
+def get_statedetails(stateid):
+    return SpokenState.objects.get(id=stateid)
+
+@register.simple_tag
+def get_citydetails(cityid):
+    return SpokenCity.objects.get(id=cityid)
+
 @register.filter()
 def format_char(value):
     s=''
@@ -87,5 +96,4 @@ def format_char(value):
 def display_foss(value):
     foss = FossCategory.objects.get(id=int(value)).foss
     return foss
-
 
