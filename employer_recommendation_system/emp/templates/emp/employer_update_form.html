@@ -1,6 +1,13 @@
 {% extends 'emp/base.html' %}
 {% load crispy_forms_tags %}
 {% block content-header %}Update Company Details{% endblock %}
+{% block css %}
+<style type="text/css">
+    .form-group{
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
 {% block content %}
 <form method="post" enctype="multipart/form-data">{% csrf_token %}
     {{ form | crispy }}
@@ -25,7 +32,6 @@
             </div>
 </div>
 <button type="submit" class="btn btn-success mt-3" id="company-update">Update</button>
-    <!-- <input type="submit" value="Update" id="company-update"> -->
 </form>
 
 

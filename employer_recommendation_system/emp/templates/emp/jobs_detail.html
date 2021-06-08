@@ -1,10 +1,11 @@
 {% extends 'emp/base.html' %}
 {% load crispy_forms_tags %}
+{% load helper %}
 {% block content-header %}{{ object.title}}{% endblock %}
 {% block content %}
 
 {% for message in messages %}
-    <div class="text-center alert alert-{{ message.tags }}">
+    <div class="text-center alert {{ message.tags }}">
                 {{ message|safe }}
             </div>
         {% endfor %}
@@ -29,11 +30,11 @@
     </tr>
     <tr>
       <th scope="row">State</th>
-      <td>{{object.state}}</td>
+      <td>{% get_statedetails object.state %}</td>
     </tr>
     <tr>
       <th scope="row">City</th>
-      <td>{{object.city}}</td>
+      <td>{% get_citydetails object.city %}</td>
     </tr>
     <tr>
       <th scope="row">Skills</th>
@@ -57,7 +58,7 @@
     </tr>
     <tr>
       <th scope="row">Gender</th>
-      <td>{{object.gender}}</td>
+      <td>{{object.gender | display_gender}}</td>
     </tr>
     <tr>
       <th scope="row">Address</th>
@@ -66,7 +67,7 @@
   </tbody>
 </table>
 
-<a href="{% url 'update-job-detail' slug=object.slug %}">Edit</a>
+<a href="{% url 'update-job-detail' slug=object.slug %}" class="btn btn-warning">Edit</a>
 {% endblock %}
 {% block js %}
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>

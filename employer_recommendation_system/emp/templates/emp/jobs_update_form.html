@@ -166,7 +166,7 @@
       </div>
     </div>
     <!-- Custom field widgets for Filter ends-->
-    <input type="submit" value="Update" id="job-submit">
+    <input type="submit" value="Update" id="job-submit" class="btn btn-warning">
 </form>
 
 {% endblock %}
@@ -224,13 +224,7 @@
   city = $('#city-select').val();
   $('#id_state_job').val(parseInt(state));
   $('#id_city_job').val(parseInt(city));
-  console.log("foss",$('#id_foss').val());
-  console.log("insti_type",$('#id_institute_type').val());
-  console.log("states",$('#id_state').val());
-  console.log("cities",$('#id_city').val());
-  alert('here');
   
-
 });
    
 });

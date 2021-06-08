@@ -25,6 +25,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.forms import HiddenInput
+from django.template.defaultfilters import slugify
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
@@ -233,13 +234,16 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     permission_required = 'emp.add_company'
     model = Company
     fields = ['name','emp_name','emp_contact','state_c','city_c','address','phone','email','logo','description','domain','company_size','website','rating','status'] 
-    success_message ="%(company_name)s was created successfully"
+    success_message ="%(name)s was created successfully"
     def get_success_url(self):
-        return reverse('company-detail', kwargs={'slug': self.object.slug})
+        obj = Company.objects.get(name=self.object.name,date_created=self.object.date_created)
+        return reverse('company-detail', kwargs={'slug': obj.slug})
+    
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.added_by = self.request.user
         self.object.save()
+        messages.success(self.request, 'Company information added successfully.')
         return super(ModelFormMixin, self).form_valid(form)
     
     def test_func(self):
@@ -262,11 +266,13 @@ class CompanyDetailView(PermissionRequiredMixin,DetailView):
     permission_required = 'emp.view_company'
     model = Company
     def get_context_data(self, **kwargs):
+        print("************ get_context_data ************")
         context = super().get_context_data(**kwargs)
         company_state = SpokenState.objects.get(id=self.object.state_c)
         company_city = SpokenCity.objects.get(id=self.object.city_c)
         context['company_state']=company_state.name
         context['company_city']=company_city.name
+        print("************ get_context_data exit ************")
         return context
 
 class CompanyListView(PermissionRequiredMixin,ListView):
@@ -317,7 +323,8 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status']
     success_message ="%(title)s job was created successfully"
     def get_success_url(self):
-        return reverse('job-detail', kwargs={'slug': self.object.slug})
+        obj = Job.objects.get(title=self.object.title,date_created=self.object.date_created)
+        return reverse('job-detail', kwargs={'slug': obj.slug})
     
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
@@ -325,6 +332,7 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.save()
+        messages.success(self.request, 'Job information added successfully.')
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_form(self):
@@ -446,6 +454,7 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.save()
+        messages.success(self.request, 'Job information updated successfully.')
         return super(ModelFormMixin, self).form_valid(form)
 
 

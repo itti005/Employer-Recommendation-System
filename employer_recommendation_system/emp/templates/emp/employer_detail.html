@@ -4,7 +4,7 @@
 {% block content-header %}{{object.name}}{% endblock %}
 {% block content %}
 {% for message in messages %}
-    <div class="text-center alert alert-{{ message.tags }}">
+    <div class="text-center alert {{ message.tags }}">
                 {{ message|safe }}
     </div>
         {% endfor %}
@@ -75,7 +75,7 @@
     {% endfor %}
   </ul>
 {% endif %}
-<a href="{% url 'update-company-detail' slug=object.slug %}">Edit</a>
+<a href="{% url 'update-company-detail' slug=object.slug %}" class="btn btn-warning">Edit</a>
 
 {% endblock %}
 
