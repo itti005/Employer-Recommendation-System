@@ -97,3 +97,8 @@ def display_foss(value):
     foss = FossCategory.objects.get(id=int(value)).foss
     return foss
 
+@register.filter()
+def display_gender(value):
+    d = {'f':'Female','m':'Male','a':'No criteria'}
+    return d[value]
+

@@ -5,7 +5,7 @@
 {% block content-header %}Add Company{% endblock %}
 {% block content %}
 {% for message in messages %}
-         <div class="text-center alert alert-{{ message.tags }}">
+         <div class="text-center alert {{ message.tags }}">
              {{ message|safe }}
          </div>
 {% endfor %}
@@ -13,20 +13,21 @@
   
     <!-- Security token -->
     {% csrf_token %}
-    <div class="form-row">
-    	<div class="col-12 form-group">
+    <div class="row">
+    	<div class="col-6 form-group mb-3">
     		{{ form.name | as_crispy_field }}
     	</div>
-    	<div class="col-md-6 form-group">
+        <div class="col-6 form-group mb-3"></div>
+    	<div class="col-md-6 form-group mb-3">
     		{{ form.emp_name | as_crispy_field }}
     	</div>
-    	<div class="col-md-6 form-group">
+    	<div class="col-md-6 form-group mb-3">
     		{{ form.emp_contact | as_crispy_field }}
     	</div>
-    	<div class="col-md-6 form-group">
+    	<div class="col-md-6 form-group mb-3">
     		{{ form.phone | as_crispy_field }}
     	</div>
-    	<div class="col-md-6 form-group">
+    	<div class="col-md-6 form-group mb-3">
     		{{ form.email | as_crispy_field }}
     	</div>
         <div class="col-md-6 form-group d-none">
@@ -36,7 +37,7 @@
             {{ form.city_c | as_crispy_field }}
         </div>
 
-    	<div class="col-md-6 form-group">
+    	<div class="col-md-6 form-group mb-3">
             <div class="form-group">
                 <label for="state">State</label>
                 <select class="form-control" id="select-state">
@@ -46,7 +47,7 @@
                 </select>
             </div>
     	</div>
-    	<div class="col-md-6 form-group">
+    	<div class="col-md-6 form-group mb-3">
     		<div class="form-group">
                 <label for="city">City</label>
                 <select class="form-control" id="select-city" disabled>
@@ -56,34 +57,34 @@
                 </select>
             </div>
     	</div>
-    	<div class="col-12 form-group">
+    	<div class="col-12 form-group mb-3">
     		{{ form.address | as_crispy_field }}
     	</div>
-    	<div class="col-lg-3 col-md-6 form-group">
+    	<div class="col-lg-3 col-md-6 form-group mb-3">
     		{{ form.domain | as_crispy_field }}
     	</div>
-    	<div class="col-lg-3 col-md-6 form-group">
+    	<div class="col-lg-3 col-md-6 form-group mb-3">
     		{{ form.company_size | as_crispy_field }}
     	</div>
-    	<div class="col-lg-3 col-md-6 form-group">
+    	<div class="col-lg-3 col-md-6 form-group mb-3">
     		{{ form.website | as_crispy_field }}
     	</div>
-    	<div class="col-lg-3 col-md-6 form-group">
+    	<div class="col-lg-3 col-md-6 form-group mb-3">
     		{{ form.logo | as_crispy_field }}
     	</div>
-    	<div class="col-12 form-group">
+    	<div class="col-12 form-group mb-3">
     		{{ form.description | as_crispy_field }}
     	</div>
-    	<div class="col-lg-3 col-md-6 form-group">
+    	<div class="col-lg-3 col-md-6 form-group mb-3">
     		{{ form.rating | as_crispy_field }}
     	</div>
-    	<div class="col-lg-3 col-md-6 form-group pb-3">
+    	<div class="col-lg-3 col-md-6 form-group pb-3 mb-3">
     		<br>
     		{{ form.status | as_crispy_field }}
     	</div>
     </div>
       
-    <input type="submit" value="Submit" id="company_form">
+    <input type="submit" value="Submit" id="company_form" class="btn btn-success mt-3">
 </form>
 
 {% endblock %}
@@ -94,12 +95,9 @@
 {% block js %}
 <script type = "text/javascript">
     $("#company_form").click(function(){
-        alert("hello");
         state = $('#select-state').val();
         city = $('#select-city').val();
 
-        alert(state);
-        alert(city);
         $('#id_state_c').val(parseInt(state));
         $('#id_city_c').val(parseInt(city));
         });

@@ -92,7 +92,6 @@ class Student(models.Model):
 
     
     def get_absolute_url(self):
-        print("****************************** ABS URL*************")
         url = str(self.id)+'/'+'profile'
         return reverse('student_profile',kwargs={'pk':self.id}) 
 
@@ -101,9 +100,7 @@ class Company(models.Model):
         ('< 50','< 50'),
         ('50 - 100','50 - 100'),
         ('100 - 500','100 - 500'),
-        ('> 500','> 500'),
-
-            ]
+        ('> 500','> 500'),]
     name = models.CharField(max_length=200)
     emp_name = models.CharField(max_length=200) #Name of the company representative
     emp_contact = models.CharField(max_length=200) #Contact of the company representative
@@ -122,7 +119,7 @@ class Company(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
     status = models.BooleanField(default=True)
-    added_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True)
+    added_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
     rating = models.IntegerField(null=True,blank=True)
 
@@ -133,10 +130,11 @@ class Company(models.Model):
         return reverse('company-detail', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
-        #s = '{} {}'.format(self.company_name)
-        # self.slug = slugify(self.name)
-        self.slug = slugify(self.id)
         super().save(*args, **kwargs)
+        if not self.slug:
+            obj = Company.objects.get(name=self.name,date_created=self.date_created)
+            obj.slug = slugify(obj.id) 
+            obj.save()
 
 class Job(models.Model):
     title = models.CharField(max_length=250) #filter
@@ -184,9 +182,11 @@ class Job(models.Model):
         return reverse('job-detail', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
-        # self.slug = slugify(self.company.name+'_'+self.title)
-        self.slug = slugify(self.id)
         super().save(*args, **kwargs)
+        if not self.slug:
+            obj = Job.objects.get(title=self.title,date_created=self.date_created)
+            obj.slug = slugify(obj.id) 
+            obj.save()
 
     class Meta:
         ordering = [('-date_updated')]
