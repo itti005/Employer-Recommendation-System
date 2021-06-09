@@ -14,8 +14,6 @@
 .main-c {
   max-height: 100vh!important;
   overflow-y: auto;
-  /*max-height: 100vh!important;*/
-  /*min-height: -webkit-fill-available;*/
 }
 .highlights{
   min-height: 100%;
@@ -42,27 +40,11 @@
 .border-o{
   border: 1px solid orange!important;
 }
-#v-pills-tab{
-  /*height: 400px;
-  overflow-y: scroll!important;
-  overflow-x: scroll!important;
-  /*overflow: scroll;*/
-  
-
-  /*background: #4CAF50;
-  color: white;
-  padding: 15px;
-  width: 50%;
-  height: 400px;
-  overflow-y: scroll;
-  border: 1px solid #ccc;*/
-}
 .job-lst{
   
   height: 70vh;
   overflow-y: scroll!important;
   overflow-x: scroll!important;
-  /*overflow: scroll;*/
   border-left: 1px solid rgba(0,0,0,0.2);
 }
 .job-details{
@@ -137,12 +119,6 @@
         {% endfor %}
       </select>
     </div>
-    <!-- <div class="form-group">
-      <label>Id</label><br>
-      <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-      
-    </div> -->
-    <!-- <button type="button" class="btn btn-outline-success">Success</button> -->
     <div>
       <br>
       <button type="submit" class="btn btn-outline-success btn-sm" id="search-job" >
@@ -154,7 +130,6 @@
       <input type="text" id="id_place" name="place" class="d-none">
       <input type="text" id="id_keyword" name="keyword" class="d-none">
       <input type="text" id="id_company" name="company" class="d-none">
-      <!-- <button type="submit" class="btn btn-primary" id="search-job" >Search</button> -->
   </form>
   </div>
   
@@ -184,7 +159,7 @@
         
         </a>
         {% empty %}
-            <li>No jobs yet.</li>
+            No jobs yet.
         {% endfor %}
   </div>
   </div>
@@ -224,7 +199,6 @@
               {% endif %} 
             {% if job in applied_jobs %}
               {% if job in accepted_jobs  %}
-                <!-- <span class="badge bg-success " id="e_{{job.id}}">In process</span> -->
                 <span class="badge bg-success ">In process</span>
               {% endif %}
               
@@ -288,19 +262,13 @@
               <p><b>Key Job Responsibilities</b></p>
               <p>{{job.key_job_responsibilities}}</p>
               <p><b>Benefits</b></p>
-              <p>{{job.benefits}}</p>
-
-              
-
-              
-
-              
+              <p>{{job.benefits}}</p>              
                 </div>
                 
               </div>
             </div>
         {% empty %}
-            <li>No jobs yet.</li>
+            No jobs yet.
         {% endfor %}
   </div>
 </div>
@@ -313,9 +281,10 @@
 
 </div>
 {% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
 {% block js %}
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script  src="{% static 'external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
   $('#search-job').on('click', function() {
