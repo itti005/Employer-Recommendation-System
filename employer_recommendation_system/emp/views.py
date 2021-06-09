@@ -280,12 +280,14 @@ class CompanyListView(PermissionRequiredMixin,ListView):
     permission_required = 'emp.view_company'
     model = Company
     filterset_class = CompanyFilterSet
-    paginate_by = 10
+    # paginate_by = 10
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filterset'] = self.collection
         context['form'] = self.collection.form
+        context['companies'] = Company.objects.values_list('name')
+        
         return context
     
     def get_queryset(self):
