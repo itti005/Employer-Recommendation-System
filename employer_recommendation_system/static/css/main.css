@@ -1,5 +1,5 @@
 /*main color : #0066A0*/
-
+/*dark color */#054C77
 
 #main .sidebar{
 	height: 100vh;
@@ -12,4 +12,7 @@ a{
 }
 a:hover{
 	opacity: 100%;
+}
+.main-bd{
+	border-bottom: 1px solid #054C77;
 }

@@ -6,12 +6,9 @@
   function throttle(func, wait, options) {
     var context, args, result;
     var timeout = null;
-    // 上次执行时间点
     var previous = 0;
     if (!options) options = {};
-    // 延迟执行函数
     var later = function () {
-      // 若设定了开始边界不执行选项，上次执行时间始终为0
       previous = options.leading === false ? 0 : new Date().getTime();
       timeout = null;
       result = func.apply(context, args);
@@ -19,21 +16,16 @@
     };
     return function () {
       var now = new Date().getTime();
-      // 首次执行时，如果设定了开始边界不执行选项，将上次执行时间设定为当前时间。
       if (!previous && options.leading === false) previous = now;
-      // 延迟执行时间间隔
       var remaining = wait - (now - previous);
       context = this;
       args = arguments;
-      // 延迟时间间隔remaining小于等于0，表示上次执行至此所间隔时间已经超过一个时间窗口
-      // remaining大于时间窗口wait，表示客户端系统时间被调整过
       if (remaining <= 0 || remaining > wait) {
         clearTimeout(timeout);
         timeout = null;
         previous = now;
         result = func.apply(context, args);
         if (!timeout) context = args = null;
-        //如果延迟执行不存在，且没有设定结尾边界不执行选项
       } else if (!timeout && options.trailing !== false) {
         timeout = setTimeout(later, remaining);
       }
@@ -78,7 +70,6 @@
 
   var ALERT_TIMEOUT_PERIOD = 1000;
 
-  // 创建模板
   function createTemplate() {
     var isLabelMode = this.isLabelMode;
     var searchable = this.config.searchable;
@@ -87,7 +78,6 @@
     return isLabelMode ? '<div class="dropdown-display-label"><div class="dropdown-chose-list">' + templateSearch + '</div></div><div class="dropdown-main">{{ul}}</div>' : '<a href="javascript:;" class="dropdown-display" tabindex="0"><span class="dropdown-chose-list"></span><a href="javascript:;"  class="dropdown-clear-all" tabindex="0">\xD7</a></a><div class="dropdown-main">' + templateSearch + '{{ul}}</div>';
   }
 
-  // 小于minCount提示的元素
   function minItemsAlert() {
     var _dropdown = this;
     var _config = _dropdown.config;
@@ -109,7 +99,6 @@
     }, ALERT_TIMEOUT_PERIOD);
   }
 
-  // 超出限制提示
   function maxItemAlert() {
     var _dropdown = this;
     var _config = _dropdown.config;
@@ -134,9 +123,7 @@
   // select-option 转 ul-li
   function selectToDiv(str) {
     var result = str || '';
-    // 移除select标签
     result = result.replace(/<select[^>]*>/gi, '').replace('</select>', '');
-    // 移除 optgroup 结束标签
     result = result.replace(/<\/optgroup>/gi, '');
     result = result.replace(/<optgroup[^>]*>/gi, function (matcher) {
       var groupName = /label="(.[^"]*)"(\s|>)/.exec(matcher);
@@ -147,7 +134,7 @@
       // var value = /value="?([\w\u4E00-\u9FA5\uF900-\uFA2D]+)"?/.exec(matcher);
       var value = $(matcher).val();
       var name = />(.*)<\//.exec(matcher);
-      // 强制要求html中使用selected/disabled，而不是selected="selected","disabled="disabled"
+      
       var isSelected = matcher.indexOf('selected') > -1 ? true : false;
       var isDisabled = matcher.indexOf('disabled') > -1 ? true : false;
       var extendAttr = ''
@@ -160,7 +147,6 @@
     return result;
   }
 
-  // object-data 转 select-option
   function objectToSelect(data) {
     var dropdown = this;
     var map = {};
@@ -174,7 +160,6 @@
     }
 
     $.each(data, function (index, val) {
-      // disable 权重高于 selected
       var hasGroup = val.groupId;
       var isDisabled = val.disabled ? ' disabled' : '';
       var isSelected = val.selected && !isDisabled ? ' selected' : '';
@@ -189,7 +174,7 @@
         name.push('<span class="dropdown-selected">' + val.name + '<i class="del" data-id="' + val.id + '"></i></span>');
         selectAmount++;
       }
-      // 判断是否有分组
+      
       if (hasGroup) {
         if (map[val.groupId]) {
           map[val.groupId] += temp;
@@ -204,7 +189,7 @@
 
     $.each(map, function (index, val) {
       var option = val.split('&janking&');
-      // 判断是否有分组
+      
       if (option.length === 2) {
         var groupName = option[0];
         var items = option[1];
@@ -217,7 +202,7 @@
     return [result, name, selectAmount];
   }
 
-  // select-option 转 object-data
+  
   //
   function selectToObject(el) {
     var $select = el;
@@ -282,19 +267,19 @@
       var itemIndex;
       var $items;
       if (keyCode === KC.down || keyCode === KC.up) {
-        // 方向
+        
         direct = keyCode === KC.up ? -1 : 1;
         $items = this.$el.find('[tabindex]');
         itemIndex = $items.index($(document.activeElement));
-        // 初始
+        
         if (itemIndex === -1) {
           index = direct + 1 ? -1 : 0;
         } else {
           index = itemIndex;
         }
-        // 确认位序
+        
         index = index + direct;
-        // 最后位循环
+        
         if (index === $items.length) {
           index = 0;
         }
@@ -373,7 +358,7 @@
 
       $target.toggleClass('dropdown-chose');
       $.each(_config.data, function (key, item) {
-        // id 有可能是数字也有可能是字符串，强制全等有弊端 2017-03-20 22:19:21
+        
         item.selected = false;
         if ('' + item.id === '' + value) {
           item.selected = hasSelected ? 0 : 1;
@@ -394,8 +379,7 @@
       var _config = _dropdown.config;
       var $target = $(event.target);
       var id = $target.data('id');
-      // 2017-03-23 15:58:50 测试
-      // 10000条数据测试删除，耗时 ~3ms
+      
       $.each(_dropdown.name, function (key, value) {
         if (value.indexOf('data-id="' + id + '"') !== -1) {
           _dropdown.name.splice(key, 1);
@@ -455,7 +439,7 @@
       var _config = _this.config;
       var $el = _this.$el;
       _this.$select.hide();
-      //  判断dropdown是否单选，是否token模式
+      
       $el.addClass(_this.isSingleSelect ? 'dropdown-single' : _this.isLabelMode ? 'dropdown-multiple-label' : 'dropdown-multiple');
 
       if (_config.data.length === 0) {
@@ -468,12 +452,12 @@
       _this.selectAmount = processResult[2];
       _this.$select.html(processResult[0]);
       _this.renderSelect();
-      // disabled权重高于readonly
+      
       _this.changeStatus(_config.disabled ? 'disabled' : _config.readonly ? 'readonly' : false);
 
       _this.config.init();
     },
-    // 渲染 select 为 dropdown
+    
     renderSelect: function (isUpdate, isCover) {
       var _this = this;
       var $el = _this.$el;
@@ -533,10 +517,10 @@
         $el.on(openHandle, '.dropdown-clear-all', $.proxy(action.clearAll, _this));
       }
 
-      // 搜索
+      
       $el.on(EVENT_SPACE.keyup, 'input', $.proxy(action.search, _this));
 
-      // 按下enter键设置token
+      
       $el.on(EVENT_SPACE.keyup, function (event) {
         var keyCode = event.keyCode;
         var KC = KEY_CODE;
@@ -545,7 +529,7 @@
         }
       });
 
-      // 按下上下键切换token
+      
       $el.on(EVENT_SPACE.keydown, $.proxy(action.control, _this));
 
       $el.on(EVENT_SPACE.click, 'li[tabindex]', $.proxy(_this.isSingleSelect ? action.singleChoose : action.multiChoose, _this));
@@ -567,11 +551,11 @@
         $el.off(openHandle, '.dropdown-display');
         $el.off(openHandle, '.dropdown-clear-all');
       }
-      // 搜索
+      
       $el.off(EVENT_SPACE.keyup, 'input');
-      // 按下enter键设置token
+      
       $el.off(EVENT_SPACE.keyup);
-      // 按下上下键切换token
+      
       $el.off(EVENT_SPACE.keydown);
       $el.off(EVENT_SPACE.click, '[tabindex]');
     },

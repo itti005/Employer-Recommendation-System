@@ -3,6 +3,17 @@
 {% load crispy_forms_tags %}
 
 {% block content-header %}Add Company{% endblock %}
+{% block css %}
+<style type="text/css">
+.main-bd{
+    border-bottom: 2px solid #0066A0;
+}   
+.main-color{
+    color: #0066A0;
+} 
+</style>
+
+{% endblock %}
 {% block content %}
 {% for message in messages %}
          <div class="text-center alert {{ message.tags }}">
@@ -68,6 +79,7 @@
     	</div>
     	<div class="col-lg-3 col-md-6 form-group mb-3">
     		{{ form.website | as_crispy_field }}
+            <small class="text-muted">Format : https://www.abc.com</small>
     	</div>
     	<div class="col-lg-3 col-md-6 form-group mb-3">
     		{{ form.logo | as_crispy_field }}
@@ -75,17 +87,46 @@
     	<div class="col-12 form-group mb-3">
     		{{ form.description | as_crispy_field }}
     	</div>
-    	<div class="col-lg-3 col-md-6 form-group mb-3">
-    		{{ form.rating | as_crispy_field }}
-    	</div>
+        <div class="col-lg-3 col-md-6 form-group mb-3">
+            <label for="id_rating" class="form-label">Rating </label> 
+            <a data-bs-toggle="offcanvas" href="#rating_info" role="button" aria-controls="rating_info"><i class="bi bi-question-circle"></i></a>
+            <input type="number" name="rating" class="numberinput form-control" id="id_rating">
+        </div>
+
+        
     	<div class="col-lg-3 col-md-6 form-group pb-3 mb-3">
     		<br>
-    		{{ form.status | as_crispy_field }}
+    		{{ form.status | as_crispy_field }} 
     	</div>
     </div>
       
     <input type="submit" value="Submit" id="company_form" class="btn btn-success mt-3">
 </form>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="rating_info" aria-labelledby="ratingInfoLabel">
+  <div class="offcanvas-header main-bd">
+    <h5 class="offcanvas-title" id="ratingInfoLabel">Rating</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul>
+        <li><i class="bi bi-check-square"></i> <span class="main-color">Checked Box</span> : The company is in active state. The company will appear in search results & job can be added.</li><br>
+        <li><i class="bi bi-square"></i> <span class="main-color">Unchecked Box</span> : The company is in inactive state. The company will NOT appear in search results & job cannot be added for this company. </li>
+      </ul>
+  </div>
+</div>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="status_info" aria-labelledby="statusInfoLabel">
+  <div class="offcanvas-header main-bd">
+    <h5 class="offcanvas-title" id="statusInfoLabel">Status</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul>
+        <li><span class="main-color fw-bold">0</span> : The company details are visible to only Admin / HR Manager. Students & other users will not be able to see the company details & the jobs posted for this company. </li><br>
+        <li><span class="main-color fw-bold">1-4</span> : The company details will be visible to all, but not highlighted on homepage. </li><br>
+        <li><span class="main-color fw-bold">5</span> : Highlighted Company. The company details will be visible on homepage & student dashboard. </li><br>
+      </ul>
+  </div>
+</div>
 
 {% endblock %}
 {% block jquery %}
@@ -101,7 +142,9 @@
         $('#id_state_c').val(parseInt(state));
         $('#id_city_c').val(parseInt(city));
         });
-    $(document).ready(function(){});
+    $(document).ready(function(){
+        $( "#div_id_status" ).append( "<span><a data-bs-toggle='offcanvas' href='#status_info' role='button' aria-controls='status_info'><i class='bi bi-question-circle'></i></a></span>" );
+    });
 </script>
 {% endblock %}
 
