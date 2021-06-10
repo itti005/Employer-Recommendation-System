@@ -102,3 +102,12 @@ def display_gender(value):
     d = {'f':'Female','m':'Male','a':'No criteria'}
     return d[value]
 
+@register.filter()
+def display_foss(value):
+    foss_ids = list(map(int,value.split(',')))
+    foss = [FossCategory.objects.get(id=x).foss for x in foss_ids]
+    if foss:
+        return ' , '.join(foss)
+    return ''
+
+
