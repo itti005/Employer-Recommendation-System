@@ -2,9 +2,6 @@
 {% load crispy_forms_tags %}
 {% load helper %}
 {% block content-header %}Job List{% endblock %}
-{% block css %}
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
-{% endblock %}
 {% block content %}
 {% for message in messages %}
     <div class="text-center alert alert-{{ message.tags }}">
@@ -49,9 +46,10 @@
   </tbody>
 </table>
 {% endblock %}
-
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
 {% block js %}
-<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 <script type = "text/javascript">
     $(document).ready(function(){
         $('#shortlisted').DataTable();
