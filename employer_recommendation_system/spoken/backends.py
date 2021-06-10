@@ -31,9 +31,7 @@ class SpokenStudentBackend(ModelBackend):
                                 user.save()
                                 group = Group.objects.get(name='STUDENT')
                                 user.groups.add(group)
-                                print("************** getting st_profile")
                                 st_profile = Profile.objects.filter(user=sp_user).first()
-                                print('***************** st_profile : ',st_profile)
                                 Student.objects.create(user=user, 
                                     state=st_profile.state.name if st_profile.state else "", 
                                     phone=st_profile.phone, address=st_profile.address, 

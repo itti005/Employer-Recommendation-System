@@ -73,15 +73,6 @@ def get_recommended_jobs(student):
                 rec_jobs.append(job)
     return rec_jobs
 
-# def get_recommended_jobs(student):
-#     rec_jobs = []
-#     student_foss = set([ x['foss'] for x in fetch_student_scores(student)])
-#     jobs = get_awaiting_jobs(student.spk_usr_id)
-#     for job in jobs:
-#         if not student_foss.isdisjoint(set(map(int, job.foss.split(',')))):
-#             rec_jobs.append(job)
-#     return rec_jobs
-
 #function to get student spoken test scores
 def fetch_student_scores(student):  #parameter : recommendation student obj
 	scores = []
@@ -111,7 +102,6 @@ def get_applied_joblist(spk_user_id):
 def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet applied
 	all_jobs = Job.objects.all()
 	applied_jobs = [x.job for x in get_applied_joblist(spk_user_id)]
-    # return set(all_jobs)-set(applied_jobs)
 	return list(set(all_jobs)-set(applied_jobs))
 
 def student_homepage(request):
@@ -259,20 +249,16 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
 
-
-
 class CompanyDetailView(PermissionRequiredMixin,DetailView):
     template_name = 'emp/employer_detail.html'
     permission_required = 'emp.view_company'
     model = Company
     def get_context_data(self, **kwargs):
-        print("************ get_context_data ************")
         context = super().get_context_data(**kwargs)
         company_state = SpokenState.objects.get(id=self.object.state_c)
         company_city = SpokenCity.objects.get(id=self.object.city_c)
         context['company_state']=company_state.name
         context['company_city']=company_city.name
-        print("************ get_context_data exit ************")
         return context
 
 class CompanyListView(PermissionRequiredMixin,ListView):
@@ -369,7 +355,6 @@ class JobListView(FormMixin,ListView):
     form_class = JobSearchForm
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['a']='ab'
         if self.request.user.groups.filter(name='STUDENT'):
             jobShortlist = JobShortlist.objects.filter(spk_user=self.request.user.student.spk_usr_id)
             job_short_list = get_applied_joblist(self.request.user.student.spk_usr_id)
@@ -381,6 +366,8 @@ class JobListView(FormMixin,ListView):
             context['accepted_jobs'] = accepted_jobs
             context['rejected_jobs'] = rejected_jobs
             context['reccomended_jobs'] = reccomended_jobs
+        elif self.request.user.groups.filter(name='MANAGER'):
+            context['grade_filter_url'] = settings.GRADE_FILTER
         return context
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -481,7 +468,6 @@ def save_student_profile(request,student):
         student.github = student_form.cleaned_data['github']
         student.experience = student_form.cleaned_data['experience']
         student.linkedin = student_form.cleaned_data['linkedin']
-        #student.spk_institute = student_form.cleaned_data['spk_institute']
         student.save()
         skills = request.POST['skills_m']
         if skills:
@@ -492,7 +478,6 @@ def save_student_profile(request,student):
         degree = request.POST['degree']
         degree_obj = Degree.objects.get(id=degree)
         institute = request.POST['institute']
-        #institute_obj = AcademicCenter.objects.get(id=institute)
         start_year = education_form.cleaned_data['start_year']
         end_year = education_form.cleaned_data['end_year']
         gpa = education_form.cleaned_data['gpa']
@@ -535,7 +520,6 @@ def save_student_profile(request,student):
         return student_form,education_form
 
 def student_profile_confirm(request,pk,job):
-    
     context = {}
     context['confirm']=True
     context['job_id']=job
@@ -552,9 +536,6 @@ def student_profile_confirm(request,pk,job):
     context['form']=student_form
     context['education_form']=education_form
     context['jobApplicationForm']=jobApplicationForm
-    # return reverse('student_profile_confirm',kwargs={'pk':request.user.student.id,'job':job})
-    # return HttpResponseRedirect(reverse('student_profile_confirm',kwargs={'pk':request.user.student.id,'job':job}))
-    # return HttpResponse(str(reverse('student_profile_confirm',kwargs={'pk':request.user.student.id,'job':job})))
     return render(request,'emp/student_form.html',context)
 
 
@@ -619,18 +600,8 @@ def shortlist_student(request):
     return JsonResponse(data) 
 
 
-
-# def update_job_app_status(spk_user_id,job,flag,student_id):
 def update_job_app_status(job,student,spk_user_id):
     job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,student=student,status=APPLIED_SHORTLISTED)
-    
-
- #    student = Student.objects.get(id=student_id)
-	# if flag:
-	# 	job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,student=student,status=APPLIED_SHORTLISTED) #student has applied & is eligible for job
-	# else:
-	# 	job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,student=student,status=APPLIED_REJECTED) #student has applied & is not eligible for job
-	# return True
 	
 # class JobShortlistListView(PermissionRequiredMixin,ListView):
 class JobAppStatusListView(ListView):
@@ -639,8 +610,6 @@ class JobAppStatusListView(ListView):
     model = Job
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # job = Job.objects.get(id=self.kwargs['id'])
-        # context['job']=job
         return context
 
 def job_app_details(request,id):
@@ -648,7 +617,6 @@ def job_app_details(request,id):
     job = Job.objects.get(id=id)
     students_awaiting = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
     students_shortlisted = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==1]
-
     context['job'] = job
     context['students_awaiting'] = students_awaiting
     context['students_shortlisted'] = students_shortlisted
@@ -664,10 +632,6 @@ class JobShortlistDetailView(DetailView):
         job = Job.objects.get(id=self.kwargs['slug'])
         context['job']=job
         return context
-
-
-
-
 
 class JobShortlistListView(ListView):
     model = JobShortlist
@@ -716,11 +680,7 @@ def check_student_eligibilty(request):
     	except FossMdlCourses.DoesNotExist as e:
     		print(e)
     try:
-        # filter_quiz_ids = list(map(lambda x:FossMdlCourses.objects.get(foss=x).mdlquiz_id,foss_list))
-        #get mdl_user from testattendance
         ta = TestAttendance.objects.values('mdluser_id','mdlcourse_id','mdlquiz_id').filter(student=student,mdlquiz_id__in=filter_quiz_ids,status__gte=3)
-        # ta = TestAttendance.objects.values('mdluser_id','mdlcourse_id','mdlquiz_id').filter(student=student,mdlquiz_id__in=filter_quiz_ids)
-        # print(f'type ta[0].mdlquiz_id: {type(ta[0]['mdlquiz_id'])}')
         ta_quiz_ids = [ x['mdlquiz_id'] for x in ta]
         if(set(filter_quiz_ids))==set(ta_quiz_ids):
             #check grade criteria
@@ -748,8 +708,6 @@ def check_student_eligibilty(request):
 
     flag = True     #Temp keep
     data['is_eligible'] = flag 
-
-    # update_job_app_status(spk_user_id,job,flag)    #Temp remove
     return JsonResponse(data)
 
 @csrf_exempt

@@ -170,7 +170,11 @@
     {% else %}
     <div class="tab-pane fade show " id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
     {% endif %}
-            
+    {% if request.user|has_group:"MANAGER" %}
+    <div class="alert alert-warning mt-2" role="alert">
+  To notify students for the job; please copy <span class="fw-bold">JOB ID : </span> <span class="fw-bold text-decoration-underline">{{job.id}}</span> & <a href="{{grade_filter_url}}" class="alert-link text-decoration-underline" target="_blank">login here</a>. 
+</div>
+{% endif %}
               <div class="d-flex">
                 <div class="">
                   {% if job.company.logo %}
@@ -181,12 +185,12 @@
                 <div class="flex-grow-1">
                   <p>{{job.company.name}}<br>
              <b>{{job.title}}</b> <br>
-              {{job.state}} , {{job.city}}</p>
+              {% get_statedetails job.state_job %} , {% get_citydetails job.city_job %}</p>
                 </div>
                 <div class="mt-1">
                   {% if request.user|has_group:"MANAGER" %}
 
-          <a href="https://spoken-tutorial.org/accounts/login/?next=/software-training/student-grade-filter/?id={{job.id}}" class="btn btn-success" target="_blank"><i class="bi bi-cursor "></i> Notify</a>
+          <!-- <a href="https://spoken-tutorial.org/accounts/login/?next=/software-training/student-grade-filter/?id={{job.id}}" class="btn btn-success" target="_blank"><i class="bi bi-cursor "></i> Notify</a> -->
           <a class="btn btn-warning" href="{% url 'update-job-detail' slug=job.slug %}">Edit</a>
           {% endif %}
 
@@ -248,7 +252,7 @@
                   <div class="card border-o">
   <div class="card-body">
     <p><i class="bi bi-calendar-event"></i> Last Application Date : {{job.last_app_date}}<br>
-    <i class="bi bi-clipboard-data"></i> Skills : {{job.foss}}</p>
+    <i class="bi bi-clipboard-data"></i> Skills : {{job.foss | display_foss}}</p>
   </div>
 </div>
                 </div>
