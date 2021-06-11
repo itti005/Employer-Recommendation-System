@@ -3,6 +3,7 @@
 {% load helper %}
 {% block content-header %}Job List{% endblock %}
 {% block content %}
+{% include "emp/page_header.html" with title="Job Applications Status" icon="<i class='bi bi-list-ul'></i>" %}
 {% for message in messages %}
     <div class="text-center alert alert-{{ message.tags }}">
                 {{ message|safe }}
@@ -27,7 +28,7 @@
   	<tr>
       <!-- <td scope="row">{{forloop.counter}}</td> -->
       <td>{{job.id}}</td>
-      <td><a href="{% url 'job-app-detail' id=job.id  %}">{{job.title}}</a></td>
+      <td><a href="{% url 'job-app-detail' id=job.id  %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view/shortlist students">{{job.title}}</a></td>
       <td>{{job.company.name}}</td>
       <td><a href="{% url 'job-app-detail' id=job.id  %}">{% application_count job %}</a></td>
       <td>{{job.last_app_date}}</td>
@@ -53,6 +54,7 @@
 <script type = "text/javascript">
     $(document).ready(function(){
         $('#shortlisted').DataTable();
+        $('[data-bs-toggle="tooltip"]').tooltip();
       });
 </script>
 {% endblock %}

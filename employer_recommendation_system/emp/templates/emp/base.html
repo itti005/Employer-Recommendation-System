@@ -146,38 +146,39 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'add_company' %}">
-              <span data-feather="file"></span>
-              Add Company
+              <i class="bi bi-bank2 icons-nav"></i> <span>Add Company</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'company-list' %}">
-              <span data-feather="shopping-cart"></span>
-              View Companies
+            <a class="nav-link " href="{% url 'company-list' %}" style="margin-left: 30px;">View Companies</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'add_job' %}"> <i class="bi bi-briefcase-fill icons-nav"></i> Add Job</a>
+         </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'job-listing' %}" style="margin-left: 30px;">
+              <span>View Job List (Quick View)</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'add_job' %}">
-              <span data-feather="users"></span>
-              Add Job
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'job-list' %}">
-              <span data-feather="bar-chart-2"></span>
-              View Jobs
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ grade_filter_url }}" target="_blank">
-              <span data-feather="layers"></span>
-              Student Grade Filter
+            <a class="nav-link" href="{% url 'job-list' %}" style="margin-left: 30px;">
+              <span>View Jobs</span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'job-app-status' %}">
-              <span data-feather="layers"></span>
-              Job Application Status
+              <i class="bi bi-list-check icons-nav"></i> <span>Job Application Status</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% get_url 'GRADE_FILTER' %}" target="_blank">
+              <i class="bi bi-funnel-fill icons-nav"></i> <span>Student Grade Filter</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% get_url 'MASS_MAIL_PAGE' %}" target="_blank">
+              <i class="bi bi-funnel-fill icons-nav"></i> <span>Send Mass Mail</span>
             </a>
           </li>
         </ul>

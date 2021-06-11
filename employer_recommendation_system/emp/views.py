@@ -26,10 +26,12 @@ from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.forms import HiddenInput
 from django.template.defaultfilters import slugify
+from django import forms
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
-
+JOB_RATING=[(0,'Only visible to Admin/HR'),(1,'Display on homepage'),(2,'Visible to all users')]
+JOB_STATUS=[(1,'Active'),(0,'Inactive')]
 
 
 #show job application status to HR
@@ -223,7 +225,7 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     template_name = 'emp/employer_form.html'
     permission_required = 'emp.add_company'
     model = Company
-    fields = ['name','emp_name','emp_contact','state_c','city_c','address','phone','email','logo','description','domain','company_size','website','rating','status'] 
+    fields = ['name','emp_name','emp_contact','state_c','city_c','address','email','logo','description','domain','company_size','website','rating','status'] 
     success_message ="%(name)s was created successfully"
     def get_success_url(self):
         obj = Company.objects.get(name=self.object.name,date_created=self.object.date_created)
@@ -248,6 +250,18 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        form = super(CompanyCreate, self).get_form(form_class)
+        form.fields['name'].widget.attrs ={'placeholder': 'Company Name'}
+        
+
+
+        return form
+
+        # return form_class(**self.get_form_kwargs())
 
 class CompanyDetailView(PermissionRequiredMixin,DetailView):
     template_name = 'emp/employer_detail.html'
@@ -286,7 +300,7 @@ class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/employer_update_form.html'
     permission_required = 'emp.change_company'
     model = Company
-    fields = ['name','emp_name','emp_contact','state_c','city_c','address','phone','email','logo','description','domain','company_size','website'] 
+    fields = ['name','emp_name','emp_contact','state_c','city_c','address','email','logo','description','domain','company_size','website'] 
     success_message ="%(name)s was updated successfully"
 
     def get_context_data(self, **kwargs):
@@ -307,7 +321,7 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     permission_required = 'emp.add_job'
     model = Job
     fields = ['company','title','designation','state_job','city_job','skills','description','domain','salary_range_min',
-    'salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender',
+    'salary_range_max','job_type','requirements','shift_time','key_job_responsibilities','gender',
     'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status']
     success_message ="%(title)s job was created successfully"
     def get_success_url(self):
@@ -328,6 +342,8 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         form.fields['last_app_date'].widget = DateInput()
         form.fields['from_date'].widget = DateInput()
         form.fields['to_date'].widget = DateInput()
+        form.fields['rating'].widget = forms.Select(attrs=None, choices=JOB_RATING)
+        form.fields['status'].widget = forms.Select(attrs=None, choices=JOB_STATUS)
         return form
 
     def get_context_data(self, **kwargs):
@@ -398,6 +414,10 @@ class JobListView(FormMixin,ListView):
             queryset = (q_kw & q_place & q_com)
         return queryset
 
+class JobListingView(ListView):
+    template_name = 'emp/job_list_tabular.html'
+    model = Job
+
 class AppliedJobListView(ListView):
     template_name = 'emp/applied_jobs_list.html'
     model = JobShortlist
@@ -416,7 +436,7 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     permission_required = 'emp.change_job'
     model = Job
     fields = ['company','title','designation','state_job','city_job','skills','description','domain','salary_range_min',
-    'salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender',
+    'salary_range_max','job_type','requirements','shift_time','key_job_responsibilities','gender',
     'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status']
     success_message ="%(title)s was updated successfully"
 

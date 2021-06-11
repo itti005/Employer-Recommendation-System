@@ -14,6 +14,7 @@
 {% endblock %}
 {% block content-header %}Add Job Details{% endblock %}
 {% block content %}
+{% include "emp/page_header.html" with title="Update Job" icon="<i class='bi bi-briefcase-fill'></i>" %}
 {% for message in messages %}
          <div class="text-center alert alert-{{ message.tags }}">
              {{ message|safe }}
@@ -86,9 +87,6 @@
           <div class="col-12 mb-3">
             {{ form.requirements | as_crispy_field }}
           </div>
-          <div class="col-12 mb-3">
-            {{ form.benefits | as_crispy_field }}
-          </div>
           <div class="col-md-4 form-group">
             {{ form.last_app_date | as_crispy_field }}
           </div>
@@ -115,7 +113,7 @@
       <div class="col-lg-6">
          <div class="custom-multi-select form-group mb-3 foss_select" >
           <label>{{filter_form.foss.label }}</label>
-          <select class="custom-multi-select form-control" id="foss-select" multiple>
+          <select class="form-control" id="foss-select" multiple>
           {% for foss in filter_form.foss %} 
           {{ foss }}
           {% endfor %}
@@ -125,7 +123,7 @@
       <div class="col-lg-6">
         <div class="custom-multi-select form-group mb-3 insti_select">
           <label>{{filter_form.institution_type.label }}</label>
-          <select class="custom-multi-select form-control" id="insti-select" multiple="multiple">
+          <select class="form-control" id="insti-select" multiple="multiple">
           {% for insti in filter_form.institution_type %} 
           1{{ insti }}
           {% endfor %}
@@ -133,7 +131,8 @@
         </div>
       </div>
       <div class="col-lg-6">
-        <div class="custom-multi-select form-group mb-3 state_select">
+        <!-- <div class="custom-multi-select form-group mb-3 state_select"> -->
+        <div class="form-group mb-3 state_select">
         <label>{{filter_form.state.label }}</label>
         <select class=" form-control" id="state-select" multiple="multiple">
         {% for foss in filter_form.state %} 
@@ -143,7 +142,8 @@
       </div>
       </div>
       <div class="col-lg-6">
-        <div class="custom-multi-select form-group mb-3 city_select">
+        <!-- <div class="custom-multi-select form-group mb-3 city_select"> -->
+        <div class="form-group mb-3 city_select">
           <label>{{filter_form.city.label }}</label>
           <select class=" form-control" id="city-select" multiple="multiple">
           {% for foss in filter_form.city %} 

@@ -110,4 +110,46 @@ def display_foss(value):
         return ' , '.join(foss)
     return ''
 
+@register.filter()
+def display_states(value):
+    state_ids = list(map(int,value.split(',')))
+    states = [SpokenState.objects.get(id=x).name for x in state_ids]
+    if states:
+        return ' , '.join(states)
+    return ''
 
+@register.filter()
+def display_cities(value):
+    city_ids = list(map(int,value.split(',')))
+    cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
+    if cities:
+        return ' , '.join(cities)
+    return ''
+
+@register.filter()
+def display_institute(value):
+    insti_ids = list(map(int,value.split(',')))
+    type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
+    if type_institutes:
+        return ' , '.join(type_institutes)
+    return ''
+
+@register.filter()
+def display_ac_status(value):
+    ac_status = {1:'Active',3:'Inactive'}
+    try:
+        return ac_status[value]
+    except:
+        return ''
+
+@register.simple_tag
+def get_url(value):
+    if value =='GRADE_FILTER':
+        return settings.GRADE_FILTER
+    if value =='MASS_MAIL_PAGE':
+        return settings.MASS_MAIL_PAGE
+    return ''
+
+
+
+    

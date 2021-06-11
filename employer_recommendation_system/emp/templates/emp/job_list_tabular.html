@@ -16,25 +16,20 @@
 {% endblock %}
 
 {% block content %}
-{% include "emp/page_header.html" with title="Company List" icon="<i class='bi bi-bank'></i>" %}
+{% include "emp/page_header.html" with title="Job List" icon="<i class='bi bi-briefcase-fill'></i>" %}
 {% for message in messages %}
     <div class="text-center alert {{ message.tags }}">
                 {{ message|safe }}
             </div>
         {% endfor %}
-<!-- {% for contact in page_obj %}
-    {# Each "contact" is a Contact model object. #}
-    {{ contact.full_name|upper }}    
-{% endfor %} -->
-
-<div class="search-container row">
+<!-- <div class="search-container row">
     <form action="" method="get" class="col-4">
       {% csrf_token %}
       <div class="form-group d-flex">
           <select class="form-select custom-single-select" aria-label="Default select example" name="name" onchange="this.form.submit()">
             <option value="{{object_list.0}}">{{object_list.0}}</option>
-            {% for company in companies %}
-            <option value="{{company.0}}">{{company.0}}</option>
+            {% for job in companies %}
+            <option value="{{company.0}}">{{job.0}}</option>
             {% endfor %}
           </select>
       <button type="submit" class="search-btn"><i class="fa fa-search"></i></button>
@@ -43,7 +38,7 @@
     <form class="col-4" id="all_companies" action="" method="get">
       <button type="submit" class="btn btn-outline-secondary btn-sm mx-auto">View all</button>
     </form>
-</div>
+</div> -->
 
 <hr>
 {% if object_list %}
@@ -51,28 +46,26 @@
   <thead>
   <tr>
     <th>Sr. No</th>
-    <th>Company Name</th>
+    <th>Job Title</th>
     <th>Rating</th>
     <th>Sector</th>
     <th>Location</th>
-    <th>HR Representative Name</th>
-    <th>Contact</th>
-    <th>Email</th>
+    <th>Last Application Date</th>
+    <th>Skills</th>
+    <th>Job Type</th>
   </tr>  
   </thead>
   <tbody>
-  {% for company in object_list %}
+  {% for job in object_list %}
   <tr>
     <td>{{forloop.counter}}</td>
-    <td><a href="{% url 'company-detail' slug=company.slug %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view or edit ">{{ company.name }}</a></td>
-    <td>{{ company.rating }}</td>
-    <td>{{ company.domain }}</td>
-    <td>{% get_citydetails company.city_c %} , {% get_statedetails company.state_c %}</td>
-    <td>{{ company.emp_name }}</td>
-    <td>{{ company.emp_contact }}</td>
-    <td>{{ company.email }}</td>
-    
-
+    <td><a href="{% url 'job-detail' slug=job.slug %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view or edit ">{{ job.title }}</a></td>
+    <td>{{ job.rating }}</td>
+    <td>{{ job.domain }}</td>
+    <td>{% get_citydetails job.city_job %} , {% get_statedetails job.state_job %}</td>
+    <td>{{ job.last_app_date }}</td>
+    <td>{{ job.foss | display_foss }}</td>
+    <td>{{ job.job_type }}</td>
   </tr>
   {% endfor %}
   </tbody>
@@ -81,24 +74,6 @@
 {% else %}
 <div>No companies ti display</div>
 {% endif %}
-
-
-<!-- <div class="pagination">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; First</a>
-            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-        {% endif %}
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">Next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-        {% endif %}
-    </span>
-</div> -->
 
 {% endblock %}
 {% block jquery %}
@@ -113,16 +88,6 @@
    $('#tb-company').DataTable();
    $('.custom-single-select').select2();
    $('[data-bs-toggle="tooltip"]').tooltip();
-   // var pathname = window.location.href;
-   // var all_company_list_url = "{% url 'company-list' %}";
-   // alert(pathname);
-   // alert(all_company_list_url);
-   // if (pathname!=all_company_list_url) {
-   //  $('#all_companies').show();
-   // }else{
-   //  $('#all_companies').hide();
-   // }
-
   });
 </script>
 {% endblock %}

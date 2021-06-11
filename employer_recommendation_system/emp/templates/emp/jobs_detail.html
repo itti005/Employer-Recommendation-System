@@ -3,7 +3,7 @@
 {% load helper %}
 {% block content-header %}{{ object.title}}{% endblock %}
 {% block content %}
-
+{% include "emp/page_header.html" with title="Job Details" icon="<i class='bi bi-briefcase-fill'></i>" %}
 {% for message in messages %}
     <div class="text-center alert {{ message.tags }}">
                 {{ message|safe }}
@@ -13,61 +13,88 @@
 <table class="table table-bordered">
   <tbody>
     <tr>
-      <th scope="row">Company</th>
+      <th>Company</th>
+      <td>{{object.title}}</td>
+    </tr>
+    <tr>
+      <th >Company</th>
       <td>{{object.company}}</td>
     </tr>
     <tr>
-      <th scope="row">Sector</th>
+      <th>Sector</th>
       <td>{{object.domain}}</td>
     </tr>
     <tr>
-      <th scope="row">Designation</th>
+      <th >Designation</th>
       <td>{{object.designation}}</td>
     </tr>
     <tr>
-      <th scope="row">Description</th>
+      <th >Description</th>
       <td>{{object.description}}</td>
     </tr>
     <tr>
-      <th scope="row">State</th>
+      <th >State</th>
       <td>{% get_statedetails object.state_job %}</td>
     </tr>
     <tr>
-      <th scope="row">City</th>
+      <th >City</th>
       <td>{% get_citydetails object.city_job %}</td>
     </tr>
     <tr>
-      <th scope="row">Skills</th>
+      <th >Skills</th>
       <td>{{object.skills}}</td>
     </tr>
     <tr>
-      <th scope="row">Job type</th>
+      <th >Job type</th>
       <td>{{object.job_type}}</td>
     </tr>
     <tr>
-      <th scope="row">Benefits</th>
-      <td>{{object.benefits}}</td>
-    </tr>
-    <tr>
-      <th scope="row">Requirements</th>
+      <th >Requirements</th>
       <td>{{object.requirements}}</td>
     </tr>
     <tr>
-      <th scope="row">Key Job Responsibilities</th>
+      <th >Key Job Responsibilities</th>
       <td>{{object.key_job_responsibilities}}</td>
     </tr>
     <tr>
-      <th scope="row">Gender</th>
+      <th >Gender</th>
       <td>{{object.gender | display_gender}}</td>
     </tr>
+    <tr class="table-info">
+      <td colspan="2"><center><b>Student Filter Criteria</b></center></td>
+    </tr>
     <tr>
-      <th scope="row">Address</th>
-      <td>{{object.address}}</td>
+      <th >Foss</th>
+      <td>{{object.foss | display_foss}}</td>
+    </tr>
+    <tr>
+      <th >Institute Type</th>
+      <td>{{object.institute_type | display_institute}}</td>
+    </tr>
+    <tr>
+      <th >State</th>
+      <td>{{object.state | display_states}}</td>
+    </tr>
+    <tr>
+      <th >City</th>
+      <td>{{object.city | display_cities}}</td>
+    </tr>
+    <tr>
+      <th >Grade</th>
+      <td>{{object.grade}}</td>
+    </tr>
+    <tr>
+      <th >Activation Status</th>
+      <td>{{object.activation_status | display_ac_status}}</td>
+    </tr>
+    <tr>
+      <th >Date Range</th>
+      <td>{{object.from_date}} - {{object.to_date}}</td>
     </tr>
   </tbody>
 </table>
 
-<a href="{% url 'update-job-detail' slug=object.slug %}" class="btn btn-warning">Edit</a>
+<a href="{% url 'update-job-detail' slug=object.slug %}" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
 {% endblock %}
 {% block js %}
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>

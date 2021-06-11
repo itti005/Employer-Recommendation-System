@@ -207,6 +207,7 @@ CRONJOBS=[('*/1 * * * *', 'emp.cron.backup_closed_jobs','>> ~/cron_job.log')]
 
 MASS_MAIL=MASS_MAIL
 GRADE_FILTER=GRADE_FILTER
+MASS_MAIL_PAGE=MASS_MAIL_PAGE
 
 
 

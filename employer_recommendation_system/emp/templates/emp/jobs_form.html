@@ -17,6 +17,7 @@
 {% endblock %}
 {% block content-header %}Add Job Details{% endblock %}
 {% block content %}
+{% include "emp/page_header.html" with title="Add Job" icon="<i class='bi bi-briefcase-fill'></i>" %}
 {% for message in messages %}
          <div class="text-center alert alert-{{ message.tags }}">
              {{ message|safe }}
@@ -47,7 +48,7 @@
             {{ form.skills | as_crispy_field }}
           </div>
           <div class="col-md-6 mb-3">
-                <label for="state">State</label>
+                <label for="state">State (Job Location) </label>
                 <select class="form-control" id="select-state">
                   {% for s in state %} 
                     <option value="{{s.id}}">{{ s }}</option>
@@ -55,7 +56,7 @@
                 </select>
           </div>
           <div class="col-md-6 mb-3">
-                    <label for="city">City</label>
+                    <label for="city">City (Job Location) </label>
                     <select class="form-control" id="select-city" disabled>
                       {% for c in city %} 
                         <option value="{{c.id}}">{{ c }}</option>
@@ -87,15 +88,17 @@
           <div class="col-12 mb-3">
             {{ form.requirements | as_crispy_field }}
           </div>
-          <div class="col-12 mb-3">
-            {{ form.benefits | as_crispy_field }}
-          </div>
           <div class="col-md-4 form-group">
             {{ form.last_app_date | as_crispy_field }}
           </div>
           <div class="col-md-4 mb-3">
             {{ form.rating | as_crispy_field }}
           </div>
+          <!-- <div class="col-lg-3 col-md-6 form-group mb-3">
+            <label for="id_rating" class="form-label">Rating </label> 
+            <a data-bs-toggle="offcanvas" href="#rating_info" role="button" aria-controls="rating_info"><i class="bi bi-question-circle"></i></a>
+            <input type="number" name="rating" class="numberinput form-control" id="id_rating">
+        </div> -->
           <div class="col-md-4 mb-3">
             {{ form.status | as_crispy_field }}
           </div> 
@@ -109,9 +112,7 @@
           {{ form.state | as_crispy_field }}
           {{ form.city | as_crispy_field }}
         </div>
-    <div class="filter-header">
-      <p>Student Filter Criteria</p>
-    </div>
+        {% include "emp/page_header.html" with title="Student Filter Criteria" icon="<i class='bi bi-card-list'></i>" %}
     <div class="row">
       <div class="col-lg-6">
          <div class="custom-multi-select form-group mb-3">
@@ -133,10 +134,12 @@
           </select>
         </div>
       </div>
-      <div class="col-lg-6">
-        <div class="custom-multi-select form-group mb-3">
+      <div class="row">
+         <div class="col-lg-6">
+        <!-- <div class="custom-multi-select form-group mb-3" id="loc-state"> -->
+        <div class="form-group mb-3" id="loc-state">
         <label>{{filter_form.state.label }}</label>
-        <select class="custom-multi-select form-control" id="state-select" multiple="multiple">
+        <select class="form-control" id="state-select" multiple="multiple">
         {% for foss in filter_form.state %} 
         {{ foss }}
         {% endfor %}
@@ -144,15 +147,19 @@
       </div>
       </div>
       <div class="col-lg-6">
-        <div class="custom-multi-select form-group mb-3">
+        <!-- <div class="custom-multi-select form-group mb-3"> -->
+        <div class="form-group mb-3">
           <label>{{filter_form.city.label }}</label>
-          <select class="custom-multi-select form-control"  id="city-select" multiple="multiple">
+          <!-- <select class="custom-multi-select form-control"  id="city-select" multiple="multiple"> -->
+          <select class="form-control"  id="city-select" multiple="multiple">
           {% for foss in filter_form.city %} 
           {{ foss }}
           {% endfor %}
           </select>
         </div>
       </div>
+      </div>
+     
       <div class="col-lg-3 form-group mb-3">
         {{ filter_form.grade | as_crispy_field }}
       </div>
@@ -170,17 +177,45 @@
     <input type="submit" value="Submit" id="job-submit" class="btn btn-success">
     
 </form>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="status_info" aria-labelledby="ratingInfoLabel">
+  <div class="offcanvas-header main-bd">
+    <h5 class="offcanvas-title" id="ratingInfoLabel">Status</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul>
+        <li><span class="main-color"><b>Active</b></span> : The job is in active state. The job will appear in search results.</li><br>
+        <li><span class="main-color"><b>Inactive</b></span> : The job is in inactive state. The job will NOT appear in search results. </li>
+      </ul>
+  </div>
+</div>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="rating_info" aria-labelledby="statusInfoLabel">
+  <div class="offcanvas-header main-bd">
+    <h5 class="offcanvas-title" id="statusInfoLabel">Rating</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul>
+        <li><span class="main-color fw-bold"> Only visible to Admin/HR (0)</span> : The job details are visible to only Admin / HR Manager. Students & other users will not be able to see the job details.</li><br>
+        <li><span class="main-color fw-bold">Display on homepage (1)</span> : Highlighted Job. The job details will be highlighted on homepage & student dashboard. </li><br>
+        <li><span class="main-color fw-bold">Visible to all users (2)</span> :  The job details will be visible to all, but not highlighted on homepage.</li><br>
+      </ul>
+  </div>
+</div>
 
 
 {% endblock %}
 {% block js %}
-<!-- <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script> -->
-<!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
 <script type="text/javascript">
   $( document ).ready(function() {
    $('.custom-multi-select').dropdown({multipleMode:'label'});
+   rating = $("label[for='id_rating']");
+   rating.append( "<span><a data-bs-toggle='offcanvas' href='#rating_info' role='button' aria-controls='status_info'><i class='bi bi-question-circle'></i></a></span>" );
+   status_elem = $("label[for='id_status']");
+   status_elem.append( "<span><a data-bs-toggle='offcanvas' href='#status_info' role='button' aria-controls='status_info'><i class='bi bi-question-circle'></i></a></span>" );
+   elem = $("#loc-state > div.dropdown-main > ul").prepend('hello');
+  console.log(elem);
+
    $( "#job-submit" ).click(function() {
   var foss = $('#foss-select').val(); 
   var insti_type = $('#insti-select').val(); 
@@ -195,6 +230,12 @@
   city = $('#city-select').val();
   $('#id_state_job').val(parseInt(state));
   $('#id_city_job').val(parseInt(city));
+
+  // $( "#state-select" ).change(function () {    
+  //   alert('here');
+  //   document.getElementById("filter_places").innerHTML="You selected: "+document.getElementById("state-select").value;  
+  // }); 
+
 
 });
    

@@ -53,6 +53,10 @@
   overflow-y: scroll!important;
   overflow-x: scroll!important;
 }
+#job{
+  border: 1px solid black;
+  padding:2px 10px;
+}
 </style>
 {% endblock %}
 {% block content %}
@@ -172,7 +176,7 @@
     {% endif %}
     {% if request.user|has_group:"MANAGER" %}
     <div class="alert alert-warning mt-2" role="alert">
-  To notify students for the job; please copy <span class="fw-bold">JOB ID : </span> <span class="fw-bold text-decoration-underline">{{job.id}}</span> & <a href="{{grade_filter_url}}" class="alert-link text-decoration-underline" target="_blank">login here</a>. 
+  To notify students for the job; please copy <span class="fw-bold">JOB ID : </span> <span class="fw-bold text-decoration-underline" id="job">{{job.id}}</span> & <a href="{{grade_filter_url}}" class="alert-link text-decoration-underline" target="_blank">login here</a>. 
 </div>
 {% endif %}
               <div class="d-flex">
@@ -191,7 +195,7 @@
                   {% if request.user|has_group:"MANAGER" %}
 
           <!-- <a href="https://spoken-tutorial.org/accounts/login/?next=/software-training/student-grade-filter/?id={{job.id}}" class="btn btn-success" target="_blank"><i class="bi bi-cursor "></i> Notify</a> -->
-          <a class="btn btn-warning" href="{% url 'update-job-detail' slug=job.slug %}">Edit</a>
+          <a class="btn btn-warning" href="{% url 'update-job-detail' slug=job.slug %}"><i class="bi bi-pencil"></i> Edit</a>
           {% endif %}
 
           {% if request.user|has_group:"STUDENT" %}
@@ -265,8 +269,6 @@
               <p>{{job.requirements}}</p>
               <p><b>Key Job Responsibilities</b></p>
               <p>{{job.key_job_responsibilities}}</p>
-              <p><b>Benefits</b></p>
-              <p>{{job.benefits}}</p>              
                 </div>
                 
               </div>
