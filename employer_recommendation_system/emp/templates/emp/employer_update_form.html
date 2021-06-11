@@ -9,6 +9,7 @@
 </style>
 {% endblock %}
 {% block content %}
+{% include "emp/page_header.html" with title="Update Company" icon="<i class='bi bi-bank'></i>" %}
 <form method="post" enctype="multipart/form-data">{% csrf_token %}
     {{ form | crispy }}
     <div class="col-md-6 form-group">

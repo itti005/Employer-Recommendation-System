@@ -11,7 +11,7 @@ from spoken.models import SpokenUser, SpokenState, SpokenCity
 
 # Create your models here.
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
-GENDER = [('f','f'),('m','m'),('a','No criteria'),]
+GENDER = [('f','F-Female Candidates'),('m','M-Male Candidates'),('a','No Criteria'),]
 START_YEAR_CHOICES = []
 END_YEAR_CHOICES = []
 for r in range(2000, (datetime.datetime.now().year+1)):
@@ -102,17 +102,16 @@ class Company(models.Model):
         ('100 - 500','100 - 500'),
         ('> 500','> 500'),]
     name = models.CharField(max_length=200)
-    emp_name = models.CharField(max_length=200) #Name of the company representative
-    emp_contact = models.CharField(max_length=200) #Contact of the company representative
+    emp_name = models.CharField(max_length=200,verbose_name="Company HR Representative Name") #Name of the company representative
+    emp_contact = models.CharField(max_length=100,verbose_name="Phone Number") #Contact of the company representative
     state_c = models.IntegerField(null=True)
     city_c = models.IntegerField(null=True)    
     # state_c = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     # city_c = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     address = models.CharField(max_length=250) #Company Address for correspondence
-    phone = models.CharField(max_length=15) #Contact of the company representative
     email = models.EmailField(null=True,blank=True) #Email for correspondence
     logo = models.ImageField(upload_to='logo/',null=True,blank=True)
-    description = models.TextField(null=True,blank=True)
+    description = models.TextField(null=True,blank=True,verbose_name="Description about the company")
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
     company_size = models.CharField(max_length=25,choices=NUM_OF_EMPS) #Number of employees in company
     website = models.URLField(null=True,blank=True)
@@ -137,34 +136,33 @@ class Company(models.Model):
             obj.save()
 
 class Job(models.Model):
-    title = models.CharField(max_length=250) #filter
-    designation = models.CharField(max_length=250) 
+    title = models.CharField(max_length=250,verbose_name="Title of the job page") #filter
+    designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
     state_job = models.IntegerField(null=True)  #spk #filter
     #state_job = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     city_job = models.IntegerField(null=True)  #spk #filter
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     skills = models.CharField(max_length=400,null=True,blank=True) 
-    description = models.TextField(null=True,blank=True) 
+    description = models.TextField(null=True,blank=True,verbose_name="Description About Job") 
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
     salary_range_min = models.IntegerField(null=True,blank=True)
     salary_range_max = models.IntegerField(null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
     date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
     job_type = models.ForeignKey(JobType,on_delete=models.CASCADE)
-    benefits = models.TextField(null=True,blank=True) # Additional benefits provided by the company to employee
     # 0: Job is inactive(added but not visible to students)
     # 1: Job is active(added & available to students for apply)
     # 2: Job Application Date is over
     # 3: Job Application is in process with HR & Company
     # 4: Student selected & job closed.
     status = models.IntegerField(default=1,blank=True)
-    requirements = models.TextField(null=True,blank=True) #Educational qualifications, other criteria
+    requirements = models.TextField(null=True,blank=True,verbose_name="Qualifications/Skills Required") #Educational qualifications, other criteria
     shift_time = models.CharField(max_length=200)
-    key_job_responsibilities = models.TextField(null=True,blank=True)
+    key_job_responsibilities = models.TextField(null=True,blank=True,verbose_name="Key Job Responsibilities")
     gender = models.CharField(max_length=10,choices=GENDER)
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
-    last_app_date = models.DateTimeField(null=True,blank=True)
+    last_app_date = models.DateTimeField(null=True,blank=True,verbose_name="Last Application Date")
     rating = models.IntegerField(null=True,blank=True)
     foss = models.CharField(max_length=200)
     institute_type = models.CharField(max_length=200)

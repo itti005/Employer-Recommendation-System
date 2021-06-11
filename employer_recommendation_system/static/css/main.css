@@ -16,3 +16,14 @@ a:hover{
 .main-bd{
 	border-bottom: 1px solid #054C77;
 }
+.page-header{
+	border: none!important;
+	border-bottom: 2px solid #054C77!important;
+	border-radius: 0px!important;
+	color: #054C77!important;
+	background: #fff!important;
+}
+.icons-nav{
+	color: #0066A0!important;
+	margin-right: 10px;
+}

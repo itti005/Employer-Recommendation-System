@@ -17,6 +17,7 @@
 </style>
 {% endblock %}
 {% block content %}
+{% include "emp/page_header.html" with title="Shortlisted Students" icon="<i class='bi bi-list-check'></i>" %}
 {% for message in messages %}
     <div class="text-center alert alert-{{ message.tags }}">
                 {{ message|safe }}

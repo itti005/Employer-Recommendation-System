@@ -20,6 +20,7 @@
              {{ message|safe }}
          </div>
 {% endfor %}
+{% include "emp/page_header.html" with title="Add Company" icon="<i class='bi bi-bank'></i>" %}
 <form method="POST" enctype="multipart/form-data" >
   
     <!-- Security token -->
@@ -29,16 +30,13 @@
     		{{ form.name | as_crispy_field }}
     	</div>
         <div class="col-6 form-group mb-3"></div>
-    	<div class="col-md-6 form-group mb-3">
+    	<div class="col-md-4 form-group mb-3">
     		{{ form.emp_name | as_crispy_field }}
     	</div>
-    	<div class="col-md-6 form-group mb-3">
+    	<div class="col-md-4 form-group mb-3">
     		{{ form.emp_contact | as_crispy_field }}
     	</div>
-    	<div class="col-md-6 form-group mb-3">
-    		{{ form.phone | as_crispy_field }}
-    	</div>
-    	<div class="col-md-6 form-group mb-3">
+    	<div class="col-md-4 form-group mb-3">
     		{{ form.email | as_crispy_field }}
     	</div>
         <div class="col-md-6 form-group d-none">
@@ -79,7 +77,7 @@
     	</div>
     	<div class="col-lg-3 col-md-6 form-group mb-3">
     		{{ form.website | as_crispy_field }}
-            <small class="text-muted">Format : https://www.abc.com</small>
+            <span class="fw-bold main-color" ><i class="bi bi-exclamation-circle"></i></span> <small class="text-muted">Format : https://www.abc.com</small>
     	</div>
     	<div class="col-lg-3 col-md-6 form-group mb-3">
     		{{ form.logo | as_crispy_field }}
@@ -102,9 +100,9 @@
       
     <input type="submit" value="Submit" id="company_form" class="btn btn-success mt-3">
 </form>
-<div class="offcanvas offcanvas-start" tabindex="-1" id="rating_info" aria-labelledby="ratingInfoLabel">
+<div class="offcanvas offcanvas-start" tabindex="-1" id="status_info" aria-labelledby="ratingInfoLabel">
   <div class="offcanvas-header main-bd">
-    <h5 class="offcanvas-title" id="ratingInfoLabel">Rating</h5>
+    <h5 class="offcanvas-title" id="ratingInfoLabel">Status</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
@@ -114,9 +112,9 @@
       </ul>
   </div>
 </div>
-<div class="offcanvas offcanvas-start" tabindex="-1" id="status_info" aria-labelledby="statusInfoLabel">
+<div class="offcanvas offcanvas-start" tabindex="-1" id="rating_info" aria-labelledby="statusInfoLabel">
   <div class="offcanvas-header main-bd">
-    <h5 class="offcanvas-title" id="statusInfoLabel">Status</h5>
+    <h5 class="offcanvas-title" id="statusInfoLabel">Rating</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
