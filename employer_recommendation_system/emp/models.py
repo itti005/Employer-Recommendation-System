@@ -61,6 +61,11 @@ class Education(models.Model):
     def __str__(self):
         return self.degree.name+'_'+str(self.institute)
 
+
+def user_directory_path(instance, filename):
+    return 'user_{0}/{1}'.format(instance.user.id, filename)
+
+
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     phone = models.CharField(max_length=10, null=True,blank=True) #spk
@@ -76,12 +81,15 @@ class Student(models.Model):
     picture = models.FileField(upload_to=profile_picture, null=True, blank=True)    #spk
     github = models.URLField(null=True,blank=True)
     linkedin = models.URLField(null=True,blank=True)
-    cover_letter = models.FileField(null=True,blank=True)
+    cover_letter = models.FileField(null=True,blank=True,upload_to='')
+    resume = models.FileField(null=True,blank=True,upload_to='')
+    # cover_letter = models.FileField(null=True,blank=True,upload_to=user_directory_path)
     date_created = models.DateTimeField(null=True,blank=True)
     date_updated = models.DateTimeField(null=True,blank=True)
     #spoken_score = 
     status = models.BooleanField(default=True) #False to restrict student from accessing
     spk_usr_id = models.IntegerField(null=True)  # spoken student id
+    spk_student_id = models.IntegerField(null=True)  # spoken student id
     gender = models.CharField(max_length=10, null=True) # autopopulated spk cms profile
     location = models.CharField(max_length=400,null=True,blank=True)  #spk
     state = models.CharField(max_length=100, null=True)  #spk
@@ -172,6 +180,7 @@ class Job(models.Model):
     activation_status = models.IntegerField(max_length=10,choices=ACTIVATION_STATUS)
     from_date = models.DateField(null=True,blank=True)
     to_date = models.DateField(null=True,blank=True)
+    num_vacancies = models.IntegerField(default=1,blank=True)
 
     def __str__(self):
         return self.title
@@ -197,7 +206,7 @@ class JobShortlist(models.Model):
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, null=True,blank=True)
     #0 : awaiting for further shortlist
-    #1 : shortlisted
+    #1 : shortlisted for 2nd round
     status = models.IntegerField(null=True,blank=True)
 
     def __str__(self):

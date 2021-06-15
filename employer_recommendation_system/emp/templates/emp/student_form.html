@@ -62,7 +62,7 @@
     
   </div>
   <div class="d-none">
-    <form id="form-job-app" action="{% url 'add_student_job_status' %}" method="post">
+    <form id="form-job-app" action="{% url 'add_student_job_status' %}" method="POST">
       {% csrf_token %}
     <input type="number" name="job_id" required="" id="id_job_id" value="{{job.id}}">
     <input type="number" name="student" required="" id="id_student" value="{{request.user.student.id}}">
@@ -122,8 +122,9 @@
 		</div>
 	</div>
 </form>
-<form method="post" id="form-student" readonly>
 
+  <form method="POST" id="form-student" enctype="multipart/form-data" action="{% url 'student_profile' request.user.id %}">
+    {% csrf_token %}
 	<div class="row">
     	<div class="col-sm-8">
         <!-- <label>{{ form.skills.label_tag }}</label>
@@ -137,6 +138,7 @@
 		</div> -->
     	</div>
 		<input type="hidden" id="skills_m" name="skills_m" >
+    <p>testtest</p>
     	<div class="col-sm-8 mb-3">
       		{{ form.about | as_crispy_field }}
     	</div>
@@ -154,6 +156,9 @@
     	<div class="col-sm-8 mb-3">
       	{{ form.cover_letter | as_crispy_field }}
     	</div>
+      <div class="col-sm-8 mb-3">
+        {{ form.resume | as_crispy_field }}
+      </div>
 
     	<!-- Add Education -->
     	<div class="col-sm-4 mb-3"></div>
@@ -192,10 +197,13 @@
         </div>
       </div> -->
 	</div>
-	{% csrf_token %}
+	
 
 	<button type="submit" class="btn btn-success mb-5" id="update_profile" {% if confirm %} style="display: none;" {% endif %}>Update Profile</button>
 </form>
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 {% endblock %}
 {% block js %}
 <!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
