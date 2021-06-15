@@ -17,7 +17,7 @@
 </style>
 {% endblock %}
 {% block content %}
-{% include "emp/page_header.html" with title="Shortlisted Students" icon="<i class='bi bi-list-check'></i>" %}
+{% include "emp/page_header.html" with title="Applied Students" icon="<i class='bi bi-list-check'></i>" %}
 {% for message in messages %}
     <div class="text-center alert alert-{{ message.tags }}">
                 {{ message|safe }}
@@ -61,63 +61,38 @@
     <table class="table table-striped" id="tb-awaiting">
       <thead>
         <tr>
-          
-   {% for key, value in d.0.items %}
-      <td><b>{{key | title}}</b></td>
+    {% if d %}
+      {% for key, value in d.0.items %}
+   {% if key == 'spk_usr_id' %}
+   <th scope="col"><input class="form-check-input" type="checkbox" value="" id="select-all" > <button type="button" class="btn btn-outline-success btn-sm" style="display: none;" id="btn-shortlist" onclick="shortlist_student(this,'{{job.id}}');">Shortlist</button></th>
+   {% else %}
+   <td><b>{{key | title}}</b></td>
+   {% endif %}
    {% endfor %}
-
+   {% else %}
+   <th>No Data Available. Please check shortlisted tab.</th>
+    {% endif %}
         </tr>
       </thead>
       <tbody>
+        {% if d %}
         {% for dict_item in d %}
         <tr>
    {% for key, value in dict_item.items %}
-      <td>{{value}}</td>
+   {% if key == 'spk_usr_id' %}
+   <td><input class="form-check-input select-student" type="checkbox" value="" id="student_{{value}}"> 
+    <a href="{% url 'student_profile_details' value job.id %}" target="_blank">{{value}}</a></td>
+   {% else %}
+   <td>{{value}}</td>
+   {% endif %}
    {% endfor %}
    </tr>
 {% endfor %}
+{% else %}
+<td></td>
+{% endif %}
       </tbody>
     </table>
-
-    <!-- <table class="table table-striped" id="tb-awaiting">
-    
-  <thead>
-    <tr>
-      <th scope="col"><input class="form-check-input" type="checkbox" value="" id="select-all" > <button type="button" class="btn btn-outline-success btn-sm" style="display: none;" id="btn-shortlist" onclick="shortlist_student(this,'{{job.id}}');">Shortlist</button></th>
-      <th scope="col">Student</th>
-      <th scope="col">Spoken User Id</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for student in students_awaiting %}
-    <tr>
-      <td><input class="form-check-input select-student" type="checkbox" value="" id="student_{{student.id}}" ></td>
-      <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td>
-      <td>{{student.spk_usr_id}}</td>
-    </tr>
-  {% empty %}
-  {% endfor %}
-  </tbody>
-</table> -->
-    <!-- <table class="table table-striped" id="tb-awaiting">
-  <thead>
-    <tr>
-      <th scope="col"><input class="form-check-input" type="checkbox" value="" id="select-all" > <button type="button" class="btn btn-outline-success btn-sm" style="display: none;" id="btn-shortlist" onclick="shortlist_student(this,'{{job.id}}');">Shortlist</button></th>
-      <th scope="col">Student</th>
-      <th scope="col">Spoken User Id</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for student in students_awaiting %}
-    <tr>
-      <td><input class="form-check-input select-student" type="checkbox" value="" id="student_{{student.id}}" ></td>
-      <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td>
-      <td>{{student.spk_usr_id}}</td>
-    </tr>
-  {% empty %}
-  {% endfor %}
-  </tbody>
-</table> -->
   </div>
   <div class="tab-pane fade" id="nav-shortlisted" role="tabpanel" aria-labelledby="nav-profile-tab">
     <table class="table table-striped pt-3" id="tb-shortlisted">
@@ -203,6 +178,7 @@
           id = $(this).attr("id");
           students+=id.split('_')[1]+','
      });
+        console.log(students);
     $.ajax({
       url: "/shortlist_student",
       data: {
@@ -235,6 +211,7 @@
         $('#textbox1').val(this.checked);        
     });
     $('input.select-student:checkbox').change(function() {
+        console.log('select checked');
         var allVals = [];
         $('input.select-student:checked').each(function() {
        allVals.push($(this).val());
