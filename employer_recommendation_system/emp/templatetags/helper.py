@@ -113,7 +113,8 @@ def display_foss(value):
 @register.filter()
 def display_states(value):
     state_ids = list(map(int,value.split(',')))
-    states = [SpokenState.objects.get(id=x).name for x in state_ids]
+    # states = [SpokenState.objects.get(id=x).name for x in state_ids]
+    states = [x.name for x in SpokenState.objects.filter(id__in=state_ids)]
     if states:
         return ' , '.join(states)
     return ''
@@ -121,7 +122,8 @@ def display_states(value):
 @register.filter()
 def display_cities(value):
     city_ids = list(map(int,value.split(',')))
-    cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
+    # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
+    cities = [x.name for x in SpokenCity.objects.filter(id__in=city_ids)]
     if cities:
         return ' , '.join(cities)
     return ''
@@ -129,7 +131,8 @@ def display_cities(value):
 @register.filter()
 def display_institute(value):
     insti_ids = list(map(int,value.split(',')))
-    type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
+    # type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
+    type_institutes = [x.name for x in InstituteType.objects.filter(id__in=insti_ids)]
     if type_institutes:
         return ' , '.join(type_institutes)
     return ''
@@ -149,6 +152,16 @@ def get_url(value):
     if value =='MASS_MAIL_PAGE':
         return settings.MASS_MAIL_PAGE
     return ''
+
+@register.filter()
+def format_status(value):
+    d={0:'warning',1:'success'}
+    return d[value]
+
+@register.filter()
+def status_value(value):
+    d={0:'In process',1:'shortlisted'}
+    return d[value]
 
 
 

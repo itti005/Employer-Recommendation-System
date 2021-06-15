@@ -9,6 +9,7 @@ urlpatterns = [
     path('<pk>/profile',views.student_profile,name='student_profile'),
     path('check_student_eligibilty',views.check_student_eligibilty,name='check_student_eligibilty'),
     path('add_student_job_status',views.add_student_job_status,name='add_student_job_status'),
+    path('student_profile/<int:id>/<int:job>',views.student_profile_details,name='student_profile_details'),
 
 
     
@@ -32,6 +33,7 @@ urlpatterns = [
     path('<slug:slug>/update-job/', JobUpdate.as_view(), name='update-job-detail'),
     path('job_list/', JobListView.as_view(), name='job-list'),
     path('applied_jobs/', AppliedJobListView.as_view(), name='applied-job-list'),
+    path('my_jobs/', views.student_jobs, name='student_jobs'),
     path('job/<slug:slug>/', JobDetailView.as_view(), name='job-detail'),
     path('job_listings/', JobListingView.as_view(), name='job-listing'),
 

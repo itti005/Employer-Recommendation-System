@@ -27,6 +27,11 @@ from django.conf import settings
 from django.forms import HiddenInput
 from django.template.defaultfilters import slugify
 from django import forms
+import pandas as pd
+import json
+from django.core.files.storage import FileSystemStorage
+from os import listdir
+import re
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
@@ -75,7 +80,7 @@ def get_recommended_jobs(student):
                 rec_jobs.append(job)
     return rec_jobs
 
-#function to get student spoken test scores
+#function to get student spoken test scores; returns list of dictionary of foss & scores
 def fetch_student_scores(student):  #parameter : recommendation student obj
 	scores = []
 	#student = Student.objects.get(id=2) #TEMPORARY
@@ -110,14 +115,15 @@ def student_homepage(request):
     context={}
 
     # Top 5 jobs & company to display on student homepage
-    company_display = Company.objects.filter(rating=5).order_by('-date_updated')[:5]
+    company_display = Company.objects.filter(rating=5).order_by('-date_updated')[:7]
     context['company_display']=company_display
     rec_student = Student.objects.get(user=request.user)
     applied_jobs = get_applied_joblist(rec_student.spk_usr_id)
-    awaiting_jobs = get_awaiting_jobs(rec_student.spk_usr_id)[:5]
+    awaiting_jobs = get_awaiting_jobs(rec_student.spk_usr_id)
     rec_jobs = get_recommended_jobs(rec_student)
-    context['applied_jobs'] = applied_jobs if len(applied_jobs)<3 else applied_jobs[:3]
-    context['awaiting_jobs'] = awaiting_jobs if len(applied_jobs)<3 else awaiting_jobs[:]
+    context['applied_jobs'] = applied_jobs if len(applied_jobs)<4 else applied_jobs[:4]
+    context['awaiting_jobs'] = awaiting_jobs if len(awaiting_jobs)<2 else awaiting_jobs[:2]
+    l = awaiting_jobs if len(applied_jobs)<2 else awaiting_jobs[:2]
     context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
     context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
     
@@ -431,6 +437,8 @@ class AppliedJobListView(ListView):
         queryset = super().get_queryset()
         return JobShortlist.objects.filter(student=self.request.user.student)
 
+
+
 class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/jobs_update_form.html'
     permission_required = 'emp.change_job'
@@ -480,15 +488,57 @@ def add_education(student,degree,institute,start_year,end_year,gpa):
     student.education.add(ed)
 
 def save_student_profile(request,student):
-    student_form = StudentForm(request.POST)
+    student_form = StudentForm(request.POST,request.FILES)
     education_form = EducationForm(request.POST)
     
     if student_form.is_valid() and education_form.is_valid():
+        # student_form.save()
+        # instance = ModelWithFileField(file_field=request.FILES['file'])
         student.about = student_form.cleaned_data['about']
         student.github = student_form.cleaned_data['github']
         student.experience = student_form.cleaned_data['experience']
         student.linkedin = student_form.cleaned_data['linkedin']
+        # student.cover_letter = request.FILES['cover_letter']
+        try:
+            location = settings.MEDIA_ROOT+'/students/'+str(request.user.id)+'/'
+            os.makedirs(location)
+        except:
+            pass
+        fs = FileSystemStorage(location=location) #defaults to   MEDIA_ROOT
+        l=listdir(location)
+        if request.FILES['cover_letter']:
+            re_c = re.compile("cover_letter.*")
+            redundant_cover = list(filter(re_c.match, l))
+            for file in redundant_cover :
+                os.remove(os.path.join(location,file))
+
+            cover_letter = request.FILES['cover_letter']
+            # filename_cover_letter = 'cover_letter.pdf'
+            filename_cover_letter = 'cover_letter'+str(request.user.id)+'.pdf'
+            filename_c = fs.save(filename_cover_letter, cover_letter)
+            student.cover_letter=fs.url(os.path.join('students',str(request.user.id),filename_c))
+
+        if request.FILES['resume']:
+            re_r = re.compile("resume.*")
+            redundant_resume = list(filter(re_r.match, l))
+            for file in redundant_resume:
+                os.remove(os.path.join(location,file))
+            resume = request.FILES['resume']
+            filename_resume = 'resume'+str(request.user.id)+'.pdf'
+            filename_r = fs.save(filename_resume, resume)
+            student.resume=fs.url(os.path.join('students',str(request.user.id),filename_r))
+
+        l = listdir(location)
+        re_c = re.compile("cover_letter_.*")
+        re_r = re.compile("resume_.*")
+        redundant_cover = list(filter(re_c.match, l))
+        redundant_resume = list(filter(re_r.match, l))
+        for file in redundant_cover + redundant_resume:
+            os.remove(os.path.join(location,file))
+
+
         student.save()
+
         skills = request.POST['skills_m']
         if skills:
             skills = skills.split(',')
@@ -501,7 +551,6 @@ def save_student_profile(request,student):
         start_year = education_form.cleaned_data['start_year']
         end_year = education_form.cleaned_data['end_year']
         gpa = education_form.cleaned_data['gpa']
-        
         try:
             e = Education.objects.filter(student=student)
             if e:
@@ -569,7 +618,7 @@ def student_profile(request,pk):
         education_form = EducationForm(request.POST)
         if student_form.is_valid() and education_form.is_valid():
             student_form,education_form = save_student_profile(request,student)
-            messages.success(request, 'Profile uodated successfully')
+            messages.success(request, 'Profile updated successfully')
         else:
             messages.danger(request, 'Error in updating profile')
     else:
@@ -631,11 +680,42 @@ class JobAppStatusListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-
+# def job_app_details(id):        
 def job_app_details(request,id):
     context = {}
     job = Job.objects.get(id=id)
     students_awaiting = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
+    students_awaiting1 = [x.student.spk_student_id for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
+    ta = TestAttendance.objects.filter(student_id__in=students_awaiting1)
+    ta = ta.values('student_id','mdluser_id','mdlcourse_id','mdlquiz_id')
+    ta_df=pd.DataFrame(ta)
+    mdl_quiz_grades = MdlQuizGrades.objects.using('moodle').filter(userid__in=ta_df['mdluser_id'])
+    mdl_quiz_grades=mdl_quiz_grades.values('quiz','userid','grade')
+    mdl_quiz_grades_df=pd.DataFrame(mdl_quiz_grades)
+    fossmdlcourses=FossMdlCourses.objects.filter(mdlquiz_id__in=mdl_quiz_grades_df['quiz']).values('mdlcourse_id','foss_id','mdlquiz_id')
+    fossmdlcourses_df=pd.DataFrame(fossmdlcourses)
+    fosscategory=FossCategory.objects.filter(id__in=fossmdlcourses_df['foss_id']).values('id','foss')
+    fosscategory_df=pd.DataFrame(fosscategory)
+    df1 = pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
+    df1=df1.drop(['id','foss_id'], axis = 1)
+    pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
+    df1 = pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
+    df1=df1.drop(['id','foss_id'], axis = 1)
+    d = pd.merge(ta_df,mdl_quiz_grades_df,left_on=['mdlquiz_id','mdluser_id'],right_on=['quiz','userid'])
+    df = pd.merge(d,df1,on='mdlcourse_id')
+    sq = Student.objects.filter(spk_student_id__in=df['student_id'])
+    sq = sq.values('address','spk_institute','gender','state','city','spk_student_id')
+    sq_df=pd.DataFrame(sq)
+    df=pd.merge(df,sq_df,left_on='student_id',right_on='spk_student_id')
+    df1=df.drop_duplicates().pivot(index='student_id',columns='foss',values='grade')
+    context['columns']=df1.columns
+    df1.reset_index(inplace=True)
+    dnew=pd.merge(df1,sq_df,left_on='student_id',right_on='spk_student_id').drop(columns= ['spk_student_id'])
+    json_records = dnew.reset_index().to_json(orient ='records')
+    data = []
+    data = json.loads(json_records)
+    context = {'d': data}
+    context['df']=df1.to_html()
     students_shortlisted = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==1]
     context['job'] = job
     context['students_awaiting'] = students_awaiting
@@ -673,7 +753,7 @@ def add_student_job_status(request):
         context['applied_jobs'] = [x.job for x in JobShortlist.objects.filter(student=student)]
     else:
         print(form.errors)
-    return HttpResponseRedirect(reverse('applied-job-list'))
+    return HttpResponseRedirect(reverse('student_jobs'))
 
 def check_student_eligibilty(request):
     flag = False
@@ -742,4 +822,30 @@ def ajax_state_city(request):
                 tmp +='<option value='+str(i.id)+'>'+i.name+'</option>'
         data['cities']=tmp
         return JsonResponse(data)
+
+def student_profile_details(request,id,job):
+    context = {}
+    context['spk_student_id']=id
+    context['job_id']=job
+    job_obj = Job.objects.get(id=job)
+    context['job']=job_obj
+    student = Student.objects.get(spk_student_id=id)
+    context['student']=student
+    print(f"job: {job_obj} ; student : {student}")
+    return render(request,'emp/student_profile.html',context)
+
+def student_jobs(request):
+    context = {}
+    #get applied jobs
+    rec_student = Student.objects.get(user=request.user)
+    applied_jobs = get_applied_joblist(rec_student.spk_usr_id)
+    rec_jobs = get_recommended_jobs(rec_student)
+    #get recommended jobs
+    context['applied_jobs']=applied_jobs
+    context['rec_jobs']=rec_jobs
+    
+    return render(request,'emp/student_jobs.html',context)
+
+
+
 
