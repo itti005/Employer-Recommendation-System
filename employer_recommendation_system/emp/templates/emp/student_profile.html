@@ -1,0 +1,73 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% load helper %}
+{% block content-header %}{{ object.title}}{% endblock %}
+{% block css %}
+<style type="text/css">
+	i{
+		color: #0066A0;
+		margin-right: 1rem;
+	}
+  .profile-info{
+    height: 90vh;
+    /*border: 2px solid blue;*/
+    overflow: scroll;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<!-- {% include "emp/page_header.html" with title="Job Details" icon="<i class='bi bi-briefcase-fill'></i>" %} -->
+{% for message in messages %}
+    <div class="text-center alert {{ message.tags }}">
+                {{ message|safe }}
+            </div>
+{% endfor %}
+<section>
+	<div class="row profile-info">
+		<div class="col-lg-4 profile-info">
+			<ul class="list-group">
+        <li class="list-group-item list-group-item-info"><span>Student Details</span></li>
+  <li class="list-group-item">
+  	<b><i class="bi bi-person-square"></i></b><span>{{student.user.get_full_name | title}}</span><br>
+  	<b><i class="bi bi-geo-alt-fill"></i><small>(Address)</small></b> <span>{{student.address |default_if_none:'Data Not Available'}}</span><br>
+  	<b><i class="bi bi-bank2"></i><small>(Institute)</small></b> <span>{{student.spk_institute |default_if_none:'Data Not Available'}}</span><br><hr>
+    <b>Gender : </b><span>{{student.gender | title}}</span><br>
+    <b>Spoken User Id: </b><span>{{student.spk_usr_id | title}}</span><br>
+  </li>
+  <li class="list-group-item list-group-item-info"><span>Profile</span></li>
+  <li class="list-group-item">
+  	<b>About</b>
+  	<p>{{student.about}}</p>
+  	<b>Experience</b>
+  	<p>{{student.experience}}</p>
+  </li>
+  <li class="list-group-item list-group-item-info"><span>Links</span></li>
+  <li class="list-group-item">
+  	<b><i class="bi bi-github"></i><span class="me-1">Github</span></b><span>{{student.github}}</span><br>
+  	<b><i class="bi bi-linkedin"></i><span class="me-1">LinkedIn</span></b><span>{{student.linkedin}}</span>
+  </li>
+</ul>
+		</div>
+		<div class="col-lg-8 profile-info">
+      <div>
+        {% if student.resume %}
+        <embed src="{{ MEDIA_URL }}students/{{student.user.id}}/resume{{student.user.id}}.pdf" width="800px" height="2100px" /> 
+        {% else %}
+        <div class="alert alert-dark" role="alert">No Resume Available.</div>
+        {% endif %}
+        {% if student.cover_letter %}
+        <embed src="{{ MEDIA_URL }}students/{{student.user.id}}/cover_letter{{student.user.id}}.pdf" width="800px" height="2100px" />
+        {% else %}  
+        <div class="alert alert-dark" role="alert">No Cover Letter Available.</div>
+        {% endif %}
+
+      </div>
+      <div>
+      </div>
+		</div>
+	</div>
+</section>
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+{% endblock %}

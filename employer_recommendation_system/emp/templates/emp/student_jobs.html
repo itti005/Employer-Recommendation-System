@@ -1,0 +1,67 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% load helper %}
+{% block content-header %}Job List{% endblock %}
+{% block content %}
+{% for message in messages %}
+    <div class="text-center alert {{ message.tags }}" role="alert">
+                {{ message|safe }}
+    </div>
+{% endfor %}
+<div class="row">
+  <div class="col">
+    <table class="table" id="tb-applied-jobs">
+  <thead>
+    <tr>
+      <th scope="col">Job Id</th>
+      <th scope="col">Company</th>
+      <th scope="col">Job Title</th>
+      <th scope="col">Application Date</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for object in applied_jobs %}
+    <tr>
+      <td>{{object.job.id}}</td>
+      <td><a href="{% url 'company-detail' slug=object.job.company.slug %}" target="_blank">{{ object.job.company.name }}</a></td>
+      <td><a href="{% url 'job-detail' slug=object.job.slug %}" target="_blank">{{ object.job.title }}</a></td>
+      <td>{{object.date_created}}</td>
+      <td>
+        <span class="badge bg-{{object.status | format_status}} rounded-pill">
+      {{object.status | status_value }}
+    </span>
+      </td>
+    </tr>
+    {% endfor %}
+    {% for job in rec_jobs %}
+    <tr>
+      <td>{{job.id}}</td>
+      <td><a href="{% url 'company-detail' slug=job.company.slug %}" target="_blank">{{ job.company.name }}</a></td>
+      <td><a href="{% url 'job-detail' slug=job.slug %}" target="_blank">{{ job.title }}</a></td>
+      <td><a class="btn btn-outline-success btn-sm" href="{% url 'student_profile_confirm' pk=request.user.student.id job=job.id %}">Apply</a></td>
+      <td>
+        <span>Apply Before : {{job.last_app_date}}</span>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table> 
+
+
+  </div>
+  
+</div>
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+{% block js %}
+<script type = "text/javascript">
+    $(document).ready(function(){
+      $('#tb-applied-jobs').DataTable();
+      });
+</script>
+{% endblock %}
+
+
