@@ -81,7 +81,7 @@
    {% for key, value in dict_item.items %}
    {% if key == 'spk_usr_id' %}
    <td><input class="form-check-input select-student" type="checkbox" value="" id="student_{{value}}"> 
-    <a href="{% url 'student_profile_details' value job.id %}" target="_blank">{{value}}</a></td>
+    <a href="{% url 'student_profile_details' value job.id %}" target="_blank">{{value | get_student_fullname | title }} ({{value}})</a></td>
    {% else %}
    <td>{{value}}</td>
    {% endif %}

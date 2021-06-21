@@ -34,6 +34,30 @@
     <b>Gender : </b><span>{{student.gender | title}}</span><br>
     <b>Spoken User Id: </b><span>{{student.spk_usr_id | title}}</span><br>
   </li>
+  <li class="list-group-item list-group-item-info"><span>Spoken Tutorial Test Scores</span>
+   <li class="list-group-item">
+     <table class="table table-bordered ">
+  <thead>
+  </thead>
+  <tbody>
+    <tr>
+     <td><b>Foss</b></td>
+     <td><b>Grade</b></td>
+   </tr>
+    {% if scores %}
+      {% for item in scores %}
+   <tr>
+     <td>{{item.name}}</td>
+     <td>{{item.grade}}</td>
+   </tr>
+   {% endfor %}
+   {% else %}
+   <th>No Data Available. Please check shortlisted tab.</th>
+    {% endif %}
+  </tbody>
+</table>
+   </li>
+  </li>
   <li class="list-group-item list-group-item-info"><span>Profile</span></li>
   <li class="list-group-item">
   	<b>About</b>
