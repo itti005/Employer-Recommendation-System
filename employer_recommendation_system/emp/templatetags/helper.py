@@ -163,6 +163,15 @@ def status_value(value):
     d={0:'In process',1:'shortlisted'}
     return d[value]
 
+@register.filter()
+def get_student_fullname(value):
+    try:
+        print(f"id is {value}")
+        user = SpokenUser.objects.get(id=value)
+        return user.first_name + ' ' + user.last_name
+    except Exception as e:
+        print(e)
+        return 'Error in fetching name'
 
 
     

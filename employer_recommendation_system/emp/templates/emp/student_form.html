@@ -122,23 +122,43 @@
 		</div>
 	</div>
 </form>
+<div class="row">
+  <div class="col-md-8">
+    <table class="table table-bordered ">
+  <thead>
+    <tr>
+      <th scope="col" class="table-warning" colspan="3">Spoken Tutorial Test Scores</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+     <td><b>Foss</b></td>
+     <td><b>Grade</b></td>
+   </tr>
+    {% if scores %}
+      {% for item in scores %}
+   <tr>
+     <td>{{item.name}}</td>
+     <td>{{item.grade}}</td>
+   </tr>
+   {% endfor %}
+   {% else %}
+   <th>No Data Available. Please check shortlisted tab.</th>
+    {% endif %}
+  </tbody>
+</table>
+  </div>
+  
+</div>
 
   <form method="POST" id="form-student" enctype="multipart/form-data" action="{% url 'student_profile' request.user.id %}">
     {% csrf_token %}
 	<div class="row">
     	<div class="col-sm-8">
-        <!-- <label>{{ form.skills.label_tag }}</label>
-    		<div class="demo mb-3">
-          
-  			<select style="display: none;" multiple >
-  			{% for skill in skills %}	
-  			<option value="{{skill.id}}">{{skill.name}}</option>
-  			{% endfor %}
-  			</select>
-		</div> -->
+        
     	</div>
 		<input type="hidden" id="skills_m" name="skills_m" >
-    <p>testtest</p>
+    <p>{{scores.items}}</p>
     	<div class="col-sm-8 mb-3">
       		{{ form.about | as_crispy_field }}
     	</div>

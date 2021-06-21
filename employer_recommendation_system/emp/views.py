@@ -605,6 +605,7 @@ def student_profile_confirm(request,pk,job):
     context['form']=student_form
     context['education_form']=education_form
     context['jobApplicationForm']=jobApplicationForm
+    context['scores'] = fetch_student_scores(student)
     return render(request,'emp/student_form.html',context)
 
 
@@ -633,6 +634,8 @@ def student_profile(request,pk):
     context['education_form']=education_form
     institutes = AcademicCenter.objects.values('id','institution_name')
     context['institutes'] = institutes
+    context['scores'] = fetch_student_scores(student)
+
     return render(request,'emp/student_form.html',context)
 
 def fetch_education_data(request):
@@ -665,6 +668,7 @@ def shortlist_student(request):
         # JobShortlist.objects.filter(job=job,student_id__in=student_ids).update(status=1)
         JobShortlist.objects.filter(job=job,spk_user__in=student_ids).update(status=1)
         data['updated']=True
+        # data['students'] = User.objects.filter(student__id__in=student_ids).values('first_name','last_name')
     except:
         data['updated']=False
     return JsonResponse(data) 
@@ -708,6 +712,10 @@ def job_app_details(request,id):
         sq = Student.objects.filter(spk_student_id__in=df['student_id'])
         sq = sq.values('spk_usr_id','address','spk_institute','gender','state','city','spk_student_id')
         sq_df=pd.DataFrame(sq)
+        # users = User.objects.filter(student__in=sq).values('first_name','last_name')
+        # users_df = pd.DataFrame(users)
+        # sq_df=sq_df.join(users_df,on='user_id')
+        # sq_df['fullname']=sq_df['first_name'] + sq_df['last_name']
         df=pd.merge(df,sq_df,left_on='student_id',right_on='spk_student_id')
         df1=df.drop_duplicates().pivot(index='student_id',columns='foss',values='grade')
         context['columns']=df1.columns
@@ -843,6 +851,7 @@ def student_profile_details(request,id,job):
     student = Student.objects.get(spk_usr_id=id)
     context['student']=student
     context['MEDIA_URL']=settings.MEDIA_URL
+    context['scores']=fetch_student_scores(student)
     return render(request,'emp/student_profile.html',context)
 
 def student_jobs(request):
