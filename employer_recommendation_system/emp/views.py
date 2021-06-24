@@ -33,6 +33,40 @@ from django.core.files.storage import FileSystemStorage
 from os import listdir
 import re
 from django.utils.datastructures import MultiValueDictKeyError
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
+from django.utils.functional import wraps
+from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
+
+# test functions to limit access to pages start
+def is_student(user):
+    return settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
+
+def is_manager(user):
+    return settings.ROLES['MANAGER'][1] in [x.name for x in user.groups.all()]
+
+def check_student(view_func):
+    @wraps(view_func)
+    def inner(request,pk, *args, **kwargs):
+        student = request.user.student
+        if request.user.id!=int(pk):
+            raise PermissionDenied()
+        return view_func(request,pk, *args, **kwargs)
+    return inner
+
+def check_student_job(view_func):
+    @wraps(view_func)
+    def inner(request,pk,job, *args, **kwargs):
+        student = request.user.student
+        job_obj = Job.objects.get(id=job)
+        jobs = get_recommended_jobs(student)
+        if student.id!=int(pk) or not job_obj in jobs:
+            raise PermissionDenied()
+        return view_func(request,pk,job, *args, **kwargs)
+    return inner
+
+# test functions to limit access to pages ends
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
@@ -113,7 +147,9 @@ def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet app
     applied_jobs = [x.job for x in get_applied_joblist(spk_user_id)]
     return list(set(all_jobs)-set(applied_jobs))
 
+@user_passes_test(is_student)
 def student_homepage(request):
+    print("1 --------")
     context={}
 
     # Top 5 jobs & company to display on student homepage
@@ -664,7 +700,8 @@ def save_student_profile(request,student):
         #education.save()
         #student.education.add(education)
         
-
+@user_passes_test(is_student)
+@check_student_job
 def student_profile_confirm(request,pk,job):
     context = {}
     context['confirm']=True
@@ -686,7 +723,7 @@ def student_profile_confirm(request,pk,job):
     context['projects'] = student.projects.all()
     return render(request,'emp/student_form.html',context)
 
-
+@check_student
 def student_profile(request,pk):
     context = {}
     student = Student.objects.get(user=request.user)
@@ -853,6 +890,7 @@ class JobShortlistListView(ListView):
         context = super().get_context_data(**kwargs)
         return context
 
+@login_required
 def add_student_job_status(request):
     context={}
     form = JobApplicationForm(request.POST)
@@ -869,61 +907,6 @@ def add_student_job_status(request):
         print(form.errors)
     return HttpResponseRedirect(reverse('student_jobs'))
 
-def check_student_eligibilty(request):
-    flag = False
-    spk_user_id = int(request.GET.get('spk_user_id'))
-    job_id = int(request.GET.get('job_id'))
-    data = {}
-    spk_user = SpokenUser.objects.get(id=spk_user_id)     
-    student = SpokenStudent.objects.get(user=spk_user)    
-    job_id=job_id   
-    
-    job = Job.objects.get(id=job_id)   #get Job object
-    state = list(map(lambda x : int(x),job.state.split(',')))
-    city = list(map(lambda x : int(x),job.city.split(',')))
-    institution_type = list(map(lambda x : int(x),job.institute_type.split(',')))
-    activation_status = job.activation_status
-    grade = job.grade
-    foss_list = list(map(lambda x : int(x),job.foss.split(',')))
-    #get quiz_list for all above fosses
-    filter_quiz_ids = []
-    for foss in foss_list:
-        try:
-            quiz = FossMdlCourses.objects.get(foss=foss).mdlquiz_id
-            filter_quiz_ids.append(quiz)
-        except FossMdlCourses.DoesNotExist as e:
-            print(e)
-    try:
-        ta = TestAttendance.objects.values('mdluser_id','mdlcourse_id','mdlquiz_id').filter(student=student,mdlquiz_id__in=filter_quiz_ids,status__gte=3)
-        ta_quiz_ids = [ x['mdlquiz_id'] for x in ta]
-        if(set(filter_quiz_ids))==set(ta_quiz_ids):
-            #check grade criteria
-            mdl_user_id = TestAttendance.objects.filter(student=student)[0].mdluser_id
-            mdl_quiz_grades = MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id,grade__gte=grade,quiz__in=filter_quiz_ids)
-            mdl_quiz_grades_ids = [ x.quiz for x in mdl_quiz_grades]
-            if(sorted(set(mdl_quiz_grades_ids))==sorted(set(filter_quiz_ids))):
-                #check other remaining criteria
-                test_attendance=TestAttendance.objects.filter(
-                        student=student,
-                        mdlquiz_id__in=filter_quiz_ids,
-                        test__academic__state__in=state if state else SpokenState.objects.using('spk').all(),
-                        test__academic__city__in=city if city else SpokenCity.objects.using('spk').all(), 
-                        test__academic__institution_type__in=institution_type if institution_type else InstituteType.objects.using('spk').all(), 
-                        test__academic__status__in=[activation_status] if activation_status else [1,3]
-                        )
-                ta_quizes = [ ta.mdlquiz_id for ta in test_attendance]
-                if(sorted(set(ta_quizes))==sorted(set(filter_quiz_ids))):
-                    flag = True
-                    data['is_eligible'] = flag
-                    return JsonResponse(data)
-
-    except IndexError as e:
-        print(e)
-
-    flag = True     #Temp keep
-    data['is_eligible'] = flag 
-    return JsonResponse(data)
-
 @csrf_exempt
 def ajax_state_city(request):
     if request.method == 'POST':
@@ -937,6 +920,7 @@ def ajax_state_city(request):
         data['cities']=tmp
         return JsonResponse(data)
 
+@user_passes_test(is_manager)
 def student_profile_details(request,id,job):
     context = {}
     context['spk_student_id']=id
@@ -950,6 +934,7 @@ def student_profile_details(request,id,job):
     context['scores']=fetch_student_scores(student)
     return render(request,'emp/student_profile.html',context)
 
+@user_passes_test(is_student)
 def student_jobs(request):
     context = {}
     #get applied jobs

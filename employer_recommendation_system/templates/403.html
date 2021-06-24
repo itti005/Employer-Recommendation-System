@@ -3,17 +3,15 @@
 {% load helper %}
 {% block content-header %}{{ object.title}}{% endblock %}
 {% block content %}
-{% include "emp/page_header.html" with title="Job Details" icon="<i class='bi bi-briefcase-fill'></i>" %}
+{% include "emp/page_header.html" with title="Permission Denied" icon="<i class='bi bi-exclamation-circle'></i>" %}
 {% for message in messages %}
     <div class="text-center alert {{ message.tags }}">
                 {{ message|safe }}
             </div>
         {% endfor %}
-
-
-
-<p>404</p>
-
+	<div class="alert alert-warning" role="alert">
+  	<span>You do not have access to this page.</span>
+	</div>
 {% endblock %}
 {% block js %}
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>

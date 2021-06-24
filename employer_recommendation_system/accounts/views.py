@@ -19,17 +19,12 @@ class LoginViewCustom(LoginView):
 	template_name = 'accounts/login.html'					
 
 	def get_success_url(self):	
-		print("************** here")							#return profile template based on the user role
 		role_url = {
 		settings.ROLES['MANAGER'][1]:'/manager',
 		settings.ROLES['STUDENT'][1]:'/student',
 		settings.ROLES['EMPLOYER'][1]:'/employer',
 		}
-		print("************** role_url",role_url)
-		# print("************** dic",self.request.user.groups.all()[0].name )
 		url = role_url[self.request.user.groups.all()[0].name]
-		print("************** url",url)
-		print("************** url",url)
 		return url
 
 class RegisterView(generic.CreateView):
@@ -74,7 +69,6 @@ def validate_student(request):
 		user = User.objects.using('spk').filter(email__iexact=email)[0]
 		try:
 			student = SpkStudent.objects.using('spk').filter(user_id=user.id)[0]
-			print(f'student ------ {student.user_id}')
 			attendance_exists = TestAttendance.objects.using('spk').filter(student_id=student.id).exists()
 			if attendance_exists:
 				data['is_spk_test_user']=True
@@ -100,37 +94,25 @@ def register_student(request):
 			user = User.objects.using('spk').get(Q(email__iexact=email))
 			if user is not None:
 				if user.check_password(password):
-					print("pwd matched *************")
 					# rec_user = User.objects.create_user(username=user.username,password=user.password,email=user.email
 					# 	,first_name=user.first_name,last_name=user.last_name)
 					rec_user = User.objects.using('spk').get(pk=user.id)
 					rec_user.pk = None
 					rec_user.save(using='default')
 					try:
-						print('inside try ------------ ')
 						student_group = Group.objects.get(id=settings.ROLES['STUDENT'][0])
 						rec_user.groups.add(student_group)
 						rec_user.save()
-						print(f"-----------------{rec_user}")
-						print(f'{rec_user} is saved ************')
 						student_obj=RecStudent.objects.create(user=rec_user)
-						print('1')
 						# fetch student university from spoken db
 						student_spk = SpkStudent.objects.using('spk').filter(user_id=user.id)[0]
-						print('2')
 						# univ = TestAttendance.objects.using('spk').filter(student_id=student.id)
 						testAttendance = TestAttendance.objects.using('spk').filter(student_id=student_spk.id).select_related('test')
-						print('3')
 						academic_insti = testAttendance[0].test.academic_id
-						print('4')
 						student_obj.university = AcademicCenter.objects.using('spk').get(pk=academic_insti).institution_name
-						print('5')
-						print("univ --------- {}".format(student_obj.university))
-						
 						student_obj.save()
 						
 					except Exception as e:
-						print("inside exception ------------------------ ")
 						print(e)
 					login(request, rec_user)
 					return render(request, 'emp/student_homepage.html')

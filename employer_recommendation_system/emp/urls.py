@@ -7,12 +7,9 @@ urlpatterns = [
     path('student',views.student_homepage,name="student"),
     path('<pk>/profile/<int:job>',views.student_profile_confirm,name='student_profile_confirm'),
     path('<pk>/profile',views.student_profile,name='student_profile'),
-    path('check_student_eligibilty',views.check_student_eligibilty,name='check_student_eligibilty'),
     path('add_student_job_status',views.add_student_job_status,name='add_student_job_status'),
     path('student_profile/<int:id>/<int:job>',views.student_profile_details,name='student_profile_details'),
 
-
-    
     path('employer',views.employer_homepage,name="employer"),
     path('manager',views.manager_homepage,name="manager"),
     path('logout', views.handlelogout, name='logout'),
