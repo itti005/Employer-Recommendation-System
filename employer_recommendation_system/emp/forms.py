@@ -34,10 +34,15 @@ class EducationForm(ModelForm):
         model = Education
         fields = '__all__'
 
+class PrevEducationForm(EducationForm):
+    class Meta:
+        model = Education
+        fields = '__all__'
+
 class StudentForm(ModelForm):
     class Meta:
         model = Student
-        fields = ['about','experience','github','linkedin','cover_letter','skills','resume']
+        fields = ['about','github','linkedin','cover_letter','skills','resume','projects','phone','alternate_email','address']
 
 class DateInput(forms.DateInput):
     input_type = 'date'

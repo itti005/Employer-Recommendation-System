@@ -49,15 +49,22 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
+class Discipline(models.Model):
+    name = models.CharField(max_length=240)
+
+    def __str__(self):
+        return self.name
+
 class Education(models.Model):
     degree = models.ForeignKey(Degree,null=True,on_delete=models.CASCADE)
+    acad_discipline = models.ForeignKey(Discipline,on_delete=models.CASCADE,verbose_name='Academic Discipline')
     # institute = models.CharField(max_length=400) #Institute name
     #institute = models.ForeignKey(AcademicCenter,max_length=400,on_delete=models.CASCADE,null=True,blank=True) #Institute name
-    institute = models.IntegerField(null=True)
-    start_year = models.IntegerField(choices=START_YEAR_CHOICES, default=1)
-    end_year = models.IntegerField(choices=END_YEAR_CHOICES, default=1)
-    gpa = models.CharField(max_length=10,null=True,blank=True)
-    
+    institute = models.IntegerField(null=True,blank=True)
+    start_year = models.IntegerField(choices=START_YEAR_CHOICES, null=True)
+    end_year = models.IntegerField(choices=END_YEAR_CHOICES, null=True)
+    gpa = models.CharField(max_length=10,null=True)
+    order = models.IntegerField(default=1) #1 : Current Education 2: Pas education
     def __str__(self):
         return self.degree.name+'_'+str(self.institute)
 
@@ -65,6 +72,12 @@ class Education(models.Model):
 def user_directory_path(instance, filename):
     return 'user_{0}/{1}'.format(instance.user.id, filename)
 
+class Project(models.Model):
+    url = models.URLField(null=True,blank=True)
+    desc = models.TextField(null=True,blank=True)
+
+    def __str__(self):
+        return str(self.url)
 
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
@@ -76,7 +89,7 @@ class Student(models.Model):
     #course = models.ForeignKey(Course,null=True,blank=True,on_delete=models.CASCADE)
     skills = models.ManyToManyField(Skill, null=True,blank=True)
     about = models.TextField(null=True,blank=True) #Short description/introduction about student profile
-    experience = models.TextField(null=True,blank=True) #Project/work or internship experience 
+    projects = models.ManyToManyField(Project, null=True,blank=True)
     #photo = models.ImageField(null=True,blank=True) #profile photo
     picture = models.FileField(upload_to=profile_picture, null=True, blank=True)    #spk
     github = models.URLField(null=True,blank=True)
@@ -95,6 +108,8 @@ class Student(models.Model):
     state = models.CharField(max_length=100, null=True)  #spk
     district = models.CharField(max_length=200, null=True)  #spk
     city = models.CharField(max_length=200, null=True)  #spk
+    alternate_email = models.EmailField(null=True,blank=True)
+    
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
 
