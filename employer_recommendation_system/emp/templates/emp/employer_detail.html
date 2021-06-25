@@ -1,6 +1,6 @@
 {% extends 'emp/base.html' %}
-
 {% load crispy_forms_tags %}
+{% load helper %}
 {% block content-header %}{{object.name}}{% endblock %}
 {% block content %}
 {% include "emp/page_header.html" with title="Company Details" icon="<i class='bi bi-bank'></i>" %}
@@ -35,6 +35,7 @@
       <th scope="row">Website</th>
       <td>{{object.website}}</td>
     </tr>
+    {% if request.user|has_group:"MANAGER" %}
     <tr>
       <th scope="row">Representative</th>
       <td>{{object.emp_name}}</td>
@@ -52,12 +53,13 @@
       <td>{{object.address}}</td>
     </tr>
     <tr>
-      <th scope="row">Description</th>
-      <td>{{object.description}}</td>
-    </tr>
-    <tr>
       <th scope="row">Added By</th>
       <td>{{object.added_by}}</td>
+    </tr>
+    {% endif %}
+    <tr>
+      <th scope="row">Description</th>
+      <td>{{object.description}}</td>
     </tr>
   </tbody>
 </table>
@@ -72,7 +74,9 @@
     {% endfor %}
   </ul>
 {% endif %}
+{% if request.user|has_group:"MANAGER" %}
 <a href="{% url 'update-company-detail' slug=object.slug %}" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
+{% endif %}
 
 {% endblock %}
 

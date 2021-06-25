@@ -24,7 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '$aq4w)c0cqre6^(_yj81@$ns7)gzyk+0f1v(9%h%@wvm87jugj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -64,7 +65,7 @@ ROOT_URLCONF = 'employer_recommendation_system.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -173,7 +174,8 @@ MESSAGE_TAGS = {
 	messages.INFO: 'alert-info',
 	messages.SUCCESS: 'alert-success',
 	messages.WARNING: 'alert-warning',
-	messages.ERROR: 'alert-danger',
+    messages.ERROR: 'alert-danger',
+	# messages.DANGER: 'alert-danger',
     #messages.ERROR: 'danger',
 }
 LOGIN_URL='/login/'

@@ -443,65 +443,7 @@ $(document).ready(function() {
 
 	});
 
-  // Add new element
- // $(".add").click(function(){
- //  // Finding total number of elements added
- //  var total_element = $(".element").length;
- //  // last <div> with element class id
- //  var lastid = $(".element:last").attr("id");
- //  var split_id = lastid.split("_");
- //  var nextindex = Number(split_id[1]) + 1;
-
- //  var max = 5;
- //  // Check total number elements
- //  if(total_element < max ){
- //   // Adding new div container after last occurance of element class
- //   $(".element:last").after("<div class='element form-row' id='div_"+ nextindex +"'></div>");
- 
- //   // Adding element to <div>
- //   $("#div_" + nextindex).append("" 
-    
- //    + "<span id='remove_" 
- //    + nextindex 
- //    + "' class='remove'>X</span>"
- //    + "<div class='col'><select class='form-control degree' id='id_degree_"
- //    +nextindex +"' "+"name='degree_"+nextindex+"'"
- //    +" '> </select></div>"
- //    + "<div class='col'><select class='form-control institute' id='id_institute_"
- //    +nextindex +"' "+"name='institute_"+nextindex+"'"
- //    +" '> </select></div>"
- //    + "<div class='col'><select class='form-control start_year' id='id_start_year_"
- //    +nextindex +"' "+"name='start_year_"+nextindex+"'"
- //    +" '> </select></div>"
- //    + "<div class='col'><select class='form-control end_year' id='id_end_year_"
- //    +nextindex +"' "+"name='end_year_"+nextindex+"'"
- //    +" '> </select></div>"
- //    +"<div class='col'><input type='text' class='form-control gpa' id='id_gpa_"
- //    +nextindex +"' "+"name='gpa_"+nextindex+"'"
- //    +" '></div>"
- //    );
-
- //   current_index = nextindex;
- 
- //  }
- //  if (total_element==1) {
- //    $.ajax({
- //      url: "/fetch_education_data",
- //      data: {
-        
- //      },
- //      dataType: 'json',
- //      success:function(data){
- //        var degrees = data.degrees;
- //        degree_list = data.degrees;
- //        institute_list = data.institutes;
- //        for(i=2000;i<2022;i++){
- //          start_year_list.push(i);
- //          end_year_list.push(i+1);
- //        }
- //    }});
- //  } 
- // });
+  
 
 $(document).on( 'click', '.degree', function () { 
 var options = '';
