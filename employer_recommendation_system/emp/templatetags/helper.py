@@ -173,5 +173,8 @@ def get_student_fullname(value):
         print(e)
         return 'Error in fetching name'
 
+@register.filter()
+def get_institute_name(value):
+    return AcademicCenter.objects.get(id=value).institution_name
 
     

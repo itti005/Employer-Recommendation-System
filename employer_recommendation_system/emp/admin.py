@@ -23,6 +23,8 @@ class EducationAdmin(admin.ModelAdmin):
 
 class SkillAdmin(admin.ModelAdmin):
     pass
+class DisciplineAdmin(admin.ModelAdmin):
+    pass
 
 admin.site.register(Degree,DegreeAdmin)
 admin.site.register(Course,CourseAdmin)
@@ -34,3 +36,5 @@ admin.site.register(Job,JobAdmin)
 admin.site.register(JobShortlist,JobShortlistAdmin)
 admin.site.register(Education,EducationAdmin)
 admin.site.register(Skill,SkillAdmin)
+admin.site.register(Discipline,DisciplineAdmin)
+

@@ -1,0 +1,18 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% load helper %}
+{% block content-header %}{{ object.title}}{% endblock %}
+{% block content %}
+{% include "emp/page_header.html" with title="Page Not Found" icon="<i class='bi bi-exclamation-circle'></i>" %}
+{% for message in messages %}
+    <div class="text-center alert {{ message.tags }}">
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+	<div class="alert alert-warning" role="alert">
+  Requested URL is not valid. <span>{% if request.user.is_anonymous %} <a href="{% url 'login' %}">Login here</a>{% endif %}</span>
+</div>
+{% endblock %}
+{% block js %}
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+{% endblock %}

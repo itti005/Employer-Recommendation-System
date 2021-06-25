@@ -8,12 +8,12 @@ from django.views.generic.edit import UpdateView
 from spoken.models import SpokenStudent 
 from spoken.models import SpokenUser as SpkUser 
 from django.views.generic import FormView
-from emp.forms import StudentGradeFilterForm, EducationForm,StudentForm,DateInput
+from emp.forms import StudentGradeFilterForm, EducationForm,StudentForm,DateInput,PrevEducationForm
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import CreateView,UpdateView,ModelFormMixin,FormMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin,UserPassesTestMixin
 from django.http import HttpResponse, JsonResponse
 from .filterset import CompanyFilterSet,JobFilter
 from .forms import ACTIVATION_STATUS, JobSearchForm, JobApplicationForm
@@ -32,12 +32,47 @@ import json
 from django.core.files.storage import FileSystemStorage
 from os import listdir
 import re
+from django.utils.datastructures import MultiValueDictKeyError
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
+from django.utils.functional import wraps
+from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
+
+# test functions to limit access to pages start
+def is_student(user):
+    return settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
+
+def is_manager(user):
+    return settings.ROLES['MANAGER'][1] in [x.name for x in user.groups.all()]
+
+def check_student(view_func):
+    @wraps(view_func)
+    def inner(request,pk, *args, **kwargs):
+        if request.user.student.id!=int(pk):
+            raise PermissionDenied()
+        return view_func(request,pk, *args, **kwargs)
+    return inner
+
+def check_student_job(view_func):
+    @wraps(view_func)
+    def inner(request,pk,job, *args, **kwargs):
+        student = request.user.student
+        job_obj = Job.objects.get(id=job)
+        jobs = get_recommended_jobs(student)
+        if student.id!=int(pk) or not job_obj in jobs:
+            raise PermissionDenied()
+        return view_func(request,pk,job, *args, **kwargs)
+    return inner
+
+# test functions to limit access to pages ends
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
 JOB_RATING=[(0,'Only visible to Admin/HR'),(1,'Display on homepage'),(2,'Visible to all users')]
 JOB_STATUS=[(1,'Active'),(0,'Inactive')]
-
+CURRENT_EDUCATION = 1
+PAST_EDUCATION = 2
 
 #show job application status to HR
 def get_job_app_status(job):
@@ -82,38 +117,38 @@ def get_recommended_jobs(student):
 
 #function to get student spoken test scores; returns list of dictionary of foss & scores
 def fetch_student_scores(student):  #parameter : recommendation student obj
-	scores = []
-	#student = Student.objects.get(id=2) #TEMPORARY
-	spk_user = student.spk_usr_id
-	try:
-		spk_student = SpokenStudent.objects.get(user=spk_user)
-		testattendance = TestAttendance.objects.values('mdluser_id').filter(student=spk_student)
-		mdl_grades = MdlQuizGrades.objects.using('moodle').filter(userid=testattendance[0]['mdluser_id']) #fetch all rows with mdl_course & grade
-		for item in mdl_grades: #map above mdl_course with foss from fossmdlcourse
-			try:
-				foss_mdl_courses = FossMdlCourses.objects.get(mdlquiz_id=item.quiz)
-				foss = foss_mdl_courses.foss
-				scores.append({'foss':foss.id,'name':foss.foss,'grade':item.grade,'quiz':item.quiz,'mdl':item})
-			except FossMdlCourses.DoesNotExist as e:
-				print(e)
-	except SpokenStudent.DoesNotExist as e:
-		print(e)
-	except IndexError as e:
-		print(e)
-	return scores
+    scores = []
+    #student = Student.objects.get(id=2) #TEMPORARY
+    spk_user = student.spk_usr_id
+    try:
+        spk_student = SpokenStudent.objects.get(user=spk_user)
+        testattendance = TestAttendance.objects.values('mdluser_id').filter(student=spk_student)
+        mdl_grades = MdlQuizGrades.objects.using('moodle').filter(userid=testattendance[0]['mdluser_id']) #fetch all rows with mdl_course & grade
+        for item in mdl_grades: #map above mdl_course with foss from fossmdlcourse
+            try:
+                foss_mdl_courses = FossMdlCourses.objects.get(mdlquiz_id=item.quiz)
+                foss = foss_mdl_courses.foss
+                scores.append({'foss':foss.id,'name':foss.foss,'grade':item.grade,'quiz':item.quiz,'mdl':item})
+            except FossMdlCourses.DoesNotExist as e:
+                print(e)
+    except SpokenStudent.DoesNotExist as e:
+        print(e)
+    except IndexError as e:
+        print(e)
+    return scores
 
 
 def get_applied_joblist(spk_user_id):
-	return JobShortlist.objects.filter(spk_user=spk_user_id,status__in=[APPLIED,APPLIED_SHORTLISTED])
+    return JobShortlist.objects.filter(spk_user=spk_user_id,status__in=[APPLIED,APPLIED_SHORTLISTED])
 
 def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet applied
-	all_jobs = Job.objects.all()
-	applied_jobs = [x.job for x in get_applied_joblist(spk_user_id)]
-	return list(set(all_jobs)-set(applied_jobs))
+    all_jobs = Job.objects.all()
+    applied_jobs = [x.job for x in get_applied_joblist(spk_user_id)]
+    return list(set(all_jobs)-set(applied_jobs))
 
+@user_passes_test(is_student)
 def student_homepage(request):
     context={}
-
     # Top 5 jobs & company to display on student homepage
     company_display = Company.objects.filter(rating=5).order_by('-date_updated')[:7]
     context['company_display']=company_display
@@ -148,79 +183,20 @@ def employer_homepage(request):
     context={}
     return render(request,'emp/employer_homepage.html',context)
 
+@user_passes_test(is_manager)
 def manager_homepage(request):
     context={}
     return render(request,'emp/manager_homepage.html',context)
 
 def handlelogout(request):
     logout(request)
-    return redirect('index')
+    # return redirect('index')
+    return redirect('login')
 
 def index(request):
      context={}
-     return render(request,'emp/index.html',context)
+     return render(request,'accounts/login.html',context)
 
-#Not required now
-class StudentGradeFilter(FormView):
-    template_name = 'emp/student_grade_filter.html'
-    form_class = StudentGradeFilterForm
-    success_url = '/student_grade_filter' 
-
-    def test_func(self):
-        return self.request.user.is_superuser
-
-    def form_valid(self, form):
-        if form.is_valid:
-            foss = [x for x in form.cleaned_data['foss']]
-            state = [s for s in form.cleaned_data['state']]
-            city = [c for c in form.cleaned_data['city']]
-            grade = form.cleaned_data['grade']
-            activation_status = form.cleaned_data['activation_status']
-            institution_type = [t for t in form.cleaned_data['institution_type']]
-            from_date = form.cleaned_data['from_date']
-            to_date = form.cleaned_data['to_date']
-            result=self.filter_student_grades(foss, state, city, grade, institution_type, activation_status, from_date, to_date)
-
-        else:
-            pass
-        return self.render_to_response(self.get_context_data(form=form, result=result))
-
-    def filter_student_grades(self, foss=None, state=None, city=None, grade=None, institution_type=None, activation_status=None, from_date=None, to_date=None):
-        if grade:
-            try:
-                #get the moodle id for the foss
-                fossmdl=FossMdlCourses.objects.using('spk').filter(foss__in=foss)
-                #get moodle user grade for a specific foss quiz id having certain grade
-                user_grade=MdlQuizGrades.objects.using('moodle').values_list('userid', 'quiz', 'grade').filter(quiz__in=[f.mdlquiz_id for f in fossmdl], grade__gte=int(grade))
-                #convert moodle user and grades as key value pairs
-                dictgrade = {i[0]:{i[1]:[i[2],False]} for i in user_grade}
-                #get all test attendance for moodle user ids and for a specific moodle quiz ids
-                test_attendance=TestAttendance.objects.using('spk').filter(
-                    mdluser_id__in=list(dictgrade.keys()),
-                    mdlquiz_id__in=[f.mdlquiz_id for f in fossmdl],
-                    test__academic__state__in=state if state else SpokenState.objects.using('spk').all(),
-                    test__academic__city__in=city if city else SpokenCity.objects.using('spk').all(),
-                    status__gte=3, 
-                    test__academic__institution_type__in=institution_type if institution_type else InstituteType.objects.using('spk').all(), 
-                    test__academic__status__in=[activation_status] if activation_status else [1,3]
-                    )
-
-                if from_date and to_date:
-                    test_attendance = test_attendance.filter(test__tdate__range=[from_date, to_date])
-                elif from_date:
-                    test_attendance = test_attendance.filter(test__tdate__gte=from_date)
-                filter_ta=[]
-                filter_user_id=''
-                for i in range(test_attendance.count()):
-                    if not dictgrade[test_attendance[i].mdluser_id][test_attendance[i].mdlquiz_id][1]:
-                        dictgrade[test_attendance[i].mdluser_id][test_attendance[i].mdlquiz_id][1] = True
-                        filter_ta.append(test_attendance[i])
-                        filter_user_id+=str(test_attendance[i].student.user.id) +','
-               
-                return {'mdl_user_grade': dictgrade, 'test_attendance': filter_ta, "count":len(filter_ta),"filter_user_id":filter_user_id[:-1]}
-            except FossMdlCourses.DoesNotExist:
-                return None
-        return None
 def get_state_city_lst():
     states = SpokenState.objects.all()
     cities = SpokenCity.objects.all()
@@ -262,16 +238,10 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
             form_class = self.get_form_class()
         form = super(CompanyCreate, self).get_form(form_class)
         form.fields['name'].widget.attrs ={'placeholder': 'Company Name'}
-        
-
-
         return form
 
-        # return form_class(**self.get_form_kwargs())
-
-class CompanyDetailView(PermissionRequiredMixin,DetailView):
+class CompanyDetailView(DetailView):
     template_name = 'emp/employer_detail.html'
-    permission_required = 'emp.view_company'
     model = Company
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -362,8 +332,9 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         context['filter_form']=filter_form
         return context
 
-class JobDetailView(DetailView):
+class JobDetailView(PermissionRequiredMixin,DetailView):
     template_name = 'emp/jobs_detail.html'
+    permission_required = 'emp.view_job'
     model = Job
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -380,6 +351,7 @@ class JobListView(FormMixin,ListView):
         if self.request.user.groups.filter(name='STUDENT'):
             jobShortlist = JobShortlist.objects.filter(spk_user=self.request.user.student.spk_usr_id)
             job_short_list = get_applied_joblist(self.request.user.student.spk_usr_id)
+            all_jobs = Job.objects.all()
             applied_jobs = [x.job for x in job_short_list]
             accepted_jobs = [x.job for x in job_short_list if x.status==1]
             rejected_jobs = [x.job for x in job_short_list if x.status==0]
@@ -388,6 +360,8 @@ class JobListView(FormMixin,ListView):
             context['accepted_jobs'] = accepted_jobs
             context['rejected_jobs'] = rejected_jobs
             context['reccomended_jobs'] = reccomended_jobs
+            eligible_jobs = reccomended_jobs+applied_jobs
+            context['non_eligible_jobs'] = list(set(all_jobs).difference(set(eligible_jobs)))
         elif self.request.user.groups.filter(name='MANAGER'):
             context['grade_filter_url'] = settings.GRADE_FILTER
         return context
@@ -420,24 +394,11 @@ class JobListView(FormMixin,ListView):
             queryset = (q_kw & q_place & q_com)
         return queryset
 
-class JobListingView(ListView):
+class JobListingView(UserPassesTestMixin,ListView):
     template_name = 'emp/job_list_tabular.html'
     model = Job
-
-class AppliedJobListView(ListView):
-    template_name = 'emp/applied_jobs_list.html'
-    model = JobShortlist
-    # paginate_by = 2
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
-        context['APPLIED']=APPLIED
-        return context
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return JobShortlist.objects.filter(student=self.request.user.student)
-
-
+    def test_func(self):
+        return is_manager(self.request.user)
 
 class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/jobs_update_form.html'
@@ -475,30 +436,84 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         return super(ModelFormMixin, self).form_valid(form)
 
 
-def add_education(student,degree,institute,start_year,end_year,gpa):
-    degree_obj = Degree.objects.get(id=degree)
-    institute_obj = AcademicCenter.objects.get(id=institute)
-    ed = Education.objects.create()
-    ed.degree = degree_obj
-    ed.institute = institute_obj
-    ed.start_year = start_year
-    ed.end_year = end_year
-    ed.gpa = gpa
-    ed.save()
-    student.education.add(ed)
+def add_education(student,degree,discipline,institute,start_year,end_year,gpa,order):
+    try:
+        education = Education.objects.get(student=student,order=order)
+        education.degree = degree if degree else None
+        education.discipline = discipline if discipline else None
+        education.institute = institute if start_year else None
+        education.start_year = start_year if start_year else None
+        education.end_year = end_year if end_year else None
+        education.gpa = gpa if end_year else None
+        education.save()
+        student.education.add(education)
+    except:
+        if degree or discipline or institute or start_year or end_year or gpa:
+            education = Education(degree=degree if degree else None,
+                acad_discipline=discipline if discipline else None,
+                institute=institute if institute else None,
+                start_year=start_year if start_year else None,
+                end_year=end_year if end_year else None,
+                gpa=gpa if gpa else None,
+                order=order)
+            education.save()
+            student.education.add(education)
 
-def save_student_profile(request,student):
-    student_form = StudentForm(request.POST,request.FILES)
-    education_form = EducationForm(request.POST)
+def save_prev_education(request,student):
+    degree = request.POST.get('p_degree','')
+    discipline = request.POST.get('p_discipline','')
+    institute = request.POST.get('p_institute','')
+    start_year = request.POST.get('p_start_year','')
+    end_year = request.POST.get('p_end_year','')
+    gpa = request.POST.get('p_gpa','')
+    add_education(student,degree=degree,
+        discipline = discipline,
+        institute = institute,
+        start_year = start_year, end_year = end_year,
+        gpa = gpa , order=PAST_EDUCATION)
+
+
+def save_education(edu_form,student):
+    degree = edu_form.cleaned_data['degree']
+    discipline = edu_form.cleaned_data['acad_discipline']
+    institute = edu_form.cleaned_data['institute']
+    start_year = edu_form.cleaned_data['start_year']
+    end_year = edu_form.cleaned_data['end_year']
+    gpa = edu_form.cleaned_data['gpa']
+    add_education(student,degree=degree,
+        discipline = discipline,
+        institute = institute,
+        start_year = start_year, end_year = end_year,
+        gpa = gpa , order=CURRENT_EDUCATION)
     
-    if student_form.is_valid() and education_form.is_valid():
-        # student_form.save()
-        # instance = ModelWithFileField(file_field=request.FILES['file'])
+def save_student_profile(request,student):    
+    student_form = StudentForm(request.POST,request.FILES)
+    c_education_form = EducationForm(request.POST)
+        
+    if student_form.is_valid() and c_education_form.is_valid():
         student.about = student_form.cleaned_data['about']
         student.github = student_form.cleaned_data['github']
-        student.experience = student_form.cleaned_data['experience']
         student.linkedin = student_form.cleaned_data['linkedin']
-        # student.cover_letter = request.FILES['cover_letter']
+        student.alternate_email = student_form.cleaned_data['alternate_email']
+        student.phone = student_form.cleaned_data['phone']
+        student.address = student_form.cleaned_data['address']
+        
+        # code for saving projects starts
+        urls = request.POST.getlist('pr_url', '')
+        descs = request.POST.getlist('pr_desc', '')
+        projects = student.projects.all()
+        for project in projects:
+            student.projects.remove(project)
+            project.delete()
+        # urls = [x for x in urls if x!='']
+        # descs = [x for x in descs if x!='']
+        for (url,desc) in zip(urls,descs):
+            if url or desc:
+                project = Project.objects.create(url = url,desc = desc)
+                student.projects.add(project)
+        # code for saving projects ends
+
+        # code for saving cover letter & resume starts
         try:
             location = settings.MEDIA_ROOT+'/students/'+str(request.user.id)+'/'
             os.makedirs(location)
@@ -506,27 +521,30 @@ def save_student_profile(request,student):
             pass
         fs = FileSystemStorage(location=location) #defaults to   MEDIA_ROOT
         l=listdir(location)
-        if request.FILES['cover_letter']:
-            re_c = re.compile("cover_letter.*")
-            redundant_cover = list(filter(re_c.match, l))
-            for file in redundant_cover :
-                os.remove(os.path.join(location,file))
-
-            cover_letter = request.FILES['cover_letter']
-            # filename_cover_letter = 'cover_letter.pdf'
-            filename_cover_letter = 'cover_letter'+str(request.user.id)+'.pdf'
-            filename_c = fs.save(filename_cover_letter, cover_letter)
-            student.cover_letter=fs.url(os.path.join('students',str(request.user.id),filename_c))
-
-        if request.FILES['resume']:
-            re_r = re.compile("resume.*")
-            redundant_resume = list(filter(re_r.match, l))
-            for file in redundant_resume:
-                os.remove(os.path.join(location,file))
-            resume = request.FILES['resume']
-            filename_resume = 'resume'+str(request.user.id)+'.pdf'
-            filename_r = fs.save(filename_resume, resume)
-            student.resume=fs.url(os.path.join('students',str(request.user.id),filename_r))
+        try:
+            if request.FILES['cover_letter']:
+                re_c = re.compile("cover_letter.*")
+                redundant_cover = list(filter(re_c.match, l))
+                for file in redundant_cover :
+                    os.remove(os.path.join(location,file))
+                cover_letter = request.FILES['cover_letter']
+                filename_cover_letter = 'cover_letter'+str(request.user.id)+'.pdf'
+                filename_c = fs.save(filename_cover_letter, cover_letter)
+                student.cover_letter=fs.url(os.path.join('students',str(request.user.id),filename_c))
+        except MultiValueDictKeyError as e:
+            print(e)
+        try:
+            if request.FILES['resume']:
+                re_r = re.compile("resume.*")
+                redundant_resume = list(filter(re_r.match, l))
+                for file in redundant_resume:
+                    os.remove(os.path.join(location,file))
+                resume = request.FILES['resume']
+                filename_resume = 'resume'+str(request.user.id)+'.pdf'
+                filename_r = fs.save(filename_resume, resume)
+                student.resume=fs.url(os.path.join('students',str(request.user.id),filename_r))
+        except MultiValueDictKeyError as e:
+            print(e)
 
         l = listdir(location)
         re_c = re.compile("cover_letter_.*")
@@ -535,59 +553,16 @@ def save_student_profile(request,student):
         redundant_resume = list(filter(re_r.match, l))
         for file in redundant_cover + redundant_resume:
             os.remove(os.path.join(location,file))
-
-
+        # code for saving cover letter & resume ends
         student.save()
-
-        skills = request.POST['skills_m']
-        if skills:
-            skills = skills.split(',')
-            for item in skills:
-                s = Skill.objects.get(name=item)
-                student.skills.add(s)
-        degree = request.POST['degree']
-        degree_obj = Degree.objects.get(id=degree)
-        institute = request.POST['institute']
-        start_year = education_form.cleaned_data['start_year']
-        end_year = education_form.cleaned_data['end_year']
-        gpa = education_form.cleaned_data['gpa']
-        try:
-            e = Education.objects.filter(student=student)
-            if e:
-                education = e[0]
-                education.degree = degree_obj
-                education.institute = institute
-                education.start_year = start_year
-                education.end_year = end_year
-                education.gpa = gpa
-                education.save()
-            else:
-                education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
-                education.save()
-                student.education.add(education)
-        except IndexError as e:
-            education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
-            education.save()
-            student.education.add(education)
-            print(e)
-        except Exception as e:
-            print(e)
-        #education = Education(degree=degree_obj,institute=institute,start_year=start_year,end_year=end_year,gpa=gpa)
-        # for i in range(1,6):
-        #     try:
-        #         degree = request.POST['degree_'+str(i)]
-        #         institute = request.POST['institute_'+str(i)]
-        #         start_year = request.POST['start_year_'+str(i)]
-        #         end_year = request.POST['end_year_'+str(i)]
-        #         gpa = request.POST['gpa_'+str(i)]
-        #         add_education(student,degree,institute,start_year,end_year,gpa)
-        #     except Exception as e:
-        #         print(e)
-
-        #education.save()
-        #student.education.add(education)
-        return student_form,education_form
-
+        save_education(c_education_form,student)
+        save_prev_education(request,student)
+    else:
+        messages.error(request, 'Error in updating profile')
+    return student_form,c_education_form
+        
+@user_passes_test(is_student)
+@check_student_job
 def student_profile_confirm(request,pk,job):
     context = {}
     context['confirm']=True
@@ -606,69 +581,67 @@ def student_profile_confirm(request,pk,job):
     context['education_form']=education_form
     context['jobApplicationForm']=jobApplicationForm
     context['scores'] = fetch_student_scores(student)
+    context['projects'] = student.projects.all()
     return render(request,'emp/student_form.html',context)
 
-
+@check_student
 def student_profile(request,pk):
     context = {}
     student = Student.objects.get(user=request.user)
     context['student']=student
-    context['skills']=Skill.objects.all()
+    # context['skills']=Skill.objects.all()
     if request.method=='POST':
+        print(1)
         student_form = StudentForm(request.POST)
-        education_form = EducationForm(request.POST)
-        if student_form.is_valid() and education_form.is_valid():
+        c_education_form = EducationForm(request.POST)
+        print(2)
+        if student_form.is_valid() and c_education_form.is_valid():
+            print(3)
             student_form,education_form = save_student_profile(request,student)
             messages.success(request, 'Profile updated successfully')
         else:
-            messages.danger(request, 'Error in updating profile')
+            print(4)
+            print("printing form errors -------------- ")
+            print(student_form.errors)
+            print("-------------- ")
+            print(c_education_form.errors)
+            print("done printing form errors -------------- ")
+            messages.error(request, 'Error in updating profile')
     else:
         student_form = StudentForm(instance = student)
-        try:
-            e = Education.objects.filter(student=student).order_by('-end_year')[0]
-            education_form = EducationForm(instance = e)
-        except IndexError as e:
-            education_form = EducationForm()
-            print(e)
+    try:
+        edu = Education.objects.get(student=student,order=CURRENT_EDUCATION)
+        context['current_edu']=edu
+        c_education_form = EducationForm(instance=edu)
+    except:
+        c_education_form = EducationForm(initial={'order': CURRENT_EDUCATION})
+    try:
+        p_edu = Education.objects.get(student=student,order=PAST_EDUCATION)
+        context['past_edu']=p_edu
+    except:
+        p_education_form = EducationForm(initial={'order': PAST_EDUCATION})
+    
     context['form']=student_form
-    context['education_form']=education_form
-    institutes = AcademicCenter.objects.values('id','institution_name')
-    context['institutes'] = institutes
+    context['education_form'] = c_education_form
+    context['institutes'] = AcademicCenter.objects.values('id','institution_name')
     context['scores'] = fetch_student_scores(student)
-
+    context['projects'] = student.projects.all()
+    context['degrees'] = Degree.objects.all()
+    context['acad_disciplines'] = Discipline.objects.all()
+    context['CURRENT_EDUCATION'] = CURRENT_EDUCATION
+    context['PAST_EDUCATION'] = PAST_EDUCATION
     return render(request,'emp/student_form.html',context)
 
-def fetch_education_data(request):
-    institutes = AcademicCenter.objects.all().values()
-    degrees = Degree.objects.all().values()
-    data = {}
-    data['institutes']=list(institutes)
-    data['degrees']=list(degrees)
-    return JsonResponse(data)
 
-def shortlist(request):
-    data = {'msg':'success'}
-    user_ids = request.GET.get('user_ids', None)
-    job_id = int(request.GET.get('job_id', None))
-    job = Job.objects.get(id=job_id)
-    user_list = user_ids.split(',')
-    l = []
-    for item in user_list: 
-        l.append(JobShortlist(job=job, spk_user_id=int(item),status=1))
-    JobShortlist.objects.bulk_create(l)
-    return JsonResponse(data) 
-
+@user_passes_test(is_manager)
 def shortlist_student(request):
-    data = {'msg':'true'}
-    students = request.GET.get('students', None)
-    student_ids = [ int(x) for x in students[:-1].split(',') ]
-    job_id = int(request.GET.get('job_id', None))
-    job = Job.objects.get(id=job_id)
     try:
-        # JobShortlist.objects.filter(job=job,student_id__in=student_ids).update(status=1)
+        students = request.GET.get('students', None)
+        student_ids = [ int(x) for x in students[:-1].split(',') ]
+        job_id = int(request.GET.get('job_id', None))
+        job = Job.objects.get(id=job_id)
         JobShortlist.objects.filter(job=job,spk_user__in=student_ids).update(status=1)
         data['updated']=True
-        # data['students'] = User.objects.filter(student__id__in=student_ids).values('first_name','last_name')
     except:
         data['updated']=False
     return JsonResponse(data) 
@@ -676,16 +649,17 @@ def shortlist_student(request):
 
 def update_job_app_status(job,student,spk_user_id):
     job_shortlist = JobShortlist.objects.create(job=job,spk_user=spk_user_id,student=student,status=APPLIED)
-	
-# class JobShortlistListView(PermissionRequiredMixin,ListView):
-class JobAppStatusListView(ListView):
-    #permission_required = 'emp.view_job'
+    
+class JobAppStatusListView(UserPassesTestMixin,ListView):
     template_name='emp/job_app_status_list.html'
     model = Job
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-# def job_app_details(id):        
+    def test_func(self):
+        return is_manager(self.request.user)
+
+@user_passes_test(is_manager)
 def job_app_details(request,id):
     context = {}
     job = Job.objects.get(id=id)
@@ -757,6 +731,7 @@ class JobShortlistListView(ListView):
         context = super().get_context_data(**kwargs)
         return context
 
+@login_required
 def add_student_job_status(request):
     context={}
     form = JobApplicationForm(request.POST)
@@ -773,61 +748,6 @@ def add_student_job_status(request):
         print(form.errors)
     return HttpResponseRedirect(reverse('student_jobs'))
 
-def check_student_eligibilty(request):
-    flag = False
-    spk_user_id = int(request.GET.get('spk_user_id'))
-    job_id = int(request.GET.get('job_id'))
-    data = {}
-    spk_user = SpokenUser.objects.get(id=spk_user_id)     
-    student = SpokenStudent.objects.get(user=spk_user)    
-    job_id=job_id   
-    
-    job = Job.objects.get(id=job_id)   #get Job object
-    state = list(map(lambda x : int(x),job.state.split(',')))
-    city = list(map(lambda x : int(x),job.city.split(',')))
-    institution_type = list(map(lambda x : int(x),job.institute_type.split(',')))
-    activation_status = job.activation_status
-    grade = job.grade
-    foss_list = list(map(lambda x : int(x),job.foss.split(',')))
-    #get quiz_list for all above fosses
-    filter_quiz_ids = []
-    for foss in foss_list:
-    	try:
-    		quiz = FossMdlCourses.objects.get(foss=foss).mdlquiz_id
-    		filter_quiz_ids.append(quiz)
-    	except FossMdlCourses.DoesNotExist as e:
-    		print(e)
-    try:
-        ta = TestAttendance.objects.values('mdluser_id','mdlcourse_id','mdlquiz_id').filter(student=student,mdlquiz_id__in=filter_quiz_ids,status__gte=3)
-        ta_quiz_ids = [ x['mdlquiz_id'] for x in ta]
-        if(set(filter_quiz_ids))==set(ta_quiz_ids):
-            #check grade criteria
-            mdl_user_id = TestAttendance.objects.filter(student=student)[0].mdluser_id
-            mdl_quiz_grades = MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id,grade__gte=grade,quiz__in=filter_quiz_ids)
-            mdl_quiz_grades_ids = [ x.quiz for x in mdl_quiz_grades]
-            if(sorted(set(mdl_quiz_grades_ids))==sorted(set(filter_quiz_ids))):
-                #check other remaining criteria
-                test_attendance=TestAttendance.objects.filter(
-                        student=student,
-                        mdlquiz_id__in=filter_quiz_ids,
-                        test__academic__state__in=state if state else SpokenState.objects.using('spk').all(),
-                        test__academic__city__in=city if city else SpokenCity.objects.using('spk').all(), 
-                        test__academic__institution_type__in=institution_type if institution_type else InstituteType.objects.using('spk').all(), 
-                        test__academic__status__in=[activation_status] if activation_status else [1,3]
-                        )
-                ta_quizes = [ ta.mdlquiz_id for ta in test_attendance]
-                if(sorted(set(ta_quizes))==sorted(set(filter_quiz_ids))):
-                    flag = True
-                    data['is_eligible'] = flag
-                    return JsonResponse(data)
-
-    except IndexError as e:
-        print(e)
-
-    flag = True     #Temp keep
-    data['is_eligible'] = flag 
-    return JsonResponse(data)
-
 @csrf_exempt
 def ajax_state_city(request):
     if request.method == 'POST':
@@ -841,6 +761,7 @@ def ajax_state_city(request):
         data['cities']=tmp
         return JsonResponse(data)
 
+@user_passes_test(is_manager)
 def student_profile_details(request,id,job):
     context = {}
     context['spk_student_id']=id
@@ -854,6 +775,7 @@ def student_profile_details(request,id,job):
     context['scores']=fetch_student_scores(student)
     return render(request,'emp/student_profile.html',context)
 
+@user_passes_test(is_student)
 def student_jobs(request):
     context = {}
     #get applied jobs
@@ -866,6 +788,13 @@ def student_jobs(request):
     
     return render(request,'emp/student_jobs.html',context)
 
+def error_404(request,exception):
+    data = {}
+    return render(request,'emp/error_404.html', data)
+
+def error_500(request,exception):
+    data = {}
+    return render(request,'emp/error_500.html', data)
 
 
 

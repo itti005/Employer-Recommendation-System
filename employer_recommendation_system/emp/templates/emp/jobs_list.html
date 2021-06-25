@@ -57,6 +57,9 @@
   border: 1px solid black;
   padding:2px 10px;
 }
+.list-group-item{
+  border: 1px solid rgba(0,0,0,0.1)!important;
+}
 </style>
 {% endblock %}
 {% block content %}
@@ -67,7 +70,6 @@
             </div>
         {% endfor %}
 <div class="container-fluid">
-    
  <div class="job-pagination mt-5">
 {% if is_paginated %}
 <div class="d-flex justify-content-between">
@@ -156,7 +158,7 @@
     style=" height: 50px;display: inline;">
     {% endif %}
           <div><strong class="mb-1">{{job.title}}</strong>
-            <div class="col-10 mb-1 small">{{job.company.name}}<br>{{job.state}} , {{job.city}}</div>
+            <div class="col-10 mb-1 small">{{job.company.name}}<br>{% get_citydetails job.city_job %} , {% get_statedetails job.state_job %}</div>
           </div>
           <small><i class="bi bi-bookmark"></i></small>
         </div>
@@ -203,7 +205,8 @@
                  <small class="text-muted " id="t_{{job.id}}" style="display: none;">Your profile does not meet the job requirements.
                  </small>
                  {% if job in reccomended_jobs  %}
-              <a href="#" class="btn btn-success" onclick="check_eligibility(this,'{{request.user.student.spk_usr_id}}','{{job.id}}','{{request.user.id}}');" id="apply_{{job.id}}"><i class="bi bi-cursor "></i> Apply</a>
+              <a href="{% url 'student_profile_confirm' request.user.id job.id %}" class="btn btn-success" id="apply_{{job.id}}"><i class="bi bi-cursor "></i> Apply</a>
+
               {% endif %} 
             {% if job in applied_jobs %}
               {% if job in accepted_jobs  %}
@@ -214,10 +217,8 @@
                 <span class="badge bg-danger " >Not Eligible</span><br>
                  <small class="text-muted "  >Your profile does not meet the job requirements.
                  </small>
-              {% endif %} 
-              
-            {% else %}
-            <span></span>
+              {% endif %}
+
             {% endif %}
           {% endif %}
         </div>
@@ -250,7 +251,22 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-md-12 my-2">
+                  <ul class="list-group">
+                    <li class="list-group-item list-group-item-warning d-flex justify-content-between align-items-start">
+                      <div class=" me-auto">
+                        <div class="fw-bold">Eligibility Criteria</div>
+                      </div>
+                        {% if job in non_eligible_jobs  %}
+                        <span class="badge bg-danger ">Not Eligible</span>
+                      {% endif %}
+                    </li>
+                    
+                    <li class="list-group-item">Spoken Tutorial Test Grade should be <b>greater than {{job.grade}}</b> in one of the following FOSS :<br>{{job.foss | display_foss}}</li>
+                  </ul>
+                </div>
               </div>
+
               <div class="row mt-1">
                 <div class="col">
                   <div class="card border-o">

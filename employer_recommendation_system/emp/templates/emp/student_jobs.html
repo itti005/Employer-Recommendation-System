@@ -26,7 +26,7 @@
     <tr>
       <td>{{object.job.id}}</td>
       <td><a href="{% url 'company-detail' slug=object.job.company.slug %}" target="_blank">{{ object.job.company.name }}</a></td>
-      <td><a href="{% url 'job-detail' slug=object.job.slug %}" target="_blank">{{ object.job.title }}</a></td>
+      <td><a href="{% url 'job-list' %}?id={{object.job.id}}" target="_blank">{{ object.job.title }}</a></td>
       <td>{{object.date_created}}</td>
       <td>
         <span class="badge bg-{{object.status | format_status}} rounded-pill">
@@ -39,7 +39,7 @@
     <tr>
       <td>{{job.id}}</td>
       <td><a href="{% url 'company-detail' slug=job.company.slug %}" target="_blank">{{ job.company.name }}</a></td>
-      <td><a href="{% url 'job-detail' slug=job.slug %}" target="_blank">{{ job.title }}</a></td>
+      <td><a href="{% url 'job-list' %}?id={{job.id}}" target="_blank">{{ job.title }}</a></td>
       <td><a class="btn btn-outline-success btn-sm" href="{% url 'student_profile_confirm' pk=request.user.student.id job=job.id %}">Apply</a></td>
       <td>
         <span>Apply Before : {{job.last_app_date}}</span>

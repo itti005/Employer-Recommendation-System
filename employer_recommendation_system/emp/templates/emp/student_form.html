@@ -16,12 +16,17 @@
   i{
     color: #0066A0;
   }
+  label{
+    color: #0066A0;
+    font-weight: bold;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row">
   <div class="col-md-8">
+    {% include "emp/page_header.html" with title="Student Profile" icon="<i class='bi bi-person-square'></i>" %}
     {% for message in messages %}
          <div class="text-center alert {{ message.tags }}">
              {{ message|safe }}
@@ -29,6 +34,10 @@
 {% endfor %}
   </div>
   
+</div>
+<div class="alert alert-warning alert-dismissible fade show col-md-8" role="alert" style="display: none;" id="alert-project">
+  <span>Only 5 projects can be added</span>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% if confirm %}
 <p id="disable-form" class="d-none">diable form</p>
@@ -67,6 +76,7 @@
     <input type="number" name="job_id" required="" id="id_job_id" value="{{job.id}}">
     <input type="number" name="student" required="" id="id_student" value="{{request.user.student.id}}">
     <input type="number" name="spk_user_id" required="" id="id_spk_user_id" value="{{request.user.student.spk_usr_id}}">
+    
     </form> 
   </div>
   
@@ -83,44 +93,21 @@
   </div>
 </div>
 {% endif %}
-<form class="py-5">
-	<div class="form-row">
-		<div class="col-sm-8">
-      <div class="col-12 mb-3">
-        <div class="input-group">
+<form class="py-1">
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <div class="input-group">
           <div class="input-group-text"><i class="bi bi-person-fill"></i></div>
           <input type="text" class="form-control" value="{{student.user.get_full_name | default_if_none:'' | format_char}}" readonly>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-6 mb-3">
-        <div class="input-group">
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="input-group">
           <div class="input-group-text"><i class="bi bi-envelope"></i></i></div>
           <input type="text" class="form-control" value="{{student.user.email | default_if_none:''}}" readonly>
         </div>
-      </div>
-      <div class="col-6 mb-3">
-        <div class="input-group">
-          <div class="input-group-text"><i class="bi bi-telephone"></i></div>
-          <input type="text" class="form-control" value="{{student.phone | default_if_none:'' }}" readonly>
-        </div>
-      </div>
-      </div>
-      
-      <div class="col-12 mb-3">
-        <div class="input-group">
-          <div class="input-group-text"><i class="bi bi-house"></i></div>
-          <input type="text" class="form-control" value="{{student.address | default_if_none:'' }}" readonly>
-        </div>
-      </div>
-      <div class="col-12 mb-3">
-        <div class="input-group">
-          <div class="input-group-text"><i class="fas fa-landmark"></i></div>
-          <input type="text" class="form-control" value="{{student.user.phone | default_if_none:'' }}" readonly>
-        </div>
-      </div>
-		</div>
-	</div>
+    </div>
+  </div>
 </form>
 <div class="row">
   <div class="col-md-8">
@@ -148,23 +135,50 @@
   </tbody>
 </table>
   </div>
-  
 </div>
-
-  <form method="POST" id="form-student" enctype="multipart/form-data" action="{% url 'student_profile' request.user.id %}">
+<form method="post" id="form-student" enctype="multipart/form-data" action="{% url 'student_profile' request.user.id %}">
     {% csrf_token %}
 	<div class="row">
-    	<div class="col-sm-8">
-        
-    	</div>
 		<input type="hidden" id="skills_m" name="skills_m" >
-    <p>{{scores.items}}</p>
+    <div class="col-sm-4 mb-3">
+          {{ form.phone | as_crispy_field }}
+      </div>
+      <div class="col-sm-4 mb-3">
+          {{ form.alternate_email | as_crispy_field }}
+      </div>
+      <div class="col-md-8 mb-3">
+        <div class="input-group">
+          <div class="input-group-text"><i class="bi bi-house"></i></div>
+          <input type="text" class="form-control" value="{{student.address | default_if_none:'' }}" name="address">
+        </div>
+      </div>
     	<div class="col-sm-8 mb-3">
       		{{ form.about | as_crispy_field }}
     	</div>
-    	<div class="col-sm-8 mb-3">
-      		{{ form.experience | as_crispy_field }}
-    	</div>
+      <div class="col-sm-8">
+        <hr>
+        <p>Project Work & Experience (Maximum 5 projects can be added)</p>
+        <span class="btn btn-outline-success mb-2"><span id="btn-add-project"><i class="bi bi-plus-circle"></i> Add </span>    </span>
+        <div class="all_projects">
+          <!-- {{form.projects}} -->
+          {% for project in projects %}
+            <div class="wrapper mb-3">
+              <span>
+                <div class="remove mb-1"><i class="bi bi-dash-circle"></i> Remove <b>Project # {{ forloop.counter }}</b></div>
+                <input class="textinput textInput form-control mb-3 input-url" placeholder="Add Project URL" name="pr_url" type="url"value="{{project.url}}">
+              </span>
+              <div>
+                <textarea class="textarea form-control mb-3 text-desc" placeholder="Add Project Description" name="pr_desc" maxlength="2000" cols="80" rows="10" >{{project.desc}}</textarea>
+              </div>
+            </div>
+          {% endfor %}
+          <!-- <div class="wrapper">
+            <div class="url"></div>
+            <div class="desc"></div>
+          </div> -->
+          
+        </div>
+      </div>
     	<div class="col-sm-4 mb-3">
     	</div>
     	<div class="col-sm-4 mb-3">
@@ -179,45 +193,156 @@
       <div class="col-sm-8 mb-3">
         {{ form.resume | as_crispy_field }}
       </div>
-
-    	<!-- Add Education -->
+    	<!-- Add Education 1 -->
     	<div class="col-sm-4 mb-3"></div>
-    	<div class="col-sm-4 mb-3">
-      	{{ education_form.degree | as_crispy_field }}
-    	</div>
-    	<div class="col-sm-4 d-none" >
-      	{{ education_form.institute | as_crispy_field }}
-    	</div>
-      <!-- <div class="d-none"><input type="text" id="institute" name="institute"></div> -->
-      <div class="col-md-4 mb-3">
-            <div>
-                <label for="state">Institute</label>
-                <select class="form-control" id="institute-select">
-                  {% for i in institutes %} 
-                    <option value="{{i.id}}">{{ i.institution_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
       </div>
-    	<div class="col-sm-4 mb-3"></div>
-    	<div class="col-sm-3 mb-3">
-      	{{ education_form.start_year | as_crispy_field }}
-    	</div>
-    	<div class="col-sm-3 mb-3">
-      	{{ education_form.end_year | as_crispy_field }}
-    	</div>
-    	<div class="col-sm-2 mb-3">
-      	{{ education_form.gpa | as_crispy_field }}
-    	</div>
-      <!-- <div class="col-12 mb-3">
-        <div class="container" >
-          <div class='element' id='div_0'>
-            <span class='add'>Add Education</span>
-          </div>
+      <div class="col-8">
+        <div class="row border border-success mb-3 rounded p-2">
+          <div class="col-12 ">
+          <p class="fs-6 fw-bold">Add Current Education Details</p>
         </div>
+        <div class="col-sm-6 mb-3">
+          <label for="state">Degree<sup>*</sup></label>
+          <select name="degree" class="form-select" id="id_degree" required>
+            {% if current_edu %}
+              <option value="{{current_edu.degree.id}}" selecteds>{{current_edu.degree.name}}</option>
+            {% else %}
+            <option value="" selected="">---------</option>
+            {% endif %}
+            {% for degree in degrees %} 
+              <option value="{{degree.id}}">{{ degree.name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+      <div class="col-sm-6 mb-3">
+        <label for="state">Academic Discipline<sup>*</sup></label>
+          <select name="acad_discipline" class="form-select" id="id_acad_discipline" required>
+            {% if current_edu %}
+              <option value="{{current_edu.acad_discipline}}" selecteds>{{current_edu.acad_discipline.name}}</option>
+            {% else %}
+            <option value="" selected="">---------</option>
+            {% endif %}
+            {% for d in acad_disciplines %} 
+              <option value="{{d.id}}">{{ d.name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+      <div class="col-md-12 mb-3">
+          <label for="state">Institute<sup>*</sup></label>
+          <!-- <select class="form-control" id="institute-select"> -->
+          <select class="form-select" name="institute" required>
+            {% if current_edu %}
+              <option value="{{current_edu.institute}}" selected>{{current_edu.institute | get_institute_name }}</option>
+            {% else %}
+            <option value="" selected="">---------</option>
+            {% endif %}
+            {% for i in institutes %} 
+              <option value="{{i.id}}">{{ i.institution_name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+      <div class="col-sm-4 mb-3">
+        {{ education_form.start_year | as_crispy_field }}
+      </div>
+      <div class="col-sm-4 mb-3">
+        {{ education_form.end_year | as_crispy_field }}
+      </div>
+      <div class="col-sm-4 mb-3">
+        {{ education_form.gpa | as_crispy_field }}
+      </div>
+      <div class="col-sm-3 mb-3 d-none">
+        {{ education_form.order | as_crispy_field }}
+      </div>
+        </div>
+        <div class="row border border-warning rounded p-2 mb-3">
+        
+        
+      
+      <!-- <div class="col-sm-8 d-none" >
+        {{ education_form.institute | as_crispy_field }}
       </div> -->
-	</div>
-	
+      
+      
+      <div class="col-12 mb-3">
+        <div class="py-3">
+      <div class="d-flex mb-3">
+      <button type="button" class="btn btn-outline-dark" id="btn-prev-edu">Add Previous Education Details</button>
+      <button type="button" class="btn btn-outline-dark" id="btn-prev-edu-cancel" style="display: none;">Cancel</button>
+    </div>
+      <div class="row" id="past_edu" style="display: none;">
+        <div class="col-12">
+          <p class="fs-6 fw-bold">Add Past Education Details Here</p>
+        </div>
+        <div class="col-sm-6 mb-3">
+        <label for="state">Degree</label>
+          <select class="form-select" id="institute-select" name="p_degree">
+            {% if past_edu %}
+            <option value="{{past_edu.degree}}" selected="">{{past_edu.degree}}</option>
+            {% else %}
+            <option value="" selected="">---------</option>
+            {% endif %}
+            {% for degree in degrees %} 
+              <option value="{{degree.id}}">{{ degree.name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+      <div class="col-sm-6 mb-3">
+        <label for="state">Academic Discipline</label>
+          <select class="form-select" id="institute-select" name="p_discipline">
+            {% if past_edu %}
+            <option value="{{past_edu.acad_discipline}}" selected="">{{past_edu.acad_discipline}}</option>
+            {% else %}
+            <option value="" selected="">---------</option>
+            {% endif %}
+            {% for d in acad_disciplines %} 
+              <option value="{{d.id}}">{{ d.name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+      
+      <div class="col-md-12 mb-3">
+      <div>
+          <label for="state">Institute</label>
+          <select class="form-select" id="institute-select" name="p_institute">
+            {% if past_edu %}
+            <option value="{{past_edu.institute}}" selected="">{{past_edu.institute | get_institute_name }}</option>
+            {% else %}
+            <option value="" selected="">---------</option>
+            {% endif %}
+            {% for i in institutes %} 
+              <option value="{{i.id}}">{{ i.institution_name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+      </div>
+      <!-- <div class="col-sm-4 mb-3"></div> -->
+      <div class="col-sm-4 mb-3">
+        <label  class="form-label">Start Year</label><small class="fw-light">(yyyy)</small>
+      <input type="text"  class="form-control" value="{{past_edu.start_year}}" name="p_start_year">
+      </div>
+      <div class="col-sm-4 mb-3">
+        <label  class="form-label">End Year</label><small class="fw-light">(yyyy)</small>
+      <input type="text"  class="form-control" value="{{past_edu.end_year}}" name="p_end_year">
+      </div>
+      <div class="col-sm-4 mb-3">
+        <label  class="form-label">GPA</label>
+      <input type="text"  class="form-control" value="{{past_edu.gpa}}" name="p_gpa">
+      </div>
+      <div class="col-sm-3 mb-3 d-none">
+        <label  class="form-label">Order</label>
+      <input type="text"  class="form-control" value="{{PAST_EDUCATION}}" name="p_order">
+      </div>
+    </div>
+    </div>
+      </div>
+    </div>
+      </div>
+    	
+    
+      <!-- Education 1 ends -->
+      <!-- Education 2 starts -->
+      <!-- s -->
+      <!-- Education 2 ends -->
 
 	<button type="submit" class="btn btn-success mb-5" id="update_profile" {% if confirm %} style="display: none;" {% endif %}>Update Profile</button>
 </form>
@@ -298,74 +423,27 @@ $(document).ready(function() {
 	  x.push($(this).text());
 	 });
 	$('#skills_m').val(x);
-	degree_id = $('#id_degree').val();
-	document.getElementById("id_degree").setAttribute('value',degree_id);
-	d=$('#id_degree option:selected').val();
-	$('select[name="degree"]').val(d);
-	$('#id_degree').val(degree_id);
+	// degree_id = $('#id_degree').val();
+	// document.getElementById("id_degree").setAttribute('value',degree_id);
+	// d=$('#id_degree option:selected').val();
+	// $('select[name="degree"]').val(d);
+	// $('#id_degree').val(degree_id);
 	// institute_id = $('#id_institute').val();
 	// document.getElementById("id_institute").setAttribute('value',institute_id);
+  // all_urls = document.querySelectorAll('.input-url');
+  // for (var i=0;i<all_urls.length; i++){
+  //   $('.url'+i).val(all_urls[i].value);
+  // } 
+  // all_desc = document.querySelectorAll('.text-desc');
+  // for (var i=0;i<all_desc.length; i++){
+  //   $('.desc'+i).val(all_desc[i].value);
+  // } 
+
+
+
 	});
 
-  // Add new element
- $(".add").click(function(){
-  // Finding total number of elements added
-  var total_element = $(".element").length;
-  // last <div> with element class id
-  var lastid = $(".element:last").attr("id");
-  var split_id = lastid.split("_");
-  var nextindex = Number(split_id[1]) + 1;
-
-  var max = 5;
-  // Check total number elements
-  if(total_element < max ){
-   // Adding new div container after last occurance of element class
-   $(".element:last").after("<div class='element form-row' id='div_"+ nextindex +"'></div>");
- 
-   // Adding element to <div>
-   $("#div_" + nextindex).append("" 
-    
-    + "<span id='remove_" 
-    + nextindex 
-    + "' class='remove'>X</span>"
-    + "<div class='col'><select class='form-control degree' id='id_degree_"
-    +nextindex +"' "+"name='degree_"+nextindex+"'"
-    +" '> </select></div>"
-    + "<div class='col'><select class='form-control institute' id='id_institute_"
-    +nextindex +"' "+"name='institute_"+nextindex+"'"
-    +" '> </select></div>"
-    + "<div class='col'><select class='form-control start_year' id='id_start_year_"
-    +nextindex +"' "+"name='start_year_"+nextindex+"'"
-    +" '> </select></div>"
-    + "<div class='col'><select class='form-control end_year' id='id_end_year_"
-    +nextindex +"' "+"name='end_year_"+nextindex+"'"
-    +" '> </select></div>"
-    +"<div class='col'><input type='text' class='form-control gpa' id='id_gpa_"
-    +nextindex +"' "+"name='gpa_"+nextindex+"'"
-    +" '></div>"
-    );
-
-   current_index = nextindex;
- 
-  }
-  if (total_element==1) {
-    $.ajax({
-      url: "/fetch_education_data",
-      data: {
-        
-      },
-      dataType: 'json',
-      success:function(data){
-        var degrees = data.degrees;
-        degree_list = data.degrees;
-        institute_list = data.institutes;
-        for(i=2000;i<2022;i++){
-          start_year_list.push(i);
-          end_year_list.push(i+1);
-        }
-    }});
-  } 
- });
+  
 
 $(document).on( 'click', '.degree', function () { 
 var options = '';
@@ -423,6 +501,76 @@ var options = '';
  }); 
 
 });
+</script>
+<script type="text/javascript">
+  function add_projects(p_num,url_val='',desc_val=''){
+  
+  s_remove = document.createElement('div');
+  s_remove.innerHTML = '<i class="bi bi-dash-circle"></i> Remove <b>Project #'+p_num+'</b>';
+  s_remove.classList.add("remove","mb-1");
+
+  d_url = document.createElement("span");
+
+  d_url.appendChild(s_remove);
+  e_url = document.createElement("INPUT");
+  e_url.classList.add("textinput","textInput","form-control","mb-3", "input-url");
+  e_url.placeholder = "Add Project URL"
+  e_url.innerHTML=url_val;
+
+  e_url.setAttribute("name","pr_url");
+  e_url.setAttribute("type","url");
+  d_url.appendChild(e_url);
+  d_w = document.createElement("div");
+  d_w.setAttribute("id", "w_"+p_num);
+  d_w.classList.add("wrapper","mb-3");
+  // w = document.querySelector('.wrapper');
+  d_w.style.border = "1px solid rgba(0,0,0,0.1)";
+  d_w.style.padding = "12px";
+  d_w.appendChild(d_url);
+  d_desc = document.createElement("div");
+  e_desc = document.createElement("textarea");
+  e_desc.classList.add("textarea","form-control","mb-3","text-desc");
+  e_desc.placeholder = "Add Project Description"
+  e_desc.setAttribute("name","pr_desc");
+  e_desc.innerHTML=desc_val;
+  e_desc.maxLength = "2000";
+  e_desc.cols = "80";
+  e_desc.rows = "10";
+  d_desc.appendChild(e_desc);
+  d_w.appendChild(d_desc);
+  all = document.querySelector('.all_projects');
+  all.appendChild(d_w);
+  document.getElementById("w_"+p_num).scrollIntoView();
+  }
+  $('#btn-add-project').on('click',function(){ 
+    e = document.querySelectorAll('.all_projects .wrapper')
+    if (e.length < 5) {
+      add_projects(e.length+1);
+    }else{
+      $('#alert-project').show();
+    }
+    
+ }); 
+  $('.all_projects').on('click', '.remove', function(){
+    console.log('remove');
+    remove_span_elem = this;
+    console.log(remove_span_elem[0]);
+    wrapper_elem = remove_span_elem.parentNode.parentNode;
+    p = document.querySelector('.all_projects');
+    p.removeChild(wrapper_elem);
+
+    console.log(this);
+});
+  $('#btn-prev-edu').on('click',function(){ 
+    $('#btn-prev-edu').hide();
+    $('#btn-prev-edu-cancel').show();
+    $('#past_edu').show();
+ }); 
+  $('#btn-prev-edu-cancel').on('click',function(){ 
+    $('#btn-prev-edu-cancel').hide();
+    $('#btn-prev-edu').show();
+    $('#past_edu').hide();
+ }); 
 </script>
 
 {% endblock %}
