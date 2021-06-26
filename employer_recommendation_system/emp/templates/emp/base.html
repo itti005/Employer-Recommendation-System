@@ -167,11 +167,6 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'job-app-status' %}">
-              <i class="bi bi-list-check icons-nav"></i> <span>Job Application Status</span>
-            </a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="{% get_url 'GRADE_FILTER' %}" target="_blank">
               <i class="bi bi-funnel-fill icons-nav"></i> <span>Student Grade Filter</span>
             </a>
@@ -179,6 +174,11 @@
           <li class="nav-item">
             <a class="nav-link" href="{% get_url 'MASS_MAIL_PAGE' %}" target="_blank">
               <i class="bi bi-funnel-fill icons-nav"></i> <span>Send Mass Mail</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'job-app-status' %}">
+              <i class="bi bi-list-check icons-nav"></i> <span>Job Application Status</span>
             </a>
           </li>
         </ul>
@@ -198,12 +198,11 @@
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Student Dashboard</span></a>
               </li>
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                  <a class="nav-link" href="{% url 'student_profile' pk=request.user.id%}" id="student_profile">
           <i class="fas fa-user-graduate"></i>
           <span>My Profile</span></a>
-              </li>
-             
+              </li> -->
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'student_profile' pk=request.user.student.id %}">
           <i class="bi bi-pencil-square"></i>

@@ -14,7 +14,7 @@ ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('f','F-Female Candidates'),('m','M-Male Candidates'),('a','No Criteria'),]
 START_YEAR_CHOICES = []
 END_YEAR_CHOICES = []
-for r in range(2000, (datetime.datetime.now().year+1)):
+for r in range(2000, (datetime.datetime.now().year+4)):
     START_YEAR_CHOICES.append((r,r))
     END_YEAR_CHOICES.append((r+1,r+1))
 
@@ -57,7 +57,7 @@ class Discipline(models.Model):
 
 class Education(models.Model):
     degree = models.ForeignKey(Degree,null=True,on_delete=models.CASCADE)
-    acad_discipline = models.ForeignKey(Discipline,on_delete=models.CASCADE,verbose_name='Academic Discipline')
+    acad_discipline = models.ForeignKey(Discipline,on_delete=models.CASCADE,verbose_name='Academic Discipline',null=True)
     # institute = models.CharField(max_length=400) #Institute name
     #institute = models.ForeignKey(AcademicCenter,max_length=400,on_delete=models.CASCADE,null=True,blank=True) #Institute name
     institute = models.IntegerField(null=True,blank=True)
@@ -65,8 +65,8 @@ class Education(models.Model):
     end_year = models.IntegerField(choices=END_YEAR_CHOICES, null=True)
     gpa = models.CharField(max_length=10,null=True)
     order = models.IntegerField(default=1) #1 : Current Education 2: Pas education
-    def __str__(self):
-        return self.degree.name+'_'+str(self.institute)
+    # def __str__(self):
+    #     return self.degree.name+'_'+str(self.institute)
 
 
 def user_directory_path(instance, filename):
@@ -82,13 +82,13 @@ class Project(models.Model):
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     phone = models.CharField(max_length=10, null=True,blank=True) #spk
-    address = models.CharField(max_length=400, null=True,blank=True)  #spk
+    address = models.CharField(max_length=400, null=True,blank=True,verbose_name='Home Address')  #spk
     #spk_institute = models.CharField(max_length=200) #spk
     education = models.ManyToManyField(Education, null=True)
     spk_institute = models.IntegerField(null=True)  #spk
     #course = models.ForeignKey(Course,null=True,blank=True,on_delete=models.CASCADE)
     skills = models.ManyToManyField(Skill, null=True,blank=True)
-    about = models.TextField(null=True,blank=True) #Short description/introduction about student profile
+    about = models.TextField(null=True,blank=True,verbose_name='About Yourself') #Short description/introduction about student profile
     projects = models.ManyToManyField(Project, null=True,blank=True)
     #photo = models.ImageField(null=True,blank=True) #profile photo
     picture = models.FileField(upload_to=profile_picture, null=True, blank=True)    #spk
@@ -97,8 +97,8 @@ class Student(models.Model):
     cover_letter = models.FileField(null=True,blank=True,upload_to='')
     resume = models.FileField(null=True,blank=True,upload_to='')
     # cover_letter = models.FileField(null=True,blank=True,upload_to=user_directory_path)
-    date_created = models.DateTimeField(null=True,blank=True)
-    date_updated = models.DateTimeField(null=True,blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
     #spoken_score = 
     status = models.BooleanField(default=True) #False to restrict student from accessing
     spk_usr_id = models.IntegerField(null=True)  # spoken student id
@@ -109,7 +109,7 @@ class Student(models.Model):
     district = models.CharField(max_length=200, null=True)  #spk
     city = models.CharField(max_length=200, null=True)  #spk
     alternate_email = models.EmailField(null=True,blank=True)
-    
+    certifications = models.TextField(null=True,blank=True)
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
 
@@ -166,7 +166,7 @@ class Job(models.Model):
     city_job = models.IntegerField(null=True)  #spk #filter
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     skills = models.CharField(max_length=400,null=True,blank=True) 
-    description = models.TextField(null=True,blank=True,verbose_name="Description About Job") 
+    description = models.TextField(null=True,blank=True,verbose_name="Job Description") 
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
     salary_range_min = models.IntegerField(null=True,blank=True)
     salary_range_max = models.IntegerField(null=True,blank=True)
@@ -220,6 +220,7 @@ class JobShortlist(models.Model):
     student=models.ForeignKey(Student,on_delete=models.CASCADE)  #rec
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, null=True,blank=True)
+    date_updated = models.DateTimeField(auto_now=True)
     #0 : awaiting for further shortlist
     #1 : shortlisted for 2nd round
     status = models.IntegerField(null=True,blank=True)

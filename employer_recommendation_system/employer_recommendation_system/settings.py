@@ -24,8 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '$aq4w)c0cqre6^(_yj81@$ns7)gzyk+0f1v(9%h%@wvm87jugj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -159,7 +159,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')] # comment while deploying
 # MEDIA_ROOT=os.path.join(BASE_DIR, 'static/images')
 MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
+MEDIA_URL = ''
 # MEDIA_URL = '/static/images/'
 STUDENT_PROFILE_PIC='profile'
 #Define ROLE Constants
