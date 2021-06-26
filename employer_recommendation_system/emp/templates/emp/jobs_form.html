@@ -116,7 +116,7 @@
     <div class="row">
       <div class="col-lg-6">
          <div class="custom-multi-select form-group mb-3">
-          <label>{{filter_form.foss.label }}</label>
+          <label>{{filter_form.foss.label | title }}</label><small class="fw-light">Multiple foss can be selected</small>
           <select class="custom-multi-select form-control" id="foss-select" multiple>
           {% for foss in filter_form.foss %} 
           {{ foss }}
@@ -124,7 +124,10 @@
           </select>
         </div>
       </div>
-      <div class="col-lg-6">
+       <div class="col-lg-3 form-group mb-3">
+        {{ filter_form.grade | as_crispy_field }}
+      </div>
+      <div class="col-lg-3">
         <div class="custom-multi-select form-group mb-3">
           <label>{{filter_form.institution_type.label }}</label>
           <select class="custom-multi-select form-control" id="insti-select" multiple="multiple">
@@ -160,9 +163,7 @@
       </div>
       </div>
      
-      <div class="col-lg-3 form-group mb-3">
-        {{ filter_form.grade | as_crispy_field }}
-      </div>
+     
       <div class="col-lg-3 form-group mb-3">
         {{ form.activation_status | as_crispy_field }}
       </div>

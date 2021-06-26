@@ -201,15 +201,15 @@
           {% endif %}
 
           {% if request.user|has_group:"STUDENT" %}
-          <span class="badge bg-danger " id="e_{{job.id}}" style="display: none;">Not Eligible</span><br>
+          <!-- <span class="badge bg-danger " id="e_{{job.id}}" style="display: none;">Not Eligible</span><br>
                  <small class="text-muted " id="t_{{job.id}}" style="display: none;">Your profile does not meet the job requirements.
-                 </small>
+                 </small> -->
                  {% if job in reccomended_jobs  %}
-              <a href="{% url 'student_profile_confirm' request.user.id job.id %}" class="btn btn-success" id="apply_{{job.id}}"><i class="bi bi-cursor "></i> Apply</a>
+              <a href="{% url 'student_profile_confirm' request.user.student.id job.id %}" class="btn btn-success" id="apply_{{job.id}}"><i class="bi bi-cursor "></i> Apply</a>
 
               {% endif %} 
             {% if job in applied_jobs %}
-              {% if job in accepted_jobs  %}
+              {% if job in in_process_jobs  %}
                 <span class="badge bg-success ">In process</span>
               {% endif %}
               

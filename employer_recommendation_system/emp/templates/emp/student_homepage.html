@@ -50,16 +50,17 @@
 <br>
 <div class="row">
 {% for company in company_display %}
-{% if company.logo %}
-<div class="col-lg-2 col-sm-6">  
-  <div class="border d-flex flex-column p-1">
+
+<div class="col-4 col-md-2">  
+  <div class="border d-flex flex-column p-1" style="height: 100%;">
+    {% if company.logo %}
     <img class="d-block align-self-center m-2" src="{{ company.logo.url|default_if_none:'#' }}" alt="Card image cap" 
-    style=" height: 60px;display: inline;"><br>
+    style=" height: 60px;display: inline;">{% endif %}<br>
     <span class="c-name align-self-center"><b>{{company.name}}</b></span>
-    <span class="text-muted align-self-center">vacancies : 10</span> <!-- to do  -->
+    <!-- <span class="text-muted align-self-center">vacancies : 10</span> --> <!-- to do  -->
   </div>
 </div>
-{% endif %}
+
 {% endfor %}
 </div>
 <section>
@@ -82,7 +83,7 @@
             <img class="card-img-top me-2" src="{{ job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" style="width: auto;height: 60px;">
             {% endif %}
             <div class="me-auto">
-           <span class="card-title fw-bold">{{job.title}}</span><br>
+           <span class="card-title fw-bold"><a href="{% url 'job-list' %}?id={{job.id}}">{{job.title}}</a></span><br>
             <small style="color: rgba(0,0,0,0.6)">{% get_citydetails job.city_job %} , {% get_statedetails job.state_job %}
           </small>
             </div>
@@ -107,7 +108,7 @@
 
 <br>
 <div class="row">
-  <div class="col-4 py-3">
+  <div class="col-12 col-md-4 py-3">
     <div>
       <ul class="list-group ">
         <li class="list-group-item  list-group-item-success d-flex justify-content-between align-items-start">
@@ -139,7 +140,7 @@
 {% else %}
 <li class="list-group-item d-flex justify-content-between align-items-start">
     <div class="ms-2 me-auto">
-      <div>No Jobs Posted Yet. </div>
+      <div>You have not yet applied for any job! </div>
       
     </div>
     
@@ -153,8 +154,8 @@
 
   {% if awaiting_jobs %}
     {% for job in awaiting_jobs %}
-    <div class="col-lg-3 col-sm-12 py-3">  
-      <div class="card" style="width: 18rem;height: 100%;">
+    <div class="col-12 col-md-4 py-3">  
+      <div class="card" style="width: 100%;height: 100%;">
         <div class="card-body">
           <div class="d-flex justify-content-between">
             {% if job.company.logo %}

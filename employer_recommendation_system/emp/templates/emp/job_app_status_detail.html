@@ -57,8 +57,24 @@
 </nav>
 <div class="tab-content" id="nav-tabContent">
   <div class="tab-pane fade show active" id="nav-awaiting" role="tabpanel" aria-labelledby="nav-home-tab">
+      <span scope="col"><input class="form-check-input" type="checkbox" value="" id="select-all" > <button type="button" class="btn btn-outline-success btn-sm" style="display: none;" id="btn-shortlist" onclick="shortlist_student(this,'{{job.id}}');">Shortlist</button></span>
 
-    <table class="table table-striped" id="tb-awaiting">
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for student in students_awaiting %}
+    <tr>
+      <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{student.spk_usr_id}}"> 
+    <a href="{% url 'student_profile_details' student.spk_usr_id job.id %}" target="_blank">{{student.spk_usr_id | get_student_fullname | title }}</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    <!-- <table class="table table-striped" id="tb-awaiting">
       <thead>
         <tr>
     {% if d %}
@@ -92,7 +108,7 @@
 <td></td>
 {% endif %}
       </tbody>
-    </table>
+    </table> -->
   </div>
   <div class="tab-pane fade" id="nav-shortlisted" role="tabpanel" aria-labelledby="nav-profile-tab">
     <table class="table table-striped pt-3" id="tb-shortlisted">
