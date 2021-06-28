@@ -51,15 +51,10 @@ JOB_APP_STATUS = {'RECEIVED_APP':0,'FIRST_SHORTLIST':1,'REJECTED':2}
 # test functions to limit access to pages start
 def is_student(user):
     b = settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
-    print(f"b-------------{b}")
     return settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
 
 def is_manager(user):
-    print("HEREEEE*************")
-    print(f"user.groups.all ------ {user.groups.all()}")
-    print(f"settings.ROLES['MANAGER'][1] ----- {settings.ROLES['MANAGER'][1]}")
     b = settings.ROLES['MANAGER'][1] in [x.name for x in user.groups.all()]
-    print(f"b ----------- {b}")
     return settings.ROLES['MANAGER'][1] in [x.name for x in user.groups.all()]
 
 def check_student(view_func):
@@ -73,14 +68,11 @@ def check_student(view_func):
 def check_student_job(view_func):
     @wraps(view_func)
     def inner(request,pk,job, *args, **kwargs):
-        print("inner ******************************************************")
         student = request.user.student
         job_obj = Job.objects.get(id=job)
         jobs = get_recommended_jobs(student)
         if student.id!=int(pk) or not job_obj in jobs:
-            print("student.id!=int(pk) or not job_obj in jobs")
             raise PermissionDenied()
-        print("return ******************************************************")
         return view_func(request,pk,job, *args, **kwargs)
     return inner
 
@@ -159,8 +151,6 @@ def get_recommended_jobs(student):
             
         else:
             pass
-            # print("Not valid ------")
-            # print(f"counts ----- {count}")
         count+=1
     return rec_jobs
 
@@ -173,27 +163,23 @@ def fetch_student_scores(student):  #parameter : recommendation student obj
         spk_student = SpokenStudent.objects.get(user=spk_user)
         testattendance = TestAttendance.objects.values('mdluser_id').filter(student=spk_student)
         mdl_grades = MdlQuizGrades.objects.using('moodle').filter(userid=testattendance[0]['mdluser_id']) #fetch all rows with mdl_course & grade
-        print(f"mdl_grades ------ {mdl_grades}")
         count = 1
         for item in mdl_grades: #map above mdl_course with foss from fossmdlcourse
-            print(f"count ------ {count}")
             try:
                 foss_mdl_courses = FossMdlCourses.objects.get(mdlquiz_id=item.quiz)
                 foss = foss_mdl_courses.foss
                 scores.append({'foss':foss.id,'name':foss.foss,'grade':item.grade,'quiz':item.quiz,'mdl':item})
-                print(f"item ----- {item}. scores ----- {scores[-1]}")
             except FossMdlCourses.DoesNotExist as e:
-                print(f"1--------{e}")
+                print(e)
             except MultipleObjectsReturned:
                 for foss_mdl_courses in FossMdlCourses.objects.filter(mdlquiz_id=item.quiz):
                     foss = foss_mdl_courses.foss
                     scores.append({'foss':foss.id,'name':foss.foss,'grade':item.grade,'quiz':item.quiz,'mdl':item})
-                    print(f"item ----- {item}. scores ----- {scores[-1]}")
             count+=1
     except SpokenStudent.DoesNotExist as e:
-        print(f"2-------------------{e}")
+        print(e)
     except IndexError as e:
-        print(f"3-------------------{e}")
+        print(e)
     return scores
 
 
@@ -233,7 +219,7 @@ def student_homepage(request):
              spk_mdl_course_map = FossMdlCourses.objects.using('spk').get(mdlcourse_id=mdl_course_id)
              spk_foss = FossCategory.objects.using('spk').get(id=spk_mdl_course_map.foss_id)
     except Exception as e:
-        print(f'e ----- {e}')
+        print(e)
     scores = fetch_student_scores(rec_student)
     context['scores']=scores
     return render(request,'emp/student_homepage.html',context)
@@ -415,7 +401,6 @@ class JobListView(FormMixin,ListView):
             in_process_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['RECEIVED_APP']]
             rejected_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['REJECTED']]
             reccomended_jobs = get_recommended_jobs(self.request.user.student)
-            print(f"get_recommended_jobs ************************ {reccomended_jobs}")
             context['applied_jobs'] = applied_jobs
             context['in_process_jobs'] = in_process_jobs
             context['rejected_jobs'] = rejected_jobs
@@ -561,6 +546,7 @@ def save_student_profile(request,student):
         student.alternate_email = student_form.cleaned_data['alternate_email']
         student.phone = student_form.cleaned_data['phone']
         student.address = student_form.cleaned_data['address']
+        student.certifications = student_form.cleaned_data['certifications']
         
         # code for saving projects starts
         urls = request.POST.getlist('pr_url', '')
@@ -669,7 +655,6 @@ def student_profile(request,pk):
     try:
         edu = Education.objects.get(student=student,order=CURRENT_EDUCATION)
         context['current_edu']=edu
-        print(f"edu------------------------{edu}")
         c_education_form = EducationForm(instance=edu)
     except:
         c_education_form = EducationForm(initial={'order': CURRENT_EDUCATION})
@@ -693,16 +678,12 @@ def student_profile(request,pk):
 
 # @user_passes_test(is_manager)
 def shortlist_student(request):
-    print('here-------------------')
     data = {}
     try:
         students = request.GET.get('students', None)
-        print(f'students----------{students}')
         student_ids = [ int(x) for x in students[:-1].split(',') ]
-        print(f'student_ids----------{student_ids}')
         job_id = int(request.GET.get('job_id', None))
         job = Job.objects.get(id=job_id)
-        print(f'job----------{job}')
         JobShortlist.objects.filter(job=job,spk_user__in=student_ids).update(status=1)
         data['updated']=True
     except:

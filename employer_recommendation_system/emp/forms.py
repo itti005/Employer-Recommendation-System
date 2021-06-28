@@ -42,7 +42,14 @@ class PrevEducationForm(EducationForm):
 class StudentForm(ModelForm):
     class Meta:
         model = Student
-        fields = ['about','github','linkedin','cover_letter','skills','resume','projects','phone','alternate_email','address']
+        fields = ['about','github','linkedin','cover_letter','skills','resume','projects','phone','alternate_email','address','certifications']
+
+        widgets = {
+            'certifications' : forms.Textarea(attrs={'rows':2, 'cols':15,'maxlength':200}),
+        }
+        help_texts = {
+            'certifications' : 'Please mention your certifications as comma seperated values.'
+        }
 
 class DateInput(forms.DateInput):
     input_type = 'date'
