@@ -577,14 +577,10 @@ var options = '';
     
  }); 
   $('.all_projects').on('click', '.remove', function(){
-    console.log('remove');
     remove_span_elem = this;
-    console.log(remove_span_elem[0]);
     wrapper_elem = remove_span_elem.parentNode.parentNode;
     p = document.querySelector('.all_projects');
     p.removeChild(wrapper_elem);
-
-    console.log(this);
 });
   $('#btn-prev-edu').on('click',function(){ 
     $('#btn-prev-edu').hide();
