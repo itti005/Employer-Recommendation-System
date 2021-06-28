@@ -10,7 +10,7 @@
  
 
   $(document).ready(function(){
-    $('#select-state').change(function() {
+    $('.select-state').change(function() {
           var state = $(this).val();
           if(state){
               $.ajax({
@@ -21,10 +21,10 @@
                   },
                   success: function(data) {
                       if(data){
-                          $('#select-city').html(data.cities);
-                          $( "#select-city" ).prop( "disabled", false );
+                          $('.select-city').html(data.cities);
+                          $( ".select-city" ).prop( "disabled", false );
                       } else{
-                          $( "#select-city" ).prop( "disabled", true );
+                          $( ".select-city" ).prop( "disabled", true );
                       }
                   }
               });

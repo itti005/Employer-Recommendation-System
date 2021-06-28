@@ -38,31 +38,30 @@
           <div class="col-md-6 mb-3">
             {{ form.domain | as_crispy_field }}
           </div>
-          <div class="col-md-6 mb-3 d-none">
-            {{ form.state_job | as_crispy_field }}
-          </div>
-          <div class="col-md-6 mb-3 d-none">
-            {{ form.city_job | as_crispy_field }}
+         <div class="col-md-6 mb-3">
+            <div id="div_id_state_job" class="form-group">
+              
+        <label for="id_state_job" >State</label>
+        <select class="form-control select-state" id="id_state_job"  name="state_job">
+        {% for state in filter_form.state %} 
+        {{ state }}
+        {% endfor %}
+        </select>
+          </div></div>
+          <div class="col-md-6 mb-3">
+            <div id="div_id_city_job" class="form-group">
+            <label for="id_state_job" >City</label>
+        <select class="form-control select-city" id="id_city_job"  name="city_job">
+        {% for city in filter_form.city %} 
+        {{ city }}
+        {% endfor %}
+        </select>
+            </div>
           </div>
           <div class="col-md-6 mb-3 d-none">
             {{ form.skills | as_crispy_field }}
           </div>
-          <div class="col-md-6 mb-3">
-                <label for="state">State (Job Location) </label>
-                <select class="form-control" id="select-state">
-                  {% for s in state %} 
-                    <option value="{{s.id}}">{{ s }}</option>
-                    {% endfor %}
-                </select>
-          </div>
-          <div class="col-md-6 mb-3">
-                    <label for="city">City (Job Location) </label>
-                    <select class="form-control" id="select-city" disabled>
-                      {% for c in city %} 
-                        <option value="{{c.id}}">{{ c }}</option>
-                        {% endfor %}
-                    </select>
-          </div>
+          
           <div class="col-md-3 mb-3">
             {{ form.job_type | as_crispy_field }}
          </div>
@@ -94,55 +93,38 @@
           <div class="col-md-4 mb-3">
             {{ form.rating | as_crispy_field }}
           </div>
-          <!-- <div class="col-lg-3 col-md-6 form-group mb-3">
-            <label for="id_rating" class="form-label">Rating </label> 
-            <a data-bs-toggle="offcanvas" href="#rating_info" role="button" aria-controls="rating_info"><i class="bi bi-question-circle"></i></a>
-            <input type="number" name="rating" class="numberinput form-control" id="id_rating">
-        </div> -->
           <div class="col-md-4 mb-3">
             {{ form.status | as_crispy_field }}
           </div> 
            
         </div>
         
-    <!-- Custom field widgets for Filter -->
-    <div class="row" hidden>
-          {{ form.foss | as_crispy_field }}
-          {{ form.institute_type | as_crispy_field }}
-          {{ form.state | as_crispy_field }}
-          {{ form.city | as_crispy_field }}
-        </div>
         {% include "emp/page_header.html" with title="Student Filter Criteria" icon="<i class='bi bi-card-list'></i>" %}
-    <div class="row">
-      <div class="col-lg-6">
-         <div class="custom-multi-select form-group mb-3">
-          <label>{{filter_form.foss.label | title }}</label><small class="fw-light">Multiple foss can be selected</small>
-          <select class="custom-multi-select form-control" id="foss-select" multiple>
-          {% for foss in filter_form.foss %} 
-          {{ foss }}
-          {% endfor %}
-          </select>
+
+      <div class="row" hidden>
+          <input type="text" name="foss" id="id_foss" value="{{job.foss}}">
+          <input type="text" name="institute_type" id="id_institute_type" value="{{job.institute_type}}">
+          <input type="text" name="state" id="id_state" value="{{job.state}}">
+          <input type="text" name="city" id="id_city" value="{{job.city}}">
         </div>
+    <div class="row">
+
+      <div class="col-lg-6">
+        <label>{{filter_form.foss.label }}</label>
+        <select class="form-control" id="foss-select" multiple="multiple">
+        {% for foss in filter_form.foss %} 
+        {{ foss }}
+        {% endfor %}
+        </select>
       </div>
        <div class="col-lg-3 form-group mb-3">
         {{ filter_form.grade | as_crispy_field }}
       </div>
-      <div class="col-lg-3">
-        <div class="custom-multi-select form-group mb-3">
-          <label>{{filter_form.institution_type.label }}</label>
-          <select class="custom-multi-select form-control" id="insti-select" multiple="multiple">
-          {% for insti in filter_form.institution_type %} 
-          {{ insti }}
-          {% endfor %}
-          </select>
-        </div>
-      </div>
       <div class="row">
          <div class="col-lg-6">
-        <!-- <div class="custom-multi-select form-group mb-3" id="loc-state"> -->
         <div class="form-group mb-3" id="loc-state">
         <label>{{filter_form.state.label }}</label>
-        <select class="form-control" id="state-select" multiple="multiple">
+        <select class="form-control" id="state-select" multiple="multiple" >
         {% for foss in filter_form.state %} 
         {{ foss }}
         {% endfor %}
@@ -150,11 +132,9 @@
       </div>
       </div>
       <div class="col-lg-6">
-        <!-- <div class="custom-multi-select form-group mb-3"> -->
         <div class="form-group mb-3">
           <label>{{filter_form.city.label }}</label>
-          <!-- <select class="custom-multi-select form-control"  id="city-select" multiple="multiple"> -->
-          <select class="form-control"  id="city-select" multiple="multiple">
+          <select class="form-control"  id="city-select" multiple="multiple" >
           {% for foss in filter_form.city %} 
           {{ foss }}
           {% endfor %}
@@ -162,8 +142,16 @@
         </div>
       </div>
       </div>
-     
-     
+      <div class="col-lg-3">
+        <div class="custom-multi-select form-group mb-3">
+          <label>{{filter_form.institution_type.label }}</label>
+          <select class="custom-multi-select form-control" id="insti-select" multiple="multiple" >
+          {% for insti in filter_form.institution_type %} 
+          {{ insti }}
+          {% endfor %}
+          </select>
+        </div>
+      </div>
       <div class="col-lg-3 form-group mb-3">
         {{ form.activation_status | as_crispy_field }}
       </div>
@@ -215,7 +203,6 @@
    status_elem = $("label[for='id_status']");
    status_elem.append( "<span><a data-bs-toggle='offcanvas' href='#status_info' role='button' aria-controls='status_info'><i class='bi bi-question-circle'></i></a></span>" );
    elem = $("#loc-state > div.dropdown-main > ul").prepend('hello');
-  console.log(elem);
 
    $( "#job-submit" ).click(function() {
   var foss = $('#foss-select').val(); 
@@ -227,10 +214,10 @@
   $('#id_state').val(states.toString());
   $('#id_city').val(cities.toString());
 
-  state = $('#state-select').val();
-  city = $('#city-select').val();
-  $('#id_state_job').val(parseInt(state));
-  $('#id_city_job').val(parseInt(city));
+  // state = $('#state-select').val();
+  // city = $('#city-select').val();
+  // $('#id_state_job').val(parseInt(state));
+  // $('#id_city_job').val(parseInt(city));
 
   // $( "#state-select" ).change(function () {    
   //   alert('here');

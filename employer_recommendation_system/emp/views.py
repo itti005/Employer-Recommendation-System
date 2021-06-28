@@ -116,19 +116,25 @@ def get_recommended_jobs(student):
     count = 1
     for job in jobs:
         fosses = list(map(int,job.foss.split(',')))
-        states = '' if job.state=='0' else list(map(int,job.state.split(',')))
-        cities = '' if job.city=='0' else list(map(int,job.city.split(',')))
-        insti_type = '' if job.institute_type=='0' else list(map(int,job.institute_type.split(',')))
+        if job.state and job.state!='0':
+            states = list(map(int,job.state.split(',')))
+        else:
+            states = ''
+        if job.city and job.city!='0':
+            cities = list(map(int,job.city.split(',')))
+        else:
+            cities = ''
+        # cities = '' if job.city=='0' else list(map(int,job.city.split(',')))
+        # insti_type = '' if job.institute_type=='0' else list(map(int,job.institute_type.split(',')))
+        if job.institute_type and job.institute_type!='0':
+            insti_type = list(map(int,job.institute_type.split(',')))
+        else:
+            insti_type = ''
         valid_fosses = [   d['foss'] for d in scores if str(d['foss']) in job.foss and int(d['grade'])>=job.grade]
         
         if valid_fosses:
             mdl_quiz_ids = [x.mdlquiz_id for x in FossMdlCourses.objects.filter(foss_id__in=valid_fosses)] #Student passes 1st foss & grade criteria
             mdluser_id = TestAttendance.objects.filter(student=spk_student).first().mdluser_id
-
-            print(f"mdl_quiz_ids ----- {mdl_quiz_ids}")
-            print(f"valid_fosses ----- {valid_fosses}")
-            print(f"{spk_student} - {mdl_quiz_ids} - {states} - {cities} - ")
-
             # test_attendance = TestAttendance.objects.filter(student=spk_student, 
             test_attendance = TestAttendance.objects.filter(mdluser_id=mdluser_id, 
                                                 mdlquiz_id__in=mdl_quiz_ids,
@@ -138,15 +144,11 @@ def get_recommended_jobs(student):
                                                 test__academic__institution_type__in=insti_type,
                                                 test__academic__status__in=[job.activation_status] if job.activation_status else [1,3],
                                                 )
-            print(f"1 test_attendance ------------ {test_attendance}")
             if job.from_date and job.to_date:
                 test_attendance = test_attendance.filter(test__tdate__range=[job.from_date, job.to_date])
-                print(f"2 test_attendance ------------ {test_attendance}")
             elif job.from_date:
                 test_attendance = test_attendance.filter(test__tdate__gte=job.from_date)
-                print(f"3 test_attendance ------------ {test_attendance}")
             if test_attendance:
-                print(f"4 test_attendance ------------ {test_attendance}")
                 rec_jobs.append(job)
             
         else:
