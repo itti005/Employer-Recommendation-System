@@ -104,37 +104,42 @@ def display_gender(value):
 
 @register.filter()
 def display_foss(value):
-    foss_ids = list(map(int,value.split(',')))
-    foss = [FossCategory.objects.get(id=x).foss for x in foss_ids]
-    if foss:
-        return ' , '.join(foss)
+    if value!='None':
+        foss_ids = list(map(int,value.split(',')))
+        foss = [FossCategory.objects.get(id=x).foss for x in foss_ids]
+        if foss:
+            return ' , '.join(foss)
     return ''
 
 @register.filter()
 def display_states(value):
-    state_ids = list(map(int,value.split(',')))
-    # states = [SpokenState.objects.get(id=x).name for x in state_ids]
-    states = [x.name for x in SpokenState.objects.filter(id__in=state_ids)]
-    if states:
-        return ' , '.join(states)
+    if value!='None':
+        print(f"1 ---- state ---- {value}")
+        state_ids = list(map(int,value.split(',')))
+        # states = [SpokenState.objects.get(id=x).name for x in state_ids]
+        states = [x.name for x in SpokenState.objects.filter(id__in=state_ids)]
+        if states:
+            return ' , '.join(states)
     return ''
 
 @register.filter()
 def display_cities(value):
-    city_ids = list(map(int,value.split(',')))
-    # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
-    cities = [x.name for x in SpokenCity.objects.filter(id__in=city_ids)]
-    if cities:
-        return ' , '.join(cities)
+    if value!='None':
+        city_ids = list(map(int,value.split(',')))
+        # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
+        cities = [x.name for x in SpokenCity.objects.filter(id__in=city_ids)]
+        if cities:
+            return ' , '.join(cities)
     return ''
 
 @register.filter()
 def display_institute(value):
-    insti_ids = list(map(int,value.split(',')))
-    # type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
-    type_institutes = [x.name for x in InstituteType.objects.filter(id__in=insti_ids)]
-    if type_institutes:
-        return ' , '.join(type_institutes)
+    if value!='None':
+        insti_ids = list(map(int,value.split(',')))
+        # type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
+        type_institutes = [x.name for x in InstituteType.objects.filter(id__in=insti_ids)]
+        if type_institutes:
+            return ' , '.join(type_institutes)
     return ''
 
 @register.filter()

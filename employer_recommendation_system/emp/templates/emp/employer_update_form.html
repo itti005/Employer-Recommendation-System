@@ -15,7 +15,7 @@
     <div class="col-md-6 form-group">
             <div class="form-group">
                 <label for="state">State</label>
-                <select class="form-control" id="select-state">
+                <select class="form-control select-city" id="select-state">
                   {% for s in state %} 
                     <option value="{{s.id}}">{{ s.name }}</option>
                     {% endfor %}
@@ -25,7 +25,7 @@
     	<div class="col-md-6 form-group">
     		<div class="form-group">
                 <label for="city">City</label>
-                <select class="form-control" id="select-city" disabled>
+                <select class="form-control select-city" id="select-city" disabled>
                   {% for c in city %} 
                     <option value="{{c.id}}">{{ c }}</option>
                     {% endfor %}

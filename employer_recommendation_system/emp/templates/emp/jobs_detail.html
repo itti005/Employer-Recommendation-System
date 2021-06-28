@@ -40,10 +40,10 @@
       <th >City</th>
       <td>{% get_citydetails object.city_job %}</td>
     </tr>
-    <tr>
+    <!-- <tr>
       <th >Skills</th>
       <td>{{object.skills}}</td>
-    </tr>
+    </tr> -->
     <tr>
       <th >Job type</th>
       <td>{{object.job_type}}</td>
@@ -96,6 +96,6 @@
 
 <a href="{% url 'update-job-detail' slug=object.slug %}" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
 {% endblock %}
-{% block js %}
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 {% endblock %}

@@ -350,12 +350,22 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         return reverse('job-detail', kwargs={'slug': obj.slug})
     
     def form_invalid(self, form):
+        print("form is invalid -----------------------------")
+        print(form)
+        print(form.errors)
+        print("form is invalid -----------------------------")
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
+
+        print("form is valid 1-----------------------------")
+        print(f"form.cleaned_data['state']------------{form.cleaned_data['state']}")
+        print(f"form.cleaned_data['foss']------------{form.cleaned_data['foss']}")
         self.object = form.save(commit=False)
         self.object.save()
+        print("form is valid 2-----------------------------")
         messages.success(self.request, 'Job information added successfully.')
+        print("form is valid 3-----------------------------")
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_form(self):

@@ -46,7 +46,7 @@
           </div>
           <div class="col-md-6 mb-3">
                 <label for="state">State</label>
-                <select class="form-control" id="select-state">
+                <select class="form-control select-state" id="select-state">
                 	<option value="{{job.state_job}}">{{job.state_job}}</option>
                   {% for s in state %} 
                     <option value="{{s.id}}">{{ s }}</option>
@@ -55,7 +55,7 @@
           </div>
           <div class="col-md-6 mb-3">
                     <label for="city">City</label>
-                    <select class="form-control" id="select-city" disabled>
+                    <select class="form-control select-city" id="select-city" disabled>
                     	<option value="{{job.city_job}}">{{ job.city_job }}</option>
                       {% for c in city %} 
                         <option value="{{c.id}}">{{ c }}</option>
