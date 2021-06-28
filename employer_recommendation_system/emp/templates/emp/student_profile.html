@@ -70,6 +70,10 @@
   	<b><i class="bi bi-github"></i><span class="me-1">Github</span></b><span>{{student.github}}</span><br>
   	<b><i class="bi bi-linkedin"></i><span class="me-1">LinkedIn</span></b><span>{{student.linkedin}}</span>
   </li>
+  <li class="list-group-item list-group-item-info"><span>Certifications</span></li>
+  <li class="list-group-item">
+    <p>{{student.certifications}}</p>
+  </li>
   <li class="list-group-item list-group-item-info"><span>Projects</span></li>
   {% for item in student.projects.all %}
   <li class="list-group-item">

@@ -182,8 +182,12 @@
           
         </div>
       </div>
-    	<div class="col-sm-4 mb-3">
-    	</div>
+    	
+      <div class="col-sm-8 mb-3">
+          {{ form.certifications | as_crispy_field }}
+      </div>
+      <div class="col-sm-4 mb-3">
+      </div>
     	<div class="col-sm-4 mb-3">
       		{{ form.linkedin | as_crispy_field }}
     	</div>
