@@ -84,6 +84,21 @@ def check_user(view_func):
         return view_func(request,pk, *args, **kwargs)
     return inner
 # test functions to limit access to pages ends
+def access_profile(view_func):
+    @wraps(view_func)
+    def inner(request,id,job, *args, **kwargs):
+        if is_manager(request.user):
+            return view_func(request,id,job, *args, **kwargs)
+        if is_student(request.user):
+            rec_jobs = get_recommended_jobs(request.user.student)
+            try:
+                job_obj = Job.objects.get(id=job)
+                if job_obj in rec_jobs and request.user.student.spk_usr_id==int(id):
+                    return view_func(request,id,job, *args, **kwargs)
+            except:
+                raise PermissionDenied()
+        raise PermissionDenied()
+    return inner
 
 @check_user
 def document_view(request,pk):
@@ -849,7 +864,8 @@ def ajax_state_city(request):
         data['cities']=tmp
         return JsonResponse(data)
 
-@user_passes_test(is_manager)
+# @user_passes_test(is_manager)
+@access_profile
 def student_profile_details(request,id,job):
     context = {}
     context['spk_student_id']=id
