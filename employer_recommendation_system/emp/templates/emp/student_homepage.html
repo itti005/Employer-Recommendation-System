@@ -90,7 +90,8 @@
           </div>
           <p class="card-text mb-5">{{job.description | slice:":255"}}...</p>
           <a href="#" class="btn btn-info post-apply disabled" style="display: none;" id="applied_{{job.id}}"><i class="fas fa-check mr-3"></i>Applied</a>
-          <a class="btn btn-info pre-apply " href="{% url 'student_profile_confirm' pk=request.user.student.id job=job.id %}" id="apply_{{job.id}}">Apply</a>
+          <!-- <a class="btn btn-info pre-apply " href="{% url 'student_profile_confirm' pk=request.user.student.id job=job.id %}" id="apply_{{job.id}}">Apply</a> -->
+          <a class="btn btn-info pre-apply " href="{% url 'student_profile_details' request.user.student.spk_usr_id job.id %}" id="apply_{{job.id}}">Apply</a>
         </div>
         </div>
     </div>
