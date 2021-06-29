@@ -99,12 +99,14 @@ def display_foss(value):
 
 @register.filter()
 def display_gender(value):
-    d = {'f':'Female','m':'Male','a':'No criteria'}
-    return d[value]
+    if value is not None:
+        d = {'f':'Female','m':'Male','a':'No criteria'}
+        return d[value]
+    return ''
 
 @register.filter()
 def display_foss(value):
-    if value!='None':
+    if value is not None:
         foss_ids = list(map(int,value.split(',')))
         foss = [FossCategory.objects.get(id=x).foss for x in foss_ids]
         if foss:
@@ -113,8 +115,7 @@ def display_foss(value):
 
 @register.filter()
 def display_states(value):
-    if value!='None':
-        print(f"1 ---- state ---- {value}")
+    if value is not None:
         state_ids = list(map(int,value.split(',')))
         # states = [SpokenState.objects.get(id=x).name for x in state_ids]
         states = [x.name for x in SpokenState.objects.filter(id__in=state_ids)]
@@ -124,7 +125,7 @@ def display_states(value):
 
 @register.filter()
 def display_cities(value):
-    if value!='None':
+    if value is not None:
         city_ids = list(map(int,value.split(',')))
         # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
         cities = [x.name for x in SpokenCity.objects.filter(id__in=city_ids)]
@@ -134,7 +135,7 @@ def display_cities(value):
 
 @register.filter()
 def display_institute(value):
-    if value!='None':
+    if value is not None:
         insti_ids = list(map(int,value.split(',')))
         # type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
         type_institutes = [x.name for x in InstituteType.objects.filter(id__in=insti_ids)]
