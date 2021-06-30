@@ -158,6 +158,15 @@ class Company(models.Model):
             obj.slug = slugify(obj.id) 
             obj.save()
 
+class Foss(models.Model):
+    foss = models.IntegerField(null=True,blank=True)  #spk foss id
+    mdl_course = models.IntegerField(null=True,blank=True)  #mdlcourse id
+    mdl_quiz = models.IntegerField(null=True,blank=True)  #mdl quiz id
+
+    def __str__(self):
+        return self.foss
+
+
 class Job(models.Model):
     title = models.CharField(max_length=250,verbose_name="Title of the job page") #filter
     designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
@@ -188,15 +197,20 @@ class Job(models.Model):
     last_app_date = models.DateTimeField(null=True,blank=True,verbose_name="Last Application Date")
     rating = models.IntegerField(null=True,blank=True)
     foss = models.CharField(max_length=200)
-    institute_type = models.CharField(max_length=200,null=True,blank=True)
-    state = models.CharField(max_length=200,null=True,blank=True)
-    city = models.CharField(max_length=200,null=True,blank=True)
+    # institute_type = models.CharField(max_length=200,null=True,blank=True)
+    institute_type = models.CharField(max_length=200,blank=True)
+    # state = models.CharField(max_length=200,null=True,blank=True)
+    state = models.CharField(max_length=200,blank=True)
+    # city = models.CharField(max_length=200,null=True,blank=True)
+    city = models.CharField(max_length=200,blank=True)
     grade = models.IntegerField()
     activation_status = models.IntegerField(max_length=10,choices=ACTIVATION_STATUS)
     from_date = models.DateField(null=True,blank=True)
     to_date = models.DateField(null=True,blank=True)
     num_vacancies = models.IntegerField(default=1,blank=True)
-
+    degree = models.ManyToManyField(Degree,blank=True)
+    discipline = models.ManyToManyField(Discipline,blank=True)
+    job_foss = models.ManyToManyField(Foss,null=True,blank=True)
     def __str__(self):
         return self.title
 

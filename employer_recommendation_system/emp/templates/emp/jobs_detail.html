@@ -61,7 +61,7 @@
       <td>{{object.gender | display_gender}}</td>
     </tr>
     <tr class="table-info">
-      <td colspan="2"><center><b>Student Filter Criteria</b></center></td>
+      <td colspan="2"><center><b>Student Eligibility Criteria</b></center></td>
     </tr>
     <tr>
       <th >Foss</th>
@@ -71,6 +71,23 @@
       <th >Institute Type</th>
       <td>{{object.institute_type | display_institute}}</td>
     </tr>
+    <tr>
+      <th>Degree</th>
+      <td>
+        {% for item in object.degree.all %}
+          {{item}} {% if not forloop.last %} ,{% endif %}
+        {% endfor %}
+      </td>
+    </tr>
+    <tr>
+      <th>Discipline</th>
+      <td>
+        {% for item in object.discipline.all %}
+          {{item}} {% if not forloop.last %} ,{% endif %}
+        {% endfor %}
+      </td>
+    </tr>
+    <tr>
     <tr>
       <th >State</th>
       <td>{{object.state | display_states}}</td>

@@ -5,10 +5,10 @@
 <!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
 
 
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script> -->
 <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.0.0.min.js"></script> -->
-<script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
-<link rel="stylesheet" href="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}">
+<!-- <script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
+<link rel="stylesheet" href="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}"> -->
 <style type="text/css">
   .filter-header{
     border-bottom: 2px solid blue;
@@ -99,13 +99,13 @@
            
         </div>
         
-        {% include "emp/page_header.html" with title="Student Filter Criteria" icon="<i class='bi bi-card-list'></i>" %}
+        {% include "emp/page_header.html" with title="Student Eligibility Criteria" icon="<i class='bi bi-card-list'></i>" %}
 
       <div class="row" hidden>
           <input type="text" name="foss" id="id_foss" value="{{job.foss}}">
           <input type="text" name="institute_type" id="id_institute_type" value="{{job.institute_type}}">
-          <input type="text" name="state" id="id_state" value="{{job.state}}">
-          <input type="text" name="city" id="id_city" value="{{job.city}}">
+          <input type="text" name="state" id="id_state" >
+          <input type="text" name="city" id="id_city" >
         </div>
     <div class="row">
 
@@ -125,8 +125,8 @@
         <div class="form-group mb-3" id="loc-state">
         <label>{{filter_form.state.label }}</label>
         <select class="form-control" id="state-select" multiple="multiple" >
-        {% for foss in filter_form.state %} 
-        {{ foss }}
+        {% for state in filter_form.state %} 
+        {{ state }}
         {% endfor %}
         </select>
       </div>
@@ -135,8 +135,8 @@
         <div class="form-group mb-3">
           <label>{{filter_form.city.label }}</label>
           <select class="form-control"  id="city-select" multiple="multiple" >
-          {% for foss in filter_form.city %} 
-          {{ foss }}
+          {% for city in filter_form.city %} 
+          {{ city }}
           {% endfor %}
           </select>
         </div>
@@ -151,6 +151,12 @@
           {% endfor %}
           </select>
         </div>
+      </div>
+      <div class="col-lg-3 form-group mb-3">
+        {{ form.degree | as_crispy_field }}
+      </div>
+      <div class="col-lg-3 form-group mb-3">
+        {{ form.discipline | as_crispy_field }}
       </div>
       <div class="col-lg-3 form-group mb-3">
         {{ form.activation_status | as_crispy_field }}
@@ -194,10 +200,13 @@
 
 
 {% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
 {% block js %}
 <script type="text/javascript">
   $( document ).ready(function() {
-   $('.custom-multi-select').dropdown({multipleMode:'label'});
+   // $('.custom-multi-select').dropdown({multipleMode:'label'});
    rating = $("label[for='id_rating']");
    rating.append( "<span><a data-bs-toggle='offcanvas' href='#rating_info' role='button' aria-controls='status_info'><i class='bi bi-question-circle'></i></a></span>" );
    status_elem = $("label[for='id_status']");
@@ -205,14 +214,17 @@
    elem = $("#loc-state > div.dropdown-main > ul").prepend('hello');
 
    $( "#job-submit" ).click(function() {
+    
   var foss = $('#foss-select').val(); 
   var insti_type = $('#insti-select').val(); 
   var states = $('#state-select').val(); 
   var cities = $('#city-select').val(); 
+
   $('#id_foss').val(foss.toString());
   $('#id_institute_type').val(insti_type.toString());
   $('#id_state').val(states.toString());
   $('#id_city').val(cities.toString());
+
 
   // state = $('#state-select').val();
   // city = $('#city-select').val();

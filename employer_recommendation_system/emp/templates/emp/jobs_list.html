@@ -262,7 +262,21 @@
                       {% endif %}
                     </li>
                     
-                    <li class="list-group-item">Spoken Tutorial Test Grade should be <b>greater than {{job.grade}}</b> in one of the following FOSS :<br>{{job.foss | display_foss}}</li>
+                    <li class="list-group-item">Spoken Tutorial Test Grade should be <b>greater than {{job.grade}}</b> in one of the following FOSSes :<br>{{job.foss | display_foss}}<hr>
+                      <span><b>State : </b>{{job.state | display_states}}</span><br>
+                      <span><b>City : </b>{{job.city | display_cities}}</span><br>
+                      <span><b>Institution Type : </b>{{job.institute_type | display_institute}}</span><br>
+                      <span><b>Degree : </b>
+                        {% for item in job.degree.all %}
+                        {{item}} {% if not forloop.last %} ,{% endif %}
+                        {% endfor %}</span><br>
+                      <span><b>Discipline : </b>{% for item in job.discipline.all %}
+                        {{item}} {% if not forloop.last %} ,{% endif %}
+                      {% endfor %}</span><br>
+                      <span><b>Test Period : </b>{{job.from_date | default_if_none:''}} - {{job.to_date | default_if_none:''}}</span><br>
+
+
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -271,7 +285,7 @@
                 <div class="col">
                   <div class="card border-o">
   <div class="card-body">
-    <p><i class="bi bi-calendar-event"></i> Last Application Date : {{job.last_app_date}}<br>
+    <p><i class="bi bi-calendar-event"></i> Last Application Date : {{job.last_app_date | default_if_none:''}}<br>
     <i class="bi bi-clipboard-data"></i> Skills : {{job.foss | display_foss}}</p>
   </div>
 </div>

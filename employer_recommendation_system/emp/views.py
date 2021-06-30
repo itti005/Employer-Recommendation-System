@@ -354,13 +354,21 @@ class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         return form
 
 #---------------- CBV for Create, Detail, List, Update for Jobs starts ----------------#
+def update_form_widgets(self,form):
+    form.fields['last_app_date'].widget = DateInput()
+    form.fields['from_date'].widget = DateInput()
+    form.fields['to_date'].widget = DateInput()
+    form.fields['rating'].widget = forms.Select(attrs=None, choices=JOB_RATING)
+    form.fields['status'].widget = forms.Select(attrs=None, choices=JOB_STATUS)
+    return form
+
 class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     template_name = 'emp/jobs_form.html'
     permission_required = 'emp.add_job'
     model = Job
     fields = ['company','title','designation','state_job','city_job','skills','description','domain','salary_range_min',
     'salary_range_max','job_type','requirements','shift_time','key_job_responsibilities','gender',
-    'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status']
+    'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status','degree','discipline']
     success_message ="%(title)s job was created successfully"
     def get_success_url(self):
         obj = Job.objects.get(title=self.object.title,date_created=self.object.date_created)
@@ -370,18 +378,18 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
+        form.cleaned_data.get("discipline")
         self.object = form.save(commit=False)
+        # form.save()
         self.object.save()
+        # self.save_degree(form)
+        form.save_m2m()
         messages.success(self.request, 'Job information added successfully.')
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_form(self):
         form = super(JobCreate, self).get_form()
-        form.fields['last_app_date'].widget = DateInput()
-        form.fields['from_date'].widget = DateInput()
-        form.fields['to_date'].widget = DateInput()
-        form.fields['rating'].widget = forms.Select(attrs=None, choices=JOB_RATING)
-        form.fields['status'].widget = forms.Select(attrs=None, choices=JOB_STATUS)
+        form = update_form_widgets(self,form)
         return form
 
     def get_context_data(self, **kwargs):
@@ -468,7 +476,7 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     model = Job
     fields = ['company','title','designation','state_job','city_job','skills','description','domain','salary_range_min',
     'salary_range_max','job_type','requirements','shift_time','key_job_responsibilities','gender',
-    'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status']
+    'last_app_date','rating','foss','grade','activation_status','from_date','to_date','state','city','institute_type','status','degree','discipline']
     success_message ="%(title)s was updated successfully"
 
 
@@ -492,11 +500,16 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.save()
+        form.save()
+        # self.object = form.save(commit=False)
+        # self.object.save()
         messages.success(self.request, 'Job information updated successfully.')
         return super(ModelFormMixin, self).form_valid(form)
 
+    def get_form(self):
+        form = super(JobUpdate, self).get_form()
+        form = update_form_widgets(self,form)
+        return form
 
 def add_education(student,degree,discipline,institute,start_year,end_year,gpa,order):
     def add_values(education,degree,discipline,institute,start_year,end_year,gpa,order):
@@ -599,7 +612,6 @@ def save_student_profile(request,student):
                 filename_cover_letter = 'cover_letter'+str(request.user.id)+'.pdf'
                 filename_c = fs.save(filename_cover_letter, cover_letter)
                 student.cover_letter=fs.url(os.path.join('students',str(request.user.id),filename_c))
-                print(f"student.cover -----{fs.url(os.path.join('students',str(request.user.id),filename_c))}")
         except MultiValueDictKeyError as e:
             print(e)
         try:

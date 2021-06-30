@@ -107,7 +107,7 @@
           <input type="text" name="city" id="id_city" value="{{job.city}}">
         </div>
     <div class="filter-header">
-      <p>Student Filter Criteria</p>{{job.city}}
+      {% include "emp/page_header.html" with title="Student Eligibility Criteria" icon="<i class='bi bi-card-list'></i>" %}
     </div>
     <div class="row">
       <div class="col-lg-6">
@@ -120,16 +120,10 @@
           </select>
         </div>
       </div>
-      <div class="col-lg-6">
-        <div class="custom-multi-select form-group mb-3 insti_select">
-          <label>{{filter_form.institution_type.label }}</label>
-          <select class="form-control" id="insti-select" multiple="multiple">
-          {% for insti in filter_form.institution_type %} 
-          1{{ insti }}
-          {% endfor %}
-          </select>
-        </div>
+      <div class="col-lg-3 form-group mb-3">
+        {{ filter_form.grade | as_crispy_field }}
       </div>
+      
       <div class="col-lg-6">
         <!-- <div class="custom-multi-select form-group mb-3 state_select"> -->
         <div class="form-group mb-3 state_select">
@@ -152,8 +146,21 @@
           </select>
         </div>
       </div>
+      <div class="col-lg-3">
+        <div class="custom-multi-select form-group mb-3 insti_select">
+          <label>{{filter_form.institution_type.label }}</label>
+          <select class="form-control" id="insti-select" multiple="multiple">
+          {% for insti in filter_form.institution_type %} 
+          1{{ insti }}
+          {% endfor %}
+          </select>
+        </div>
+      </div>
       <div class="col-lg-3 form-group mb-3">
-        {{ filter_form.grade | as_crispy_field }}
+        {{ form.degree | as_crispy_field }}
+      </div>
+      <div class="col-lg-3 form-group mb-3">
+        {{ form.discipline | as_crispy_field }}
       </div>
       <div class="col-lg-3 form-group mb-3">
         {{ form.activation_status | as_crispy_field }}
