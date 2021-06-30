@@ -45,7 +45,7 @@
 <table class="paleblue table table-striped table-hover table-bordered" id="tb-company">
   <thead>
   <tr>
-    <th>Sr. No</th>
+    <th>Job ID</th>
     <th>Job Title</th>
     <th>Rating</th>
     <th>Sector</th>
@@ -58,7 +58,8 @@
   <tbody>
   {% for job in object_list %}
   <tr>
-    <td>{{forloop.counter}}</td>
+    <!-- <td>{{forloop.counter}}</td> -->
+    <td>{{job.id}}</td>
     <td><a href="{% url 'job-detail' slug=job.slug %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view or edit ">{{ job.title }}</a></td>
     <td>{{ job.rating }}</td>
     <td>{{ job.domain }}</td>

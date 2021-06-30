@@ -106,7 +106,8 @@ def display_gender(value):
 
 @register.filter()
 def display_foss(value):
-    if value is not None:
+    if value:
+    # if value is not None:
         foss_ids = list(map(int,value.split(',')))
         foss = [FossCategory.objects.get(id=x).foss for x in foss_ids]
         if foss:
@@ -115,7 +116,8 @@ def display_foss(value):
 
 @register.filter()
 def display_states(value):
-    if value is not None:
+    # if value is not None:
+    if value:
         state_ids = list(map(int,value.split(',')))
         # states = [SpokenState.objects.get(id=x).name for x in state_ids]
         states = [x.name for x in SpokenState.objects.filter(id__in=state_ids)]
@@ -125,7 +127,8 @@ def display_states(value):
 
 @register.filter()
 def display_cities(value):
-    if value is not None:
+    # if value is not None:
+    if value:
         city_ids = list(map(int,value.split(',')))
         # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
         cities = [x.name for x in SpokenCity.objects.filter(id__in=city_ids)]
@@ -135,7 +138,8 @@ def display_cities(value):
 
 @register.filter()
 def display_institute(value):
-    if value is not None:
+    if value:
+    # if value is not None:
         insti_ids = list(map(int,value.split(',')))
         # type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
         type_institutes = [x.name for x in InstituteType.objects.filter(id__in=insti_ids)]
@@ -150,6 +154,29 @@ def display_ac_status(value):
         return ac_status[value]
     except:
         return ''
+
+@register.filter()
+def display_degrees(value):
+    # if value is not None:
+    if value:
+        degree_ids = list(map(int,value.split(',')))
+        # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
+        degrees = [x.name for x in Degree.objects.filter(id__in=degree_ids)]
+        if degrees:
+            return ' , '.join(degrees)
+    return ''
+
+@register.filter()
+def display_disciplines(value):
+    # if value is not None:
+    if value:
+        discipline_ids = list(map(int,value.split(',')))
+        # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
+        disciplines = [x.name for x in Discipline.objects.filter(id__in=discipline_ids)]
+        if disciplines:
+            return ' , '.join(disciplines)
+    return ''
+
 
 @register.simple_tag
 def get_url(value):
