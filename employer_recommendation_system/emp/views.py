@@ -104,7 +104,6 @@ def access_profile(view_func):
 def document_view(request,pk):
     try:
         file_type = request.GET["type"]
-        print(f"file ------------- {file_type}")
         file = os.path.join('media','students',str(request.user.id),file_type+str(request.user.id)+'.pdf')
         return FileResponse(open(file, 'rb'), content_type='application/pdf')
         # return FileResponse(open('media/students/18/cover_letter18.pdf', 'rb'), content_type='application/pdf')
@@ -795,9 +794,7 @@ def job_app_details(request,id):
         df1 = pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
         df1=df1.drop(['id','foss_id'], axis = 1)
         d = pd.merge(ta_df,mdl_quiz_grades_df,left_on=['mdlquiz_id','mdluser_id'],right_on=['quiz','userid'])
-        # print(f"d ---- {d}")
         df = pd.merge(d,df1,on='mdlcourse_id')
-        # print(f"df ---- {df}")
         sq = Student.objects.filter(spk_student_id__in=df['student_id'])
         sq = sq.values('spk_usr_id','address','spk_institute','gender','state','city','spk_student_id')
         sq_df=pd.DataFrame(sq)
@@ -912,5 +909,156 @@ def error_500(request,exception):
     data = {}
     return render(request,'emp/error_500.html', data)
 
+class DegreeCreateView(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
+    model = Degree
+    fields = ['name']
+    permission_required = 'emp.add_degree'
+    success_message ="\'%(name)s\' degree is added successfully"
+    def get_success_url(self):
+        obj = Degree.objects.get(name=self.object.name,date_created=self.object.date_created)
+        # return reverse('degree-detail', kwargs={'slug': obj.slug})
+        return reverse('add_degree')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        degrees = Degree.objects.values('id','name')
+        context['degrees']=degrees
+        return context
+
+class DegreeUpdateView(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
+    model = Degree
+    fields = ['name']
+    permission_required = 'emp.add_company'
+    success_message ="\'%(name)s\' degree is updated successfully"
+    template_name = 'emp/degree_update_form.html'
+    def get_success_url(self):
+        # obj = Degree.objects.get(name=self.object.name,date_created=self.object.date_created)
+        # return reverse('degree-detail', kwargs={'slug': obj.slug})
+        return reverse('add_degree')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        degrees = Degree.objects.values('id','name')
+        context['degrees']=degrees
+        context['current_degree']=self.get_object()
+        return context
+
+class DisciplineCreateView(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
+    model = Discipline
+    fields = ['name']
+    permission_required = 'emp.add_discipline'
+    success_message ="\'%(name)s\' discipline is added successfully"
+    def get_success_url(self):
+        obj = Discipline.objects.get(name=self.object.name,date_created=self.object.date_created)
+        # return reverse('degree-detail', kwargs={'slug': obj.slug})
+        return reverse('add_discipline')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        disciplines = Discipline.objects.values('id','name')
+        context['disciplines']=disciplines
+        return context
+
+class DisciplineUpdateView(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
+    model = Discipline
+    fields = ['name']
+    permission_required = 'emp.add_discipline'
+    success_message ="\'%(name)s\' discipline is updated successfully"
+    # template_name_suffix = '_update_form'
+    template_name = 'emp/discipline_update_form.html'
+    # template_name = 'emp/degree_update_form.html'
+    def get_success_url(self):
+        # obj = Degree.objects.get(name=self.object.name,date_created=self.object.date_created)
+        # return reverse('degree-detail', kwargs={'slug': obj.slug})
+        return reverse('add_discipline')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        disciplines = Discipline.objects.values('id','name')
+        context['disciplines']=disciplines
+        context['current_discipline']=self.get_object()
+        return context
+
+# class DisciplineDetailView(DetailView):
+#     template_name = 'emp/employer_detail.html'
+#     model = Company
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         company_state = SpokenState.objects.get(id=self.object.state_c)
+#         company_city = SpokenCity.objects.get(id=self.object.city_c)
+#         context['company_state']=company_state.name
+#         context['company_city']=company_city.name
+#         return context
+
+class DomainCreateView(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
+    model = Domain
+    fields = ['name']
+    permission_required = 'emp.add_domain'
+    success_message ="\'%(name)s\' domain is added successfully"
+    def get_success_url(self):
+        obj = Domain.objects.get(name=self.object.name,date_created=self.object.date_created)
+        # return reverse('degree-detail', kwargs={'slug': obj.slug})
+        return reverse('add_domain')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        domains = Domain.objects.values('id','name')
+        context['domains']=domains
+        return context
+
+class DomainUpdateView(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
+    model = Domain
+    fields = ['name']
+    permission_required = 'emp.add_domain'
+    success_message ="\'%(name)s\' domain is updated successfully"
+    # template_name_suffix = '_update_form'
+    template_name = 'emp/domain_update_form.html'
+    # template_name = 'emp/degree_update_form.html'
+    def get_success_url(self):
+        # obj = Degree.objects.get(name=self.object.name,date_created=self.object.date_created)
+        # return reverse('degree-detail', kwargs={'slug': obj.slug})
+        return reverse('add_domain')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        domains = Domain.objects.values('id','name')
+        context['domains']=domains
+        context['current_domain']=self.get_object()
+        return context
+
+class JobTypeCreateView(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
+    model = JobType
+    fields = ['jobtype']
+    permission_required = 'emp.add_jobtype'
+    success_message ="\'%(jobtype)s\' job type is added successfully"
+    def get_success_url(self):
+        obj = JobType.objects.get(jobtype=self.object.jobtype,date_created=self.object.date_created)
+        # return reverse('degree-detail', kwargs={'slug': obj.slug})
+        return reverse('add_job_type')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        job_types = JobType.objects.values('id','jobtype')
+        context['job_types']=job_types
+        return context
+
+class JobTypeUpdateView(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
+    model = JobType
+    fields = ['jobtype']
+    permission_required = 'emp.add_jobtype'
+    success_message ="\'%(jobtype)s\' job type is updated successfully"
+    # template_name_suffix = '_update_form'
+    template_name = 'emp/jobtype_update_form.html'
+    # template_name = 'emp/degree_update_form.html'
+    def get_success_url(self):
+        # obj = Degree.objects.get(name=self.object.name,date_created=self.object.date_created)
+        # return reverse('degree-detail', kwargs={'slug': obj.slug})
+        return reverse('add_job_type')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        job_types = JobType.objects.values('id','jobtype')
+        context['job_types']=job_types
+        context['current_job_type']=self.get_object()
+        return context
 

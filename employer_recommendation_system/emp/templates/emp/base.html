@@ -144,43 +144,68 @@
               Manager Dashboard
             </a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item"><hr></li> -->
+          <li class="nav-item" id="nav-degree">
+            <a class="nav-link" href="{% url 'add_degree' %}">
+              <i class="fas fa-graduation-cap icons-nav"></i> <span>Degree</span>
+            </a>
+          </li>
+          <li class="nav-item" id="nav-discipline">
+            <a class="nav-link" href="{% url 'add_discipline' %}">
+              <i class="fas fa-chalkboard icons-nav"></i> <span>Discipline</span>
+            </a>
+          </li>
+          <li class="nav-item" id="nav-domain">
+            <a class="nav-link" href="{% url 'add_domain' %}">
+              <i class="bi bi-gear-wide icons-nav"></i> <span>Domain</span>
+            </a>
+          </li>
+          <li class="nav-item" id="nav-job-type">
+            <a class="nav-link" href="{% url 'add_job_type' %}">
+              <i class="bi bi-square icons-nav"></i> <span>Job Type</span>
+            </a>
+          </li>
+          <li class="nav-item"><hr></li>
+          <li class="nav-item" id="nav-add-company">
             <a class="nav-link" href="{% url 'add_company' %}">
               <i class="bi bi-bank2 icons-nav"></i> <span>Add Company</span>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="nav-view-company">
             <a class="nav-link " href="{% url 'company-list' %}" style="margin-left: 30px;">View Companies</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item"><hr></li>
+          <li class="nav-item" id="nav-add-job">
             <a class="nav-link" href="{% url 'add_job' %}"> <i class="bi bi-briefcase-fill icons-nav"></i> Add Job</a>
          </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="nav-quick-view-job">
             <a class="nav-link" href="{% url 'job-listing' %}" style="margin-left: 30px;">
               <span>View Job List (Quick View)</span>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="nav-view-job">
             <a class="nav-link" href="{% url 'job-list' %}" style="margin-left: 30px;">
               <span>View Jobs</span>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item"><hr></li>
+          <li class="nav-item" id="grade-filter">
             <a class="nav-link" href="{% get_url 'GRADE_FILTER' %}" target="_blank">
               <i class="bi bi-funnel-fill icons-nav"></i> <span>Student Grade Filter</span>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="mass-mail">
             <a class="nav-link" href="{% get_url 'MASS_MAIL_PAGE' %}" target="_blank">
               <i class="bi bi-funnel-fill icons-nav"></i> <span>Send Mass Mail</span>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="job-app-status">
             <a class="nav-link" href="{% url 'job-app-status' %}">
               <i class="bi bi-list-check icons-nav"></i> <span>Job Application Status</span>
             </a>
           </li>
+          <li class="nav-item"><hr></li>
         </ul>
       {% endif %}
       {% if request.user|has_group:"STUDENT" %}
@@ -192,7 +217,7 @@
           <span>{{request.user.get_full_name | title}}</span></a>
           <hr>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" id="s-dashboard">
                 <a class="nav-link" href="{% url 'student' %}">
             
           <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -203,17 +228,17 @@
           <i class="fas fa-user-graduate"></i>
           <span>My Profile</span></a>
               </li> -->
-              <li class="nav-item">
+              <li class="nav-item" id="s-profile">
                 <a class="nav-link" href="{% url 'student_profile' pk=request.user.student.id %}">
           <i class="bi bi-pencil-square"></i>
           <span>Profile Settings</span></a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" id="nav-view-job">
                  <a class="nav-link" href="{% url 'job-list' %}" >
                 <i class="bi bi-grid-3x3-gap"></i>
                 <span>Jobs</span></a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" id="my-jobs">
                  <a class="nav-link" href="{% url 'student_jobs' %}" >
                 <i class="bi bi-grid-3x3-gap-fill"></i>
                 <span>My Jobs</span></a>

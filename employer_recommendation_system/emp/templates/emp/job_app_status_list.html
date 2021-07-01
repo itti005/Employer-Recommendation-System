@@ -2,6 +2,18 @@
 {% load crispy_forms_tags %}
 {% load helper %}
 {% block content-header %}Job List{% endblock %}
+{% block css %}
+<style type="text/css">
+  #job-app-status{
+    border-right: 5px solid #FFCC00;
+    color: #0066A0;
+  }
+  #job-app-status a{
+    color: green!important;
+    font-weight: bold;
+  }
+</style>
+{% endblock %}
 {% block content %}
 {% include "emp/page_header.html" with title="Job Applications Status" icon="<i class='bi bi-list-ul'></i>" %}
 {% for message in messages %}
