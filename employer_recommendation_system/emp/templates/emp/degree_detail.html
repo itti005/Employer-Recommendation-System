@@ -1,0 +1,66 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}Add Company{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+	#degree_form{
+		margin-top: 20px!important;
+	}
+  
+</style>
+{% endblock %}
+{% block content %}
+{% for message in messages %}
+         <div class="text-center alert {{ message.tags }}">
+             {{ message|safe }}
+         </div>
+{% endfor %}
+{% include "emp/page_header.html" with title="Add Degree" icon="<i class='bi bi-bank'></i>" %}
+<div>
+	<form method="POST" enctype="multipart/form-data" >
+    {% csrf_token %}
+    <div class="row">
+    	<div class="col-6 form-group">
+    		{{object.name}}
+    	</div>
+    	<div class="col-6 form-group">
+    			<input type="submit" value="Edit" id="degree_form" class="btn btn-success">
+    	</div>
+    </div>
+</form>
+</div>
+<hr>
+
+<div class="mt-3">
+	<table class="table table-bordered table-striped" id="tb-degree">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Degree</th>
+    </tr>
+  </thead>
+  <tbody>
+  	{% for item in degrees %}
+  	<tr>
+  		<td>{{item.id}}</td>
+  		<td>{{item.name}}</td>
+  	</tr>
+  	{% endfor %}
+  </tbody>
+</table>
+</div>
+
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block js %}
+<script type = "text/javascript">
+    $(document).ready(function(){
+        $('#tb-degree').DataTable();
+    });
+</script>
+{% endblock %}

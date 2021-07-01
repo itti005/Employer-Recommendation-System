@@ -24,9 +24,22 @@ def profile_picture(instance, filename):
     return '/'.join(['user', str(instance.user.id), str(instance.user.id) + ext])
 
 class Degree(models.Model): # eg. BTech-Mechanical, MCA, BSc 
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200,verbose_name='Degree')
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True )
+    slug = models.SlugField(max_length = 250, null = True, blank = True)
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('degree-detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.slug:
+            obj = Degree.objects.get(name=self.name,date_created=self.date_created)
+            obj.slug = slugify(obj.id) 
+            obj.save()
 
 class Course(models.Model):
     name = models.CharField(max_length=200)
@@ -34,14 +47,50 @@ class Course(models.Model):
         return self.name
 
 class Domain(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200,unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True )
+    slug = models.SlugField(max_length = 250, null = True, blank = True)
+    
     def __str__(self):
         return self.name
+    def get_absolute_url(self):
+        return reverse('domain-detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.slug:
+            obj = Domain.objects.get(name=self.name,date_created=self.date_created)
+            obj.slug = slugify(obj.id) 
+            obj.save()
 
 class JobType(models.Model):
-    type = models.CharField(max_length=200)
+    jobtype = models.CharField(max_length=200,unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True )
+    slug = models.SlugField(max_length = 250, null = True, blank = True)
     def __str__(self):
-        return self.type
+        return self.jobtype
+
+    def get_absolute_url(self):
+        return reverse('job-type-detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.slug:
+            obj = JobType.objects.get(jobtype=self.jobtype,date_created=self.date_created)
+            obj.slug = slugify(obj.id) 
+            obj.save()
+
+    # def get_absolute_url(self):
+    #     return reverse('degree-detail', kwargs={'slug': self.slug})
+
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     if not self.slug:
+    #         obj = Degree.objects.get(name=self.name,date_created=self.date_created)
+    #         obj.slug = slugify(obj.id) 
+    #         obj.save()
 
 class Skill(models.Model):
     name = models.CharField(max_length=240)
@@ -50,10 +99,23 @@ class Skill(models.Model):
         return self.name
 
 class Discipline(models.Model):
-    name = models.CharField(max_length=240)
-
+    name = models.CharField(max_length=200,unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True )
+    slug = models.SlugField(max_length = 250, null = True, blank = True)
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        # return reverse('update-discipline', kwargs={'slug': self.slug})
+        return reverse('update-discipline', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.slug:
+            obj = Discipline.objects.get(name=self.name,date_created=self.date_created)
+            obj.slug = slugify(obj.id) 
+            obj.save()
 
 class Education(models.Model):
     degree = models.ForeignKey(Degree,null=True,on_delete=models.CASCADE)
@@ -208,9 +270,9 @@ class Job(models.Model):
     from_date = models.DateField(null=True,blank=True)
     to_date = models.DateField(null=True,blank=True)
     num_vacancies = models.IntegerField(default=1,blank=True)
-    degree = models.ManyToManyField(Degree,blank=True)
-    discipline = models.ManyToManyField(Discipline,blank=True)
-    job_foss = models.ManyToManyField(Foss,null=True,blank=True)
+    degree = models.ManyToManyField(Degree,blank=True,related_name='degrees')
+    discipline = models.ManyToManyField(Discipline,blank=True,related_name='disciplines')
+    job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
     def __str__(self):
         return self.title
 
