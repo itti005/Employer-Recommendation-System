@@ -14,7 +14,7 @@
     {{ form | crispy }}
     <div class="col-md-6 form-group">
             <div class="form-group">
-                <label for="state">State</label>
+                <label for="state">State <span class="text-muted">(Company Headquarters)</span></label>
                 <select class="form-control select-city" id="select-state">
                   {% for s in state %} 
                     <option value="{{s.id}}">{{ s.name }}</option>
@@ -24,7 +24,7 @@
     	</div>
     	<div class="col-md-6 form-group">
     		<div class="form-group">
-                <label for="city">City</label>
+                <label for="city">City <span class="text-muted">(Company Headquarters)</span></label>
                 <select class="form-control select-city" id="select-city" disabled>
                   {% for c in city %} 
                     <option value="{{c.id}}">{{ c }}</option>

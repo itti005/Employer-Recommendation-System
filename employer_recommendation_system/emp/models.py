@@ -11,9 +11,11 @@ from spoken.models import SpokenUser, SpokenState, SpokenCity
 
 # Create your models here.
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
-GENDER = [('f','F-Female Candidates'),('m','M-Male Candidates'),('a','No Criteria'),]
+GENDER = [('a','No Criteria'),('f','F-Female Candidates'),('m','M-Male Candidates'),]
 START_YEAR_CHOICES = []
 END_YEAR_CHOICES = []
+DEFAULT_NUM_EMP = '100_500'
+NUM_OF_EMPS = [('less_than_50','< 50'),('50_100','50 - 100'),('100_500','100 - 500'),('greater_than_500','> 500'),]
 for r in range(2000, (datetime.datetime.now().year+4)):
     START_YEAR_CHOICES.append((r,r))
     END_YEAR_CHOICES.append((r+1,r+1))
@@ -24,7 +26,7 @@ def profile_picture(instance, filename):
     return '/'.join(['user', str(instance.user.id), str(instance.user.id) + ext])
 
 class Degree(models.Model): # eg. BTech-Mechanical, MCA, BSc 
-    name = models.CharField(max_length=200,verbose_name='Degree')
+    name = models.CharField(max_length=200,verbose_name='Degree',unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
     slug = models.SlugField(max_length = 250, null = True, blank = True)
@@ -63,6 +65,11 @@ class Domain(models.Model):
             obj = Domain.objects.get(name=self.name,date_created=self.date_created)
             obj.slug = slugify(obj.id) 
             obj.save()
+    
+    # def get_queryset(self):
+    #     print("******************************* get queryset")
+    #     return super().get_queryset().order_by('name')
+
 
 class JobType(models.Model):
     jobtype = models.CharField(max_length=200,unique=True)
@@ -181,16 +188,12 @@ class Student(models.Model):
         return reverse('student_profile',kwargs={'pk':self.id}) 
 
 class Company(models.Model):
-    NUM_OF_EMPS = [
-        ('< 50','< 50'),
-        ('50 - 100','50 - 100'),
-        ('100 - 500','100 - 500'),
-        ('> 500','> 500'),]
+    
     name = models.CharField(max_length=200)
     emp_name = models.CharField(max_length=200,verbose_name="Company HR Representative Name") #Name of the company representative
     emp_contact = models.CharField(max_length=100,verbose_name="Phone Number") #Contact of the company representative
-    state_c = models.IntegerField(null=True)
-    city_c = models.IntegerField(null=True)    
+    state_c = models.IntegerField(null=True,verbose_name='State (Company Headquarters)')
+    city_c = models.IntegerField(null=True,verbose_name='')    
     # state_c = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     # city_c = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     address = models.CharField(max_length=250) #Company Address for correspondence
@@ -198,7 +201,7 @@ class Company(models.Model):
     logo = models.ImageField(upload_to='logo/',null=True,blank=True)
     description = models.TextField(null=True,blank=True,verbose_name="Description about the company")
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
-    company_size = models.CharField(max_length=25,choices=NUM_OF_EMPS) #Number of employees in company
+    company_size = models.CharField(max_length=25,choices=NUM_OF_EMPS,default=DEFAULT_NUM_EMP) #Number of employees in company
     website = models.URLField(null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
@@ -238,9 +241,9 @@ class Job(models.Model):
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     skills = models.CharField(max_length=400,null=True,blank=True) 
     description = models.TextField(null=True,blank=True,verbose_name="Job Description") 
-    domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
-    salary_range_min = models.IntegerField(null=True,blank=True)
-    salary_range_max = models.IntegerField(null=True,blank=True)
+    domain = models.ForeignKey(Domain,on_delete=models.CASCADE,verbose_name='Job Sector') #Domain od work Eg. Consultancy, Development, Software etc
+    salary_range_min = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Minimum)')
+    salary_range_max = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Maximum)')
     date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
     date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
     job_type = models.ForeignKey(JobType,on_delete=models.CASCADE)
@@ -251,9 +254,9 @@ class Job(models.Model):
     # 4: Student selected & job closed.
     status = models.IntegerField(default=1,blank=True)
     requirements = models.TextField(null=True,blank=True,verbose_name="Qualifications/Skills Required") #Educational qualifications, other criteria
-    shift_time = models.CharField(max_length=200)
+    shift_time = models.CharField(max_length=200,blank=True)
     key_job_responsibilities = models.TextField(null=True,blank=True,verbose_name="Key Job Responsibilities")
-    gender = models.CharField(max_length=10,choices=GENDER)
+    gender = models.CharField(max_length=10,choices=GENDER,default='a')
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
     last_app_date = models.DateTimeField(null=True,blank=True,verbose_name="Last Application Date")
@@ -266,9 +269,9 @@ class Job(models.Model):
     # city = models.CharField(max_length=200,null=True,blank=True)
     city = models.CharField(max_length=200,blank=True)
     grade = models.IntegerField()
-    activation_status = models.IntegerField(max_length=10,choices=ACTIVATION_STATUS)
-    from_date = models.DateField(null=True,blank=True)
-    to_date = models.DateField(null=True,blank=True)
+    activation_status = models.IntegerField(max_length=10,choices=ACTIVATION_STATUS,blank=True,null=True)
+    from_date = models.DateField(null=True,blank=True,verbose_name='Test Date From')
+    to_date = models.DateField(null=True,blank=True,verbose_name='Test Date Upto')
     num_vacancies = models.IntegerField(default=1,blank=True)
     degree = models.ManyToManyField(Degree,blank=True,related_name='degrees')
     discipline = models.ManyToManyField(Discipline,blank=True,related_name='disciplines')

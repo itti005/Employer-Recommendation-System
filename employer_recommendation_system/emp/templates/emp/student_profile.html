@@ -28,21 +28,27 @@
 {% endfor %}
 <section>
   {% if request.user|has_group:"STUDENT" %}
-  <div>
-    <div class="d-none">
-    <form id="form-job-app" action="{% url 'add_student_job_status' %}" method="POST">
-      {% csrf_token %}
-    <input type="number" name="job_id" required="" id="id_job_id" value="{{job.id}}">
-    <input type="number" name="student" required="" id="id_student" value="{{request.user.student.id}}">
-    <input type="number" name="spk_user_id" required="" id="id_spk_user_id" value="{{request.user.student.spk_usr_id}}">
-    </form> 
-  </div>
-<div class="alert alert-warning" role="alert">
-  <p>The following profile will be submitted to recruiter. <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link" >Click here to edit your profile.</a></p>
-  <hr>
-  <span><button class="btn btn-success" type="submit" form="form-job-app" type="submit" id="confirm_apply">Confirm Profile & Apply</button></span>
-</div>
-  </div>
+    {% if current_education %}
+      <div>
+        <div class="d-none">
+        <form id="form-job-app" action="{% url 'add_student_job_status' %}" method="POST">
+          {% csrf_token %}
+        <input type="number" name="job_id" required="" id="id_job_id" value="{{job.id}}">
+        <input type="number" name="student" required="" id="id_student" value="{{request.user.student.id}}">
+        <input type="number" name="spk_user_id" required="" id="id_spk_user_id" value="{{request.user.student.spk_usr_id}}">
+        </form> 
+      </div>
+      <div class="alert alert-warning" role="alert">
+        <p>The following profile will be submitted to recruiter. <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link" >Click here to edit your profile.</a></p>
+        <hr>
+        <span><button class="btn btn-success" type="submit" form="form-job-app" type="submit" id="confirm_apply">Confirm Profile & Apply</button></span>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-danger" role="alert">
+      <span>Please <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link text-decoration-underline" ><i class="bi bi-pencil-square"></i> add education details in your profile</a> to apply for jobs! </span>
+    </div>
+    {% endif %}
   {% endif %}
 	<div class="row profile-info">
 		<div class="col-lg-4 profile-info">
@@ -51,7 +57,7 @@
   <li class="list-group-item">
   	<b><i class="bi bi-person-square"></i></b><span>{{student.user.get_full_name | title}}</span><br>
   	<b><i class="bi bi-geo-alt-fill"></i><small>(Address)</small></b> <span>{{student.address |default_if_none:'Data Not Available'}}</span><br>
-  	<b><i class="bi bi-bank2"></i><small>(Institute)</small></b> <span>{{student.spk_institute |default_if_none:'Data Not Available'}}</span><br>
+  	<!-- <b><i class="bi bi-bank2"></i><small>(Institute)</small></b> <span>{{student.spk_institute |default_if_none:'Data Not Available'}}</span><br> -->
     {% if request.user|has_group:"STUDENT" %}
     <b><i class="bi bi-envelope"></i> <small>Email</small>: </b><span>{{student.user.email}}</span><br>
     <b><i class="bi bi-envelope"></i> <small>Alternate Email</small>: </b><span>{{student.alternate_email}}</span><br>
@@ -60,6 +66,22 @@
     <hr>
     <b>Gender : </b><span>{{student.gender | title}}</span><br>
     <b>Spoken User Id: </b><span>{{student.spk_usr_id | title}}</span><br>
+  </li>
+  <li class="list-group-item list-group-item-info"><span>Current Education Details</span></li>
+  <li class="list-group-item">
+    {% for e in current_education %}
+    <span><i class="bi bi-bank2"></i> {{e.institute | get_institute_name}}</span><br>
+    <span><i class="bi bi-book"></i> {{e.degree}} | {{e.acad_discipline}}</span><br>
+    <span><i class="far fa-clipboard"></i> GPA : {{e.gpa | default_if_none:'-'}}</span><br>
+    <span><i class="bi bi-calendar"></i> {{e.start_year | default_if_none:'-'}} - {{e.end_year | default_if_none:'-'}}</span><br>
+    {% endfor %}
+    <hr>
+    {% if past_education %}
+    <span><i class="bi bi-bank2"></i> {{past_education.institute | get_institute_name}}</span><br>
+    <span><i class="bi bi-book"></i> {{past_education.degree}} | {{past_education.acad_discipline}}</span><br>
+    <span><i class="far fa-clipboard"></i> GPA : {{past_education.gpa | default_if_none:'-'}}</span><br>
+    <span><i class="bi bi-calendar"></i> {{past_education.start_year | default_if_none:'-'}} - {{past_education.end_year | default_if_none:'-'}}</span><br>
+    {% endif %}
   </li>
   <li class="list-group-item list-group-item-info"><span>Spoken Tutorial Test Scores</span>
    <li class="list-group-item">

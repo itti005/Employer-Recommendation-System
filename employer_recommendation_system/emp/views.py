@@ -37,17 +37,19 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.utils.functional import wraps
 from django.http import HttpResponseForbidden
-from django.core.exceptions import PermissionDenied,MultipleObjectsReturned
+from django.core.exceptions import PermissionDenied,MultipleObjectsReturned,ObjectDoesNotExist
 from django.http import FileResponse, Http404
 
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
-JOB_RATING=[(0,'Only visible to Admin/HR'),(1,'Display on homepage'),(2,'Visible to all users')]
+JOB_RATING=[(2,'Visible to all users'),(0,'Only visible to Admin/HR'),(1,'Display on homepage')]
 JOB_STATUS=[(1,'Active'),(0,'Inactive')]
+COMPANY_RATING = [(2,'Visible to all users'),(0,'Only visible to Admin/HR'),(1,'Display on homepage')]
 CURRENT_EDUCATION = 1
 PAST_EDUCATION = 2
 JOB_APP_STATUS = {'RECEIVED_APP':0,'FIRST_SHORTLIST':1,'REJECTED':2}
+DEFAULT_JOB_TYPE=1
 # test functions to limit access to pages start
 def is_student(user):
     b = settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
@@ -263,6 +265,17 @@ def get_state_city_lst():
     cities = SpokenCity.objects.all()
     return states, cities
 #---------------- CBV for Create, Detail, List, Update for Company starts ----------------#
+def update_company_form(self,form):
+    print("*********************************  update_company_form ")
+    form.fields['name'].widget.attrs ={'placeholder': 'Company Name'}
+    form.fields['domain'].queryset = Domain.objects.order_by('name')
+    form.fields['rating'].widget = forms.Select(attrs=None, choices=COMPANY_RATING)
+    # try:
+    #     form.fields['job_type'].initial = JobType.objects.get(id=DEFAULT_JOB_TYPE)
+    # except (JobType.DoesNotExist,MultipleObjectsReturned) as e:
+    #     pass
+
+    return form
 
 class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     template_name = 'emp/employer_form.html'
@@ -298,7 +311,7 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         if form_class is None:
             form_class = self.get_form_class()
         form = super(CompanyCreate, self).get_form(form_class)
-        form.fields['name'].widget.attrs ={'placeholder': 'Company Name'}
+        update_company_form(self,form)
         return form
 
 class CompanyDetailView(DetailView):
@@ -359,6 +372,13 @@ def update_form_widgets(self,form):
     form.fields['to_date'].widget = DateInput()
     form.fields['rating'].widget = forms.Select(attrs=None, choices=JOB_RATING)
     form.fields['status'].widget = forms.Select(attrs=None, choices=JOB_STATUS)
+    form.fields['company'].queryset = Company.objects.order_by('name')
+    form.fields['domain'].queryset = Domain.objects.order_by('name')
+    try:
+        form.fields['job_type'].initial = JobType.objects.get(id=DEFAULT_JOB_TYPE)
+    except (JobType.DoesNotExist,MultipleObjectsReturned) as e:
+        pass
+
     return form
 
 class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
@@ -377,7 +397,7 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
-        form.cleaned_data.get("discipline")
+        print(f"shift -------- {form.cleaned_data.get('shift_time')}")
         self.object = form.save(commit=False)
         # form.save()
         self.object.save()
@@ -499,6 +519,7 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
+        print(f"shift -------- {form.cleaned_data.get('shift_time')}")
         form.save()
         # self.object = form.save(commit=False)
         # self.object.save()
@@ -694,11 +715,11 @@ def student_profile(request,pk):
     
     context['form']=student_form
     context['education_form'] = c_education_form
-    context['institutes'] = AcademicCenter.objects.values('id','institution_name')
+    context['institutes'] = AcademicCenter.objects.values('id','institution_name').order_by('institution_name')
     context['scores'] = fetch_student_scores(student)
     context['projects'] = student.projects.all()
-    context['degrees'] = Degree.objects.all()
-    context['acad_disciplines'] = Discipline.objects.all()
+    context['degrees'] = Degree.objects.order_by('name')
+    context['acad_disciplines'] = Discipline.objects.order_by('name')
     context['CURRENT_EDUCATION'] = CURRENT_EDUCATION
     context['PAST_EDUCATION'] = PAST_EDUCATION
     return render(request,'emp/student_form.html',context)
@@ -886,6 +907,9 @@ def student_profile_details(request,id,job):
     context['student']=student
     context['MEDIA_URL']=settings.MEDIA_URL
     context['scores']=fetch_student_scores(student)
+    context['current_education'] = student.education.filter(order=CURRENT_EDUCATION)
+    context['past_education'] = student.education.filter(order=PAST_EDUCATION).first()
+
     return render(request,'emp/student_profile.html',context)
 
 @user_passes_test(is_student)
