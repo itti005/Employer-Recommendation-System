@@ -10,46 +10,49 @@
             </div>
         {% endfor %}
 
-<table class="table table-bordered">
+<div class="row">
+  <div class="col-12">
+    <table class="table table-bordered ">
   <tbody>
     <tr>
-      <th>Company</th>
+      <th class="col-md-3">Title of the Job Page</th>
       <td>{{object.title}}</td>
+    </tr>
+    <tr>
+      <th >Designation <span class="text-muted fw-light">(Job Position)</span></th>
+      <td>{{object.designation}}</td>
     </tr>
     <tr>
       <th >Company</th>
       <td>{{object.company}}</td>
     </tr>
     <tr>
-      <th>Sector</th>
+      <th>Job Sector</th>
       <td>{{object.domain}}</td>
     </tr>
+    
     <tr>
-      <th >Designation</th>
-      <td>{{object.designation}}</td>
-    </tr>
-    <tr>
-      <th >Description</th>
+      <th >Job Description</th>
       <td>{{object.description}}</td>
     </tr>
     <tr>
-      <th >State</th>
-      <td>{% get_statedetails object.state_job %}</td>
+      <th>Office Location</th>
+      <td>
+        <table class="table table-bordered ">
+          <tr>
+            <th>State</th>
+            <th>City</th>
+          </tr>
+          <tr>
+            <td>{% get_statedetails object.state_job %}</td>
+            <td>{% get_citydetails object.city_job %}</td>
+          </tr>
+          
+        </table>
+      </td>
     </tr>
     <tr>
-      <th >City</th>
-      <td>{% get_citydetails object.city_job %}</td>
-    </tr>
-    <!-- <tr>
-      <th >Skills</th>
-      <td>{{object.skills}}</td>
-    </tr> -->
-    <tr>
-      <th >Job type</th>
-      <td>{{object.job_type}}</td>
-    </tr>
-    <tr>
-      <th >Requirements</th>
+      <th >Qualifications/Skills Required</th>
       <td>{{object.requirements}}</td>
     </tr>
     <tr>
@@ -57,14 +60,30 @@
       <td>{{object.key_job_responsibilities}}</td>
     </tr>
     <tr>
-      <th >Gender</th>
-      <td>{{object.gender | display_gender}}</td>
+      <th >Other</th>
+      <td>
+        <table class="table table-bordered ">
+          <tr>
+            <th>Job Type</th>
+            <th>Shift Time</th>
+            <th>Salary Range</th>
+            <th>Gender</th>
+          </tr>
+          <tr>
+            <td>{{object.job_type}}</td>
+            <td>{{object.shift_time}}</td>
+            <td>{{object.salary_range_min |default_if_none:''}} - {{object.salary_range_min | default_if_none:''}}</td>
+            <td>{{object.gender | display_gender}}</td>
+          </tr>
+          
+        </table>
+      </td>
     </tr>
     <tr class="table-info">
       <td colspan="2"><center><b>Student Eligibility Criteria</b></center></td>
     </tr>
     <tr>
-      <th >Foss</th>
+      <th >FOSS</th>
       <td>{{object.foss | display_foss}}</td>
     </tr>
     <tr>
@@ -72,7 +91,7 @@
       <td>{{object.institute_type | display_institute}}</td>
     </tr>
     <tr>
-      <th>Degree</th>
+      <th>Degree <span class="text-muted fw-light">(Qualification of the student)</span></th>
       <td>
         {% for item in object.degree.all %}
           {{item}} {% if not forloop.last %} ,{% endif %}
@@ -80,7 +99,7 @@
       </td>
     </tr>
     <tr>
-      <th>Discipline</th>
+      <th>Discipline <span class="text-muted fw-light">(Branch of study)</span></th>
       <td>
         {% for item in object.discipline.all %}
           {{item}} {% if not forloop.last %} ,{% endif %}
@@ -89,27 +108,29 @@
     </tr>
     <tr>
     <tr>
-      <th >State</th>
+      <th >State <span class="text-muted fw-light">(Spoken Tutorial Test Location)</span></th>
       <td>{{object.state | display_states}}</td>
     </tr>
     <tr>
-      <th >City</th>
+      <th >City <span class="text-muted fw-light">(Spoken Tutorial Test Location)</span></th>
       <td>{{object.city | display_cities}}</td>
     </tr>
     <tr>
-      <th >Grade</th>
+      <th >Grade </th>
       <td>{{object.grade}}</td>
     </tr>
     <tr>
-      <th >Activation Status</th>
+      <th >Activation status of the organization</th>
       <td>{{object.activation_status | display_ac_status}}</td>
     </tr>
     <tr>
-      <th >Date Range</th>
-      <td>{{object.from_date}} - {{object.to_date}}</td>
+      <th >Test Date Range </th>
+      <td>{{object.from_date | default_if_none:''}} - {{object.to_date | default_if_none:''}}</td>
     </tr>
   </tbody>
 </table>
+  </div>
+</div>
 
 <a href="{% url 'update-job-detail' slug=object.slug %}" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
 {% endblock %}

@@ -65,9 +65,17 @@
           <div class="col-md-3 mb-3">
             {{ form.job_type | as_crispy_field }}
          </div>
-          <div class="col-md-3 mb-3">
-            {{ form.shift_time | as_crispy_field }}
+         <div class="col-md-3 mb-3">
+           <label for="id_shift_time" class="form-label">Shift Time </label>
+            <span>
+              <input class="form-check-input" type="checkbox" value="" id="shiftChecked" {% if not form.shift_time %}checked{% endif %}>
+              <label class="form-check-label" for="shiftChecked">Not Specified</label>
+            </span>
+            <input name="shift_time" type="text" class="form-control" id="id_shift_time" value="{{job.shift_time}}">
          </div>
+          <!-- <div class="col-md-3 mb-3">
+            {{ form.shift_time | as_crispy_field }}
+         </div> -->
           <div class="col-md-2 mb-3">
             {{ form.salary_range_min | as_crispy_field }}
          </div>
@@ -180,7 +188,18 @@
 {% block js %}
 
 <script type="text/javascript">
+  var shift_time ;
+  $("#shiftChecked").change(function() {
+    if(this.checked) {
+        $("#id_shift_time").prop("readonly", true);
+        $("#id_shift_time").val('');
+    }else{
+        $("#id_shift_time").prop("readonly", false);
+        $("#id_shift_time").val(shift_time);
+    }
+  });
   $( document ).ready(function() {
+    shift_time = $("#id_shift_time").val();
     state_val= $('#id_state_job').val();
     $("select#select-state  > option[value=" + state_val + "]").prop("selected",true);
     city_val = $('#id_city_job').val();

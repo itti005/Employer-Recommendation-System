@@ -56,7 +56,7 @@
 
     	<div class="col-md-6 form-group mb-3">
             <div class="form-group">
-                <label for="state">State</label>
+                <label for="state">State <span class="text-muted">(Company Headquarters)</span></label>
                 <select class="form-control select-state" id="select-state">
                   {% for s in state %} 
                     <option value="{{s.id}}">{{ s.name }}</option>
@@ -66,7 +66,7 @@
     	</div>
     	<div class="col-md-6 form-group mb-3">
     		<div class="form-group">
-                <label for="city">City</label>
+                <label for="city">City <span class="text-muted">(Company Headquarters)</span></label>
                 <select class="form-control select-city" id="select-city" disabled>
                   {% for c in city %} 
                     <option value="{{c.id}}">{{ c }}</option>
@@ -93,15 +93,17 @@
     	<div class="col-12 form-group mb-3">
     		{{ form.description | as_crispy_field }}
     	</div>
-        <div class="col-lg-3 col-md-6 form-group mb-3">
+        <!-- <div class="col-lg-3 col-md-6 form-group mb-3">
             <label for="id_rating" class="form-label">Rating </label> 
             <a data-bs-toggle="offcanvas" href="#rating_info" role="button" aria-controls="rating_info"><i class="bi bi-question-circle"></i></a>
             <input type="number" name="rating" class="numberinput form-control" id="id_rating">
-        </div>
-
+        </div> -->
+        <div class="col-lg-4 mb-3">
+            <span><a data-bs-toggle='offcanvas' href='#rating_info' role='button' aria-controls='rating_info'><i class='bi bi-question-circle'></i></a></span>{{ form.rating | as_crispy_field }}
+          </div>
         
     	<div class="col-lg-3 col-md-6 form-group pb-3 mb-3">
-    		<br>
+
     		{{ form.status | as_crispy_field }} 
     	</div>
     </div>
@@ -127,9 +129,9 @@
   </div>
   <div class="offcanvas-body">
     <ul>
-        <li><span class="main-color fw-bold">0</span> : The company details are visible to only Admin / HR Manager. Students & other users will not be able to see the company details & the jobs posted for this company. </li><br>
-        <li><span class="main-color fw-bold">1-4</span> : The company details will be visible to all, but not highlighted on homepage. </li><br>
-        <li><span class="main-color fw-bold">5</span> : Highlighted Company. The company details will be visible on homepage & student dashboard. </li><br>
+        <li><span class="main-color fw-bold">Only visible to Admin/HR (0)</span> : The company details are visible to only Admin / HR Manager. Students & other users will not be able to see the company details & the jobs posted for this company. </li><br>
+        <li><span class="main-color fw-bold">Visible to all users (2)</span> : The company details will be visible to all, but not highlighted on homepage. </li><br>
+        <li><span class="main-color fw-bold">Display on homepage (1)</span> : Highlighted Company. The company details will be visible on homepage & student dashboard. </li><br>
       </ul>
   </div>
 </div>

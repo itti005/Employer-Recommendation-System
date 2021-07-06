@@ -2,7 +2,7 @@ from django import template
 from django.conf import settings
 from moodle.models import *
 from spoken.models import *
-from emp.models import JobShortlist
+from emp.models import JobShortlist,NUM_OF_EMPS
 from spoken.models import *
 
 
@@ -207,5 +207,12 @@ def get_student_fullname(value):
 @register.filter()
 def get_institute_name(value):
     return AcademicCenter.objects.get(id=value).institution_name
+
+@register.filter()
+def get_num_emp(value):
+    l,v = zip(*NUM_OF_EMPS)
+    if value:
+        return v[l.index(value)]
+    return ''
 
     

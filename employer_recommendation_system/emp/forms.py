@@ -1,6 +1,6 @@
 from django import forms
 from spoken.models import *
-from .models import Education,Student,Job,Company
+from .models import Education,Student,Job,Company,Degree,Discipline
 from django.forms import ModelForm
 
 class DateInput(forms.DateInput):
@@ -33,6 +33,12 @@ class EducationForm(ModelForm):
     class Meta:
         model = Education
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(EducationForm, self).__init__(*args, **kwargs)
+        self.fields['degree'].queryset = Degree.objects.order_by('name')
+        self.fields['acad_discipline'].queryset = Discipline.objects.order_by('name')
+
 
 class PrevEducationForm(EducationForm):
     class Meta:
