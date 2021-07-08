@@ -263,11 +263,9 @@
 </script>
 <script>
 
-
 function send_mass_mail(event) {
-        event.preventDefault();
-        console.log('send_mass_mail');
-        
+        alert('send_mass_mail');
+        event.preventDefault()
         table = $('#tb-shortlisted').DataTable()
         if (table.data().any() == false){
           alert('Email list is empty. Please filter emails for mass mail.')
@@ -279,29 +277,61 @@ function send_mass_mail(event) {
         for (i = 0; i < emails.length; i++) {
               data.push([emails[i]])
             }
-      console.log(emails);
       modal = $('#taskModal').modal()
-      console.log(modal);
       subject = modal.find('.modal-body input[name="task_subject"]').val()
       job = modal.find('.modal-body input[name="task_job"]').val()
       message = CKEDITOR.instances['task_message'].getData()
       data = JSON.stringify({ 'data': data });
-      console.log(job,message,data);
-      m_url = mass_mail_url;
       console.log(mass_mail_url);
-      $.post(m_url,{'subject': subject,'job': job, 'message': message, 'data': data},
-      function(success_url){
-        console.log('inside functino success_url')
-        window.location = success_url
+      console.log(subject,job,message,data);
+      $.post(mass_mail_url,{'subject': subject,'job': job, 'message': message, 'data': data},
+      function(data) {
+        if (data['status'] == true){
+          window.location = data['success_url']
+        }else{
+          alert('Error in sending mass error');
         }
-      ).done(function() {
-    alert( "Mass Mail Created Successfully." );
-  }).fail(function() {
-    alert( "Some error occured while creating mass mail" );
-  }).always(function() {
-    location.reload();
-  });;
+        }
+      );
       }
+// function send_mass_mail(event) {
+//         event.preventDefault();
+//         console.log('send_mass_mail');
+        
+//         table = $('#tb-shortlisted').DataTable()
+//         if (table.data().any() == false){
+//           alert('Email list is empty. Please filter emails for mass mail.')
+//           return
+//         }
+         
+//         emails = table.column(3).data()
+//         data = []
+//         for (i = 0; i < emails.length; i++) {
+//               data.push([emails[i]])
+//             }
+//       console.log(emails);
+//       modal = $('#taskModal').modal()
+//       console.log(modal);
+//       subject = modal.find('.modal-body input[name="task_subject"]').val()
+//       job = modal.find('.modal-body input[name="task_job"]').val()
+//       message = CKEDITOR.instances['task_message'].getData()
+//       data = JSON.stringify({ 'data': data });
+//       console.log(job,message,data);
+//       m_url = mass_mail_url;
+//       console.log(mass_mail_url);
+//       $.post(m_url,{'subject': subject,'job': job, 'message': message, 'data': data},
+//       function(success_url){
+//         console.log(success_url)
+//         window.location.href = success_url
+//         }
+//       ).done(function() {
+//     alert( "Mass Mail Created Successfully." );
+//   }).fail(function() {
+//     alert( "Some error occured while creating mass mail" );
+//   }).always(function() {
+//     location.reload();
+//   });;
+//       }
 </script>
 <script type="text/javascript" src="{% static '/ckeditor/ckeditor-init.js' %}"></script>
 <script type="text/javascript" src="{% static '/ckeditor/ckeditor/ckeditor.js' %}"></script>
