@@ -11,7 +11,8 @@ from django.core.mail import BadHeaderError
 def send_mail_shortlist(subject,message,emails,job):
 	subject = subject
 	message = message
-	from_host = settings.EMAIL_HOST_USER
+	# from_host = settings.EMAIL_HOST_USER
+	from_host = 'administrator@spoken-tutorial.org'
 	students_email = emails
 	fail_silently = False
 	job_id = job
