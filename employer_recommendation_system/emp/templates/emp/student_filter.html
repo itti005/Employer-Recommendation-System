@@ -1,0 +1,115 @@
+
+
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% load helper %}
+{% block content-header %}{{ object.title}}{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+	.select2-container {
+		width: 100%!important;
+		margin-bottom: 12px!important;
+	}
+  
+</style>
+{% endblock %}
+{% block content %}
+{% include "emp/page_header.html" with title="Student Filter" icon="<i class='bi bi-briefcase-fill'></i>" %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+{% for message in messages %}
+    <div class="text-center alert {{ message.tags }}">
+                {{ message|safe }}
+            </div>
+{% endfor %}
+<form method="post">
+	{% csrf_token %}
+	<div id="m_o">
+		<span class="">Mandatory/Optional</span>
+		<div class="mb-3">
+		<button type="button" class="btn btn-outline-primary" id="add_btn">Add</button>
+	</div>
+	<div class="wrapper-criteria" id="wrapper-criteria">
+		<div class="foss-criteria" id="filter_1">
+			<div style="width: 800px;">
+</div>
+			<select name="criteria-type" id="criteria-type" class="criteria-type">
+			  <option value="1">Mandatory</option>
+			  <option value="2" >Optional</option>
+			</select>
+			<select name="foss" class="foss">
+				{% for item in foss %}
+				<option value="{{item.0}}">{{item.1}}</option>
+				{% endfor %}
+			</select>
+			<input type="text" name="grade">
+			
+		</div>
+		
+	</div>
+	</div>
+	<div id="multi">
+		<span>Atleast one</span>
+		<div class="mb-3">
+		<button type="button" class="btn btn-outline-primary" id="add_multiple_btn">Add</button>
+	</div>
+	<div class="wrapper-criteria-multiple" id="wrapper-criteria-multiple">
+		<div class="foss-criteria-multiple" id="multiple_filter_1">
+			<select name="fosses_0" class="fosses"  multiple="multiple">
+				{% for item in foss %}
+				<option value="{{item.0}}">{{item.1}}</option>
+				{% endfor %}
+			</select>
+			<input type="text" name="multiple_grade">
+		</div>
+		
+	</div>
+	</div>
+	
+	<input type="text" name="num" id="num">
+	<input type="submit" name="filter" class="mt-3">
+</form>
+
+
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function (){
+		var num = 1;
+		var multi_foss = 0;
+		
+		$( "#add_btn" ).click(function() {
+		var item = document.getElementById("filter_1");
+		var clone = item.cloneNode(true);
+		count = num+1
+		clone.id = 'filter_'+ count ;
+		num = num + 1;
+		// console.log(clone)
+		document.getElementById("wrapper-criteria").appendChild(clone);
+		});
+
+		$( "#add_multiple_btn" ).click(function() {
+		multi_foss = multi_foss + 1;
+		var item = document.getElementById("multiple_filter_1");
+		var clone = item.cloneNode(true);
+		count = num+1
+		clone.id = 'multiple_filter_'+ count ;
+		clone.getElementsByClassName("fosses")[0].setAttribute('name', 'fosses_' + multi_foss);
+		num = num + 1;
+		// console.log(clone)
+		document.getElementById("wrapper-criteria-multiple").appendChild(clone);
+		$('#num').val(multi_foss);
+		});
+		
+		// alert('hi');
+		
+	});
+</script>
+
+{% endblock %}
