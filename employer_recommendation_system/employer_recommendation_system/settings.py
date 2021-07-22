@@ -171,12 +171,12 @@ ROLE_ID = { 'MANAGER': 1,'STUDENT':2,'EMPLOYER':3}
 ROLES = {'MANAGER':(1,'MANAGER'),'STUDENT':(2,'STUDENT'),'EMPLOYER':(3,'EMPLOYER')}
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 MESSAGE_TAGS = {
-	messages.DEBUG: 'alert-info',
-	messages.INFO: 'alert-info',
-	messages.SUCCESS: 'alert-success',
-	messages.WARNING: 'alert-warning',
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
-	# messages.DANGER: 'alert-danger',
+    # messages.DANGER: 'alert-danger',
     #messages.ERROR: 'danger',
 }
 LOGIN_URL='/login/'
@@ -213,4 +213,12 @@ GRADE_FILTER=GRADE_FILTER
 MASS_MAIL_PAGE=MASS_MAIL_PAGE
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
-
+# second shortlist email setting
+EMAIL_BACKEND = EMAIL_BACKEND
+EMAIL_HOST = EMAIL_HOST
+EMAIL_PORT = EMAIL_PORT
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_USE_SSL = EMAIL_USE_SSL
+EMAIL_LOG_FILE = os.path.join(BASE_DIR, 'static','email_logs')
