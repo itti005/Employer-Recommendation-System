@@ -53,17 +53,7 @@ class MdlQuiz(models.Model):
         db_table = 'mdl_quiz'
         app_label = 'mdl'
 
-class MdlQuizGrades(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    quiz = models.BigIntegerField()
-    userid = models.BigIntegerField()
-    grade = models.DecimalField(max_digits=10, decimal_places=5)
-    timemodified = models.BigIntegerField()
 
-    class Meta:
-        managed = False
-        db_table = 'mdl_quiz_grades'
-        app_label = 'mdl'
 
 class MdlUser(models.Model):
     id = models.BigIntegerField(primary_key=True)
@@ -125,4 +115,15 @@ class MdlUser(models.Model):
     class Meta(object):
         db_table = 'mdl_user'
 
+class MdlQuizGrades(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    quiz = models.BigIntegerField()
+    # userid = models.BigIntegerField()
+    userid = models.ForeignKey(MdlUser,null=True,on_delete=models.CASCADE,db_column='userid')
+    grade = models.DecimalField(max_digits=10, decimal_places=5)
+    timemodified = models.BigIntegerField()
 
+    class Meta:
+        # managed = False
+        db_table = 'mdl_quiz_grades'
+        # app_label = 'mdl'

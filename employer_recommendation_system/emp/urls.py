@@ -26,7 +26,6 @@ urlpatterns = [
     ################### jobshortlist
     path('job_application_status/', JobAppStatusListView.as_view(), name='job-app-status'),
     path('job_application_status/<int:id>/', views.job_app_details, name='job-app-detail'),
-    path('ajax-state-city/', views.ajax_state_city, name='ajax_state_city'),
     path('logout', views.handlelogout, name='logout'),
     path('<pk>/document', views.document_view, name='document_view'), #resume & cover_letter as 'type' query
     # path('employer',views.employer_homepage,name="employer"),
@@ -44,7 +43,12 @@ urlpatterns = [
     path('add_job_type/', JobTypeCreateView.as_view(), name='add_job_type'),
     path('<slug:slug>/update_job_type/', JobTypeUpdateView.as_view(), name='update_job_type'),
 
+    ################### ajax
+    path('ajax-state-city/', views.ajax_state_city, name='ajax_state_city'),
+    path('ajax-send-mail/', views.ajax_send_mail, name='ajax_send_mail'),
 
+
+    path('student_filter',views.student_filter,name='student_filter'),
     # path('degree/<slug:slug>/', DegreeDetailView.as_view(), name='degree-detail'),
     # path('degree/', CompanyListView.as_view(), name='company-list'),
     # path('degree/<slug:slug>/', CompanyDetailView.as_view(), name='company-detail'),
