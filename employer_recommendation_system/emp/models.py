@@ -7,15 +7,18 @@ from django.urls import reverse
 from spoken.models import AcademicCenter
 import os
 from spoken.models import SpokenUser, SpokenState, SpokenCity
+from django.core.validators import RegexValidator
 
 
-# Create your models here.
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('a','No Criteria'),('f','F-Female Candidates'),('m','M-Male Candidates'),]
 START_YEAR_CHOICES = []
 END_YEAR_CHOICES = []
 DEFAULT_NUM_EMP = '100_500'
 NUM_OF_EMPS = [('less_than_50','< 50'),('50_100','50 - 100'),('100_500','100 - 500'),('greater_than_500','> 500'),]
+
+phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Invalid.")
+
 for r in range(2000, (datetime.datetime.now().year+4)):
     START_YEAR_CHOICES.append((r,r))
     END_YEAR_CHOICES.append((r+1,r+1))
@@ -150,7 +153,7 @@ class Project(models.Model):
 
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
-    phone = models.CharField(max_length=10, null=True,blank=True) #spk
+    phone = models.CharField(validators=[phone_regex], max_length=17, null=True,blank=True)
     address = models.CharField(max_length=400, null=True,blank=True,verbose_name='Home Address')  #spk
     #spk_institute = models.CharField(max_length=200) #spk
     education = models.ManyToManyField(Education, null=True)
