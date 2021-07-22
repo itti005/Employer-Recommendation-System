@@ -39,6 +39,7 @@ from django.utils.functional import wraps
 from django.http import HttpResponseForbidden
 from django.core.exceptions import PermissionDenied,MultipleObjectsReturned,ObjectDoesNotExist
 from django.http import FileResponse, Http404
+from .send_mail_students import send_mail_shortlist
 
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
@@ -1085,4 +1086,49 @@ class JobTypeUpdateView(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         context['job_types']=job_types
         context['current_job_type']=self.get_object()
         return context
+
+@csrf_exempt
+def ajax_send_mail(request):
+    data = {}
+    if request.method == 'POST':
+        subject = request.POST.get('subject')
+        job = request.POST.get('job')
+        message = request.POST.get('message')
+        email = request.POST.get('data')
+        e = json.loads(email)
+        emails = [ item[0] for item in e['data']]
+        total , sent, errors = send_mail_shortlist(subject,message,emails,job)
+        data['status']='success'
+        data['total']=total
+        data['sent']=sent
+        data['errors']=errors
+    
+    return JsonResponse(data)
+
+def student_filter(request):
+    context = {}
+    foss = FossCategory.objects.values_list('id','foss')
+    # grades = FossCategory.objects.values_list('id','grade')
+    
+    context['foss'] = foss
+    if request.method == 'POST':
+        foss = request.POST.getlist('foss')
+        grades = request.POST.getlist('grade')
+        criteria_type = request.POST.getlist('criteria-type')
+        fosses = request.POST.getlist('fosses[]')
+        multiple_grade = request.POST.getlist('multiple_grade')
+
+        num = request.POST.get('num')
+        print(f"num ----- {num}")
+        l = []
+        for item in range(int(num)+1):
+            l.append(request.POST.getlist('fosses_'+str(item)))
+        print(l)
+
+        grade_filter = zip(foss, grades)
+        for foss,grade in grade_filter:
+            print(foss,grade)
+        print(f"foss ------------- {foss}")
+
+    return render(request,'emp/student_filter.html',context)
 
