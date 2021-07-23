@@ -310,4 +310,12 @@ class JobShortlist(models.Model):
     def __str__(self):
         return str(self.spk_user)+'-'+self.job.title
 
+class ShortlistEmailStatus(models.Model):
+    date_created = models.DateTimeField(auto_now_add=True)
+    email_sequence = models.IntegerField(null=True,blank=True)
+    total_mails = models.IntegerField()
+    success_mails = models.IntegerField()
+    job_id = models.IntegerField()
+    log_file = models.CharField(max_length=250)
+    
 

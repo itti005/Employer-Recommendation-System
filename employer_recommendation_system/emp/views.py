@@ -51,6 +51,7 @@ CURRENT_EDUCATION = 1
 PAST_EDUCATION = 2
 JOB_APP_STATUS = {'RECEIVED_APP':0,'FIRST_SHORTLIST':1,'REJECTED':2}
 DEFAULT_JOB_TYPE=1
+SECOND_SHORTLIST_EMAIL = 2
 # test functions to limit access to pages start
 def is_student(user):
     b = settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
@@ -1097,7 +1098,12 @@ def ajax_send_mail(request):
         email = request.POST.get('data')
         e = json.loads(email)
         emails = [ item[0] for item in e['data']]
-        total , sent, errors = send_mail_shortlist(subject,message,emails,job)
+        date_created = datetime.datetime.now()
+        
+        total , sent, errors, log_file_name = send_mail_shortlist(subject,message,emails,job)
+        file_path = os.path.join(settings.LOG_LOCATION, log_file_name)
+        email_status = ShortlistEmailStatus(date_created=date_created,email_sequence=SECOND_SHORTLIST_EMAIL,total_mails=total,success_mails=sent,job_id=int(job),log_file=file_path)
+        email_status.save()
         data['status']='success'
         data['total']=total
         data['sent']=sent

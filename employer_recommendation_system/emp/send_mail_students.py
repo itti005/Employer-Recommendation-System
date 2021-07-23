@@ -24,8 +24,8 @@ def send_mail_shortlist(subject,message,emails,job):
 	now = datetime.now()
 	
 	log_file_name = 'log_email_job_'+str(job_id)+'_'+datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+".csv"
-	log_file_name=os.path.join(settings.EMAIL_LOG_FILE,log_file_name)
-	log_file=open(log_file_name, "w+")
+	log_file_location=os.path.join(settings.EMAIL_LOG_FILE,log_file_name)
+	log_file=open(log_file_location, "w+")
 	for email in students_email:
 		print(email)
 		mail = EmailMultiAlternatives(subject,message,from_host,students_email,headers = {"Content-type" : "text/html"})
@@ -54,4 +54,4 @@ def send_mail_shortlist(subject,message,emails,job):
 			errors+=1
 	print("Total: "+ str(sent+errors)+"\n"+ "Sent: " +str(sent)+"\n"+"Errors: "+ str(errors))
 	log_file.close()
-	return len(students_email), sent, errors
+	return len(students_email), sent, errors, log_file_name
