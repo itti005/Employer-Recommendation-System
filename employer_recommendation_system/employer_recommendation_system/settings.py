@@ -214,5 +214,8 @@ MASS_MAIL_PAGE=MASS_MAIL_PAGE
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 # second shortlist email setting
-EMAIL_LOG_FILE = os.path.join(BASE_DIR, 'emp','email_logs')
+LOG_LOCATION = os.path.join('emp','email_logs')
+EMAIL_LOG_FILE = os.path.join(BASE_DIR, LOG_LOCATION)
+
+# EMAIL_LOG_FILE = os.path.join(BASE_DIR, 'emp','email_logs')
 ADMINISTRATOR_EMAIL = ADMINISTRATOR_EMAIL
