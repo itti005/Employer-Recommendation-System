@@ -35,15 +35,15 @@
 			<div style="width: 800px;">
 </div>
 			<select name="criteria-type" id="criteria-type" class="criteria-type">
-			  <option value="1">Mandatory</option>
-			  <option value="2" >Optional</option>
+			  <option value="{{MANDATORY_FOSS}}">Mandatory</option>
+			  <option value="{{OPTIONAL_FOSS}}" >Optional</option>
 			</select>
 			<select name="foss" class="foss">
 				{% for item in foss %}
 				<option value="{{item.0}}">{{item.1}}</option>
 				{% endfor %}
 			</select>
-			<input type="text" name="grade">
+			<input type="text" name="grade" value="0">
 			
 		</div>
 		
@@ -61,7 +61,7 @@
 				<option value="{{item.0}}">{{item.1}}</option>
 				{% endfor %}
 			</select>
-			<input type="text" name="multiple_grade">
+			<input type="text" name="multiple_grade" value="0">
 		</div>
 		
 	</div>
@@ -71,7 +71,33 @@
 	<input type="submit" name="filter" class="mt-3">
 </form>
 
-
+<div>
+	<hr>
+	{{mdl_user_data}}
+	<hr>
+	<div>
+		<table style="width:100%">
+  <tr>
+    <th>Firstname</th>
+    <th>Foss</th>
+    <th>Grade</th>
+  </tr>
+  {% for item in ta %}
+  <tr>
+  	<td>{{item.student_name}}</td>
+  	<td>{{item.foss_name}}</td>
+  	<td>{{item.grade}}</td>
+  </tr>
+  {% endfor %}
+</table>
+	</div>
+	{{len}}
+	<hr><hr>
+	{{mdl_user_lst}}
+	<hr><hr>
+	{{ta}}
+	
+</div>
 
 {% endblock %}
 {% block jquery %}
@@ -82,7 +108,7 @@
 <script type="text/javascript">
 	$(document).ready(function (){
 		var num = 1;
-		var multi_foss = 0;
+		var multi_foss = 1;
 		
 		$( "#add_btn" ).click(function() {
 		var item = document.getElementById("filter_1");
@@ -95,7 +121,9 @@
 		});
 
 		$( "#add_multiple_btn" ).click(function() {
+
 		multi_foss = multi_foss + 1;
+
 		var item = document.getElementById("multiple_filter_1");
 		var clone = item.cloneNode(true);
 		count = num+1
@@ -104,7 +132,9 @@
 		num = num + 1;
 		// console.log(clone)
 		document.getElementById("wrapper-criteria-multiple").appendChild(clone);
+		alert(multi_foss)
 		$('#num').val(multi_foss);
+		alert($('#num').val());
 		});
 		
 		// alert('hi');

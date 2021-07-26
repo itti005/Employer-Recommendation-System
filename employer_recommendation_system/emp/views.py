@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate,login,logout
 from .models import *
 from emp.models import Student as RecStudent
 from spoken.models import TestAttendance, FossMdlCourses,FossCategory,Profile, SpokenState, SpokenCity
-from moodle.models import MdlQuizGrades
+from moodle.models import MdlQuizGrades,MdlUser
 from django.views.generic.edit import UpdateView
 from spoken.models import SpokenStudent 
 from spoken.models import SpokenUser as SpkUser 
@@ -18,7 +18,7 @@ from django.http import HttpResponse, JsonResponse
 from .filterset import CompanyFilterSet,JobFilter
 from .forms import ACTIVATION_STATUS, JobSearchForm, JobApplicationForm
 import numpy as np
-from django.db.models import Q
+from django.db.models import Q,F,ExpressionWrapper,CharField
 from django.db.models.expressions import RawSQL
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
@@ -40,6 +40,11 @@ from django.http import HttpResponseForbidden
 from django.core.exceptions import PermissionDenied,MultipleObjectsReturned,ObjectDoesNotExist
 from django.http import FileResponse, Http404
 from .send_mail_students import send_mail_shortlist
+import time
+import itertools
+from django.db.models import OuterRef, Subquery
+from django.db.models.functions import Concat
+from django.db.models import Value
 
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
@@ -52,6 +57,8 @@ PAST_EDUCATION = 2
 JOB_APP_STATUS = {'RECEIVED_APP':0,'FIRST_SHORTLIST':1,'REJECTED':2}
 DEFAULT_JOB_TYPE=1
 SECOND_SHORTLIST_EMAIL = 2
+MANDATORY_FOSS = 1
+OPTIONAL_FOSS = 2
 # test functions to limit access to pages start
 def is_student(user):
     b = settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
@@ -242,6 +249,7 @@ def student_homepage(request):
         print(e)
     scores = fetch_student_scores(rec_student)
     context['scores']=scores
+
     return render(request,'emp/student_homepage.html',context)
 
 def employer_homepage(request):
@@ -1114,27 +1122,148 @@ def ajax_send_mail(request):
 def student_filter(request):
     context = {}
     foss = FossCategory.objects.values_list('id','foss')
+    context['foss'] = foss
+    context['MANDATORY_FOSS']=MANDATORY_FOSS
+    context['OPTIONAL_FOSS']=OPTIONAL_FOSS
     # grades = FossCategory.objects.values_list('id','grade')
     
-    context['foss'] = foss
+    
     if request.method == 'POST':
         foss = request.POST.getlist('foss')
         grades = request.POST.getlist('grade')
         criteria_type = request.POST.getlist('criteria-type')
-        fosses = request.POST.getlist('fosses[]')
-        multiple_grade = request.POST.getlist('multiple_grade')
+        fosses = request.POST.getlist('fosses[]') #list of list of fosses from any one of query
+        multiple_grade = request.POST.getlist('multiple_grade') #grades from any one of query
 
-        num = request.POST.get('num')
-        print(f"num ----- {num}")
-        l = []
+        num = request.POST.get('num') if request.POST.get('num') else 0
+        print(f"1 num ----------------- {num}")
+        
+        #list of list of any of the fosses criteria
+        # multiple_fosses = [ request.POST.getlist('fosses_'+str(item)) for item in range(int(num)+1) ]
+        multiple_fosses = []
         for item in range(int(num)+1):
-            l.append(request.POST.getlist('fosses_'+str(item)))
-        print(l)
+            multiple_fosses.append(request.POST.getlist('fosses_'+str(item)))
+        print(f"2 multiple_fosses ------------------ {multiple_fosses}")
+        print(f"3 foss, grades,criteria_type --------- {foss}, {grades}, {criteria_type}")
+        grade_filter = zip(foss, grades,criteria_type)
+        mandatory = {} #mandatorry fosses
+        optional = [] #optional fosses
+        for foss,grade,criteria_type in grade_filter:
+            if int(criteria_type)==MANDATORY_FOSS:
+                mandatory[int(foss)]=grade
+            else:
+                optional[foss]=grade
+        print(f"4 mandatory -------------- {mandatory}")
+        print(f"5 optional -------------- {optional}")
+        #get queryset 
+        start_time = time.time()
+        mdlusers = MdlUser.objects.using('moodle').all()
+        users_id = []
+        #find mdl quizzes corresponding to mandatory foss list; 
+        # 'foss' : for retrieving corresponding grades from 'mandatory' dictinoary
+        # 'mdlquiz_id' : for filtering students based on quizzes
+        foss_mdl_courses = FossMdlCourses.objects.filter(foss_id__in=mandatory).values_list('foss','mdlquiz_id')
+        mdl_quizzes = list(map(lambda x: x[1], foss_mdl_courses))
+        print(f"6 foss_mdl_courses -------------- {foss_mdl_courses}")
+        print(f"7 mdl_quizzes -------------- {mdl_quizzes}")
+        q = []
 
-        grade_filter = zip(foss, grades)
-        for foss,grade in grade_filter:
-            print(foss,grade)
-        print(f"foss ------------- {foss}")
+        # q1= mdlusers.filter(Q(mdlquizgrades__quiz=9) & Q(mdlquizgrades__grade__gt=90)).values('mdlquizgrades__quiz')
+        # q2= mdlusers.filter(Q(mdlquizgrades__quiz=10) & Q(mdlquizgrades__grade__gt=90)).values('mdlquizgrades__quiz')
+        # q = mdlusers.filter(Q(mdlquizgrades__quiz=9) & Q(mdlquizgrades__grade__gt=60)).filter(Q(mdlquizgrades__quiz=46) & Q(mdlquizgrades__grade__gt=60)).values('mdlquizgrades__quiz').values('id','mdlquizgrades__quiz')
+       
+        mdl_users = []
+        q = []
+        for item in foss_mdl_courses:
+            print(f"item ------------- {item}")
+            if mdl_users:
+                q = MdlUser.objects.filter(Q(mdlquizgrades__quiz=item[1]) & Q(mdlquizgrades__grade__gt=mandatory[item[0]]),id__in=mdl_users).values_list('id')
+            else:
+                q = MdlUser.objects.filter(Q(mdlquizgrades__quiz=item[1]) & Q(mdlquizgrades__grade__gt=mandatory[item[0]])).values_list('id')
+            mdl_users = list(itertools.chain(*q))
+            # q = Q(mdlquizgrades__quiz=item[1]) & Q(mdlquizgrades__grade__gt=mandatory[item[0]])
+            # mdlusers = mdlusers.filter(q)
+        mdlusers = q.values('id')
+        print(mdlusers.query)
+        print("************************************************************")
+        print(f"mdlusers ------------ {len(mdlusers)}")
+        print("************************************************************")
+        
+        # users_id = users.values_list('id').annotate(key=F('mdlquizgrades__userid')+'_'+F('mdlquizgrades__quiz')).annotate(grade=F('mdlquizgrades__grade'))
+        # users_id = users.values('id')
+        users_id = mdlusers.annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
+        print(f"8 users_id -------------- {users_id}")
+        unzipped = list(zip(*users_id))
+        key = unzipped[1] #mdluserid_quizid
+        values = unzipped[2] #grade
+        print(f"users_id ---------- {users_id}")
+        d = {}
+        for elem in enumerate(key):
+            d[key[elem[0]]] = values[elem[0]]
+        print(f"9 d--------- {d} ")
+            # print(key[elem[0]],values[elem[0]])
+        # users_id = users.values_list('id')
+        context['users_id'] = users_id
+        # mdl_user_lst = list(itertools.chain(*users_id))
+        mdl_user_lst = unzipped[0]
+        print(f"10 mdl_user_lst--------- {mdl_user_lst} ")
+        context['mdl_user_lst']=mdl_user_lst
+        user_subquery = SpokenUser.objects.filter(spokenstudent=OuterRef('student_id')).values('first_name')
+        print(f"11 -----------------")
+        ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst).filter(mdlquiz_id__in=mdl_quizzes).values('student_id','mdlquiz_id','mdluser_id')
+        ta = ta.annotate(student_name=Subquery(user_subquery))
+        
+        # foss_subquery = FossMdlCourses.objects.filter(mdlcourse_id=OuterRef('mdlcourse_id')).values('foss')[:1]
+        foss_id_subquery = FossMdlCourses.objects.filter(mdlcourse_id=OuterRef('mdlcourse_id')).values('foss')[:1]
+        # ta = ta.annotate(foss_name=FossCategory.objects.filter(id=Subquery(foss_subquery)))
+        # foss_subquery = FossCategory.objects.filter(id=OuterRef('foss_id')).MdlQuizGrades.objectsvalues('foss')[:1]
+        foss_subquery = FossCategory.objects.filter(id=OuterRef('foss_id')).values('foss')[:1]
+        # grade_subquery = MdlQuizGrades.objects.using('moodle').filter(quiz=OuterRef('mdlquiz_id'),userid=OuterRef('mdluser_id')).values('timemodified')[:1]
+        grade_subquery = MdlQuizGrades.objects.using('moodle').filter(userid=OuterRef('mdluser_id')).values('grade')[:1]
+        print(f"12 ta ----------------- {ta}")
+        ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade=d[Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())]).values('student_name','foss_name','grade')
+        print(f"13 -----------------")
+        students = list(map(lambda x: x['student_name'], ta))
+        print(f"14 -----------------")
+        print(f"15 ta ----------------- {ta}")
 
+        mdl_user_data = mdlusers.values_list('id','firstname')
+        context['mdl_user_data']=mdl_user_data
+        
+        # spk_students = SpokenStudent.objects.filter(id__in=students).values('id','user_id')
+        # users = list(map(lambda x: x[1], spk_students))
+        # spk_users = SpokenUser.objects.filter(spokenstudent__in=students).values('id','first_name')
+        # context['spk_users']=spk_users
+        context['ta']=ta
+        context['len']=len(ta)
     return render(request,'emp/student_filter.html',context)
 
+    
+    # def form_invalid(self, form):
+    #     print(f"hjklkn-------------{form}")
+    #     return self.render_to_response(self.get_context_data(form=form))
+
+    # def form_valid(self, form):
+    #     self.object = form.save(commit=False)
+    #     print(f'slef.user ---- -------------------------------------------------')
+    #     self.object.save()
+    #     return super(ModelFormMixin, self).form_valid(form)
+# class JobDetailView(DetailView):
+#     template_name = 'emp/jobs_detail.html'
+#     model = Job
+#     def get_context_data(self, **kwargs):
+#         print("inside job detial view *****************")
+#         context = super().get_context_data(**kwargs)
+#         return context
+# class JobListView(ListView):
+#     template_name = 'emp/jobs_list.html'
+#     model = Job
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         print("************ context : ",context)
+#         return context
+# class JobUpdate(SuccessMessageMixin,UpdateView):
+#     template_name = 'emp/jobs_update_form.html'
+#     model = Job
+#     fields = ['company','title','designation','state','city','skills','description','domain','salary_range_min','salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender']
+#     success_message ="%(title)s was updated successfully"
