@@ -15,7 +15,8 @@
     <div class="col-md-6 form-group">
             <div class="form-group">
                 <label for="state">State <span class="text-muted">(Company Headquarters)</span></label>
-                <select class="form-control select-city" id="select-state">
+                <select class="form-control select-state" id="select-state">
+                    <option value="0">-------------</option>
                   {% for s in state %} 
                     <option value="{{s.id}}">{{ s.name }}</option>
                     {% endfor %}
@@ -26,6 +27,7 @@
     		<div class="form-group">
                 <label for="city">City <span class="text-muted">(Company Headquarters)</span></label>
                 <select class="form-control select-city" id="select-city" disabled>
+                    <option value="0">-------------</option>
                   {% for c in city %} 
                     <option value="{{c.id}}">{{ c }}</option>
                     {% endfor %}
@@ -43,13 +45,12 @@
 {% block js %}
 <script type="text/javascript">
 	$( document ).ready(function() {
-		$('#select-state').val($('#id_state_c').val());
-		$('#select-city').val($('#id_city_c').val());
+        s = $('#id_state_c').val() ? $('#id_state_c').val() : '0';
+        c = $('#id_city_c').val() ? $('#id_city_c').val() : '0';
+		$('#select-state').val(s);
+		$('#select-city').val(c);
    		$( "#company-update" ).click(function() {
-		  state = $('#select-state').val();
-		  city = $('#select-city').val();
-		  $('#id_state_c').val(parseInt(state));
-		  $('#id_city_c').val(parseInt(city));
+            save_state_city();
 		});
 	});
 </script>

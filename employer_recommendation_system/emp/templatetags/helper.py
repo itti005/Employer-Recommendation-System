@@ -4,7 +4,7 @@ from moodle.models import *
 from spoken.models import *
 from emp.models import JobShortlist,NUM_OF_EMPS
 from spoken.models import *
-
+from emp.views import JOB_RATING
 
 register = template.Library()
 
@@ -214,5 +214,18 @@ def get_num_emp(value):
     if value:
         return v[l.index(value)]
     return ''
+
+@register.filter()
+def get_rating(value):
+    l,v = zip(*JOB_RATING)
+    try:
+        return v[l.index(value)]
+    except:
+        return ''
+@register.filter()
+def get_status(value):
+    if value:
+        return 'Active (The company will appear in search results & job can be added.)'
+    return 'Inactive (The company will NOT appear in search results & job cannot be added for this company.)'
 
     

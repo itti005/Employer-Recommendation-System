@@ -7,7 +7,20 @@
     $('#t_'+id).show();
     $('#apply_'+id).hide();
   }
- 
+  function save_state_city(){
+      state = $('#select-state').val();
+      city = $('#select-city').val();
+          if(state!='0'){
+            $('#id_state_c').val(parseInt(state));
+        }else{
+            $('#id_state_c').val(null);
+        }
+        if(city!='0'){
+            $('#id_city_c').val(parseInt(city));
+        }else{
+            $('#id_city_c').val(null);
+        }
+  }
 
   $(document).ready(function(){
     $('.select-state').change(function() {
