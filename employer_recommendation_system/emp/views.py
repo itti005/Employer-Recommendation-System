@@ -276,7 +276,6 @@ def get_state_city_lst():
     return states, cities
 #---------------- CBV for Create, Detail, List, Update for Company starts ----------------#
 def update_company_form(self,form):
-    print("*********************************  update_company_form ")
     form.fields['name'].widget.attrs ={'placeholder': 'Company Name'}
     form.fields['domain'].queryset = Domain.objects.order_by('name')
     form.fields['rating'].widget = forms.Select(attrs=None, choices=COMPANY_RATING)
@@ -300,6 +299,7 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.added_by = self.request.user
+
         self.object.save()
         messages.success(self.request, 'Company information added successfully.')
         return super(ModelFormMixin, self).form_valid(form)
@@ -329,10 +329,10 @@ class CompanyDetailView(DetailView):
     model = Company
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        company_state = SpokenState.objects.get(id=self.object.state_c)
-        company_city = SpokenCity.objects.get(id=self.object.city_c)
-        context['company_state']=company_state.name
-        context['company_city']=company_city.name
+        company_state = SpokenState.objects.filter(id=self.object.state_c).first()
+        company_city = SpokenCity.objects.filter(id=self.object.city_c).first()
+        context['company_state']=company_state.name if company_state else ''
+        context['company_city']=company_city.name if company_city else ''
         return context
 
 class CompanyListView(PermissionRequiredMixin,ListView):
@@ -1192,8 +1192,17 @@ def student_filter(request):
         # users_id = users.values_list('id').annotate(key=F('mdlquizgrades__userid')+'_'+F('mdlquizgrades__quiz')).annotate(grade=F('mdlquizgrades__grade'))
         # users_id = users.values('id')
         users_id = mdlusers.annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
+        
         print(f"8 users_id -------------- {users_id}")
         unzipped = list(zip(*users_id))
+        d_data = MdlUser.objects.filter(id__in=list(unzipped[0]),mdlquizgrades__quiz__in=mdl_quizzes).annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
+        d_unzipped = list(zip(*d_data))
+        d_key = d_unzipped[1] #mdluserid_quizid
+        d_values = d_unzipped[2] #grade
+        d1 = {}
+        for elem in enumerate(d_key):
+            d1[d_key[elem[0]]] = d_values[elem[0]]
+        print(f"d1 ---------- {d1}")
         key = unzipped[1] #mdluserid_quizid
         values = unzipped[2] #grade
         print(f"users_id ---------- {users_id}")
@@ -1221,7 +1230,7 @@ def student_filter(request):
         # grade_subquery = MdlQuizGrades.objects.using('moodle').filter(quiz=OuterRef('mdlquiz_id'),userid=OuterRef('mdluser_id')).values('timemodified')[:1]
         grade_subquery = MdlQuizGrades.objects.using('moodle').filter(userid=OuterRef('mdluser_id')).values('grade')[:1]
         print(f"12 ta ----------------- {ta}")
-        ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade=d[Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())]).values('student_name','foss_name','grade')
+        ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade=d1.get(Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField()),Value('0'))).values('student_name','foss_name','grade')
         print(f"13 -----------------")
         students = list(map(lambda x: x['student_name'], ta))
         print(f"14 -----------------")

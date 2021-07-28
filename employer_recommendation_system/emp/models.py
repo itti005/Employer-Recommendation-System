@@ -194,9 +194,9 @@ class Company(models.Model):
     
     name = models.CharField(max_length=200)
     emp_name = models.CharField(max_length=200,verbose_name="Company HR Representative Name") #Name of the company representative
-    emp_contact = models.CharField(max_length=100,verbose_name="Phone Number") #Contact of the company representative
-    state_c = models.IntegerField(null=True,verbose_name='State (Company Headquarters)')
-    city_c = models.IntegerField(null=True,verbose_name='')    
+    emp_contact = models.CharField(validators=[phone_regex], max_length=17, null=True,blank=True,verbose_name="Phone Number")
+    state_c = models.IntegerField(null=True,verbose_name='State (Company Headquarters)',blank=True)
+    city_c = models.IntegerField(null=True,verbose_name='City (Company Headquarters)',blank=True)    
     # state_c = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     # city_c = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     address = models.CharField(max_length=250) #Company Address for correspondence
