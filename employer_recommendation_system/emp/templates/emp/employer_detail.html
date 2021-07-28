@@ -61,6 +61,14 @@
       <th scope="row">Description</th>
       <td>{{object.description}}</td>
     </tr>
+    <tr>
+      <th scope="row">Rating</th>
+      <td>{{object.rating | get_rating }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Status</th>
+      <td>{{object.status | get_status }}</td>
+    </tr>
   </tbody>
 </table>
 {% if object.sector %}

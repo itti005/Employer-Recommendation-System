@@ -135,7 +135,7 @@
       <div class="col-lg-6">
         <!-- <div class="custom-multi-select form-group mb-3 state_select"> -->
         <div class="form-group mb-3 state_select">
-        <label>{{filter_form.state.label }}</label>
+        <label>{{filter_form.state.label }} </label>
         <select class=" form-control" id="state-select" multiple="multiple">
         {% for foss in filter_form.state %} 
         {{ foss }}
@@ -234,20 +234,30 @@
       }
   }
   // pre filled values ends
-   $('.custom-multi-select').dropdown({multipleMode:'label'});
-   $( "#job-submit" ).click(function() {
+   // $('.custom-multi-select').dropdown({multipleMode:'label'});
+   $("#job-submit").click(function() {
    
   var foss = $('#foss-select').val(); 
-  var insti_type = $('#insti-select').val(); 
-  var states = $('#state-select').val(); 
-  var cities = $('#city-select').val(); 
+  var insti_type = $('#insti-select').val() ? $('#insti-select').val().toString() : ''; 
+  var states = $('#state-select').val() ? $('#state-select').val().toString() : ''; //filter states
+  var cities = $('#city-select').val() ? $('#city-select').val().toString() : ''; //filter cities
+  alert(insti_type)
   $('#id_foss').val(foss.toString());
-  $('#id_institute_type').val(insti_type.toString());
-  $('#id_state').val(states.toString());
-  $('#id_city').val(cities.toString());
+  if (insti_type) {
+    alert(1)
+      $('#id_institute_type').val(insti_type);
+  }
+  alert(2)
+  if (states) {$('#id_state').val(states);}
+  if (cities) {$('#id_city').val(cities);}
+  alert(3)
+  
 
-  state = $('#state-select').val();
-  city = $('#city-select').val();
+  state = $('#select-state').val();
+  city = $('#select-city').val();
+  alert(state);
+  alert(city);
+  alert($('#select-city').val());
   $('#id_state_job').val(parseInt(state));
   $('#id_city_job').val(parseInt(city));
   

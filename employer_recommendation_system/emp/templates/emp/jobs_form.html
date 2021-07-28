@@ -50,7 +50,8 @@
             <div id="div_id_state_job" class="form-group">
               
         <label for="id_state_job" >State <span class="text-muted">(Company Location)</span></label>
-        <select class="form-control select-state" id="id_state_job"  name="state_job">
+        <select class="form-control select-state requiredField" id="id_state_job"  name="state_job" required>
+          <option disabled selected value> -- select state -- </option>
         {% for state in filter_form.state %} 
         {{ state }}
         {% endfor %}
@@ -59,7 +60,8 @@
           <div class="col-md-6 mb-3">
             <div id="div_id_city_job" class="form-group">
             <label for="id_state_job" >City <span class="text-muted">(Company Location)</span></label>
-        <select class="form-control select-city" id="id_city_job"  name="city_job">
+        <select class="form-control select-city requiredField" id="id_city_job"  name="city_job" required>
+          <option disabled selected value> -- select city -- </option>
         {% for city in filter_form.city %} 
         {{ city }}
         {% endfor %}
@@ -127,7 +129,7 @@
     <div class="row">
 
       <div class="col-lg-6">
-        <label>FOSS</label>
+        <label>FOSS*</label>
         <select class="form-control" id="foss-select" multiple="multiple" required>
         {% for foss in filter_form.foss %} 
         {{ foss }}
@@ -239,7 +241,6 @@
    elem = $("#loc-state > div.dropdown-main > ul").prepend('hello');
 
    $( "#job-submit" ).click(function() {
-    
   var foss = $('#foss-select').val(); 
   var insti_type = $('#insti-select').val(); 
   var states = $('#state-select').val(); 
@@ -251,16 +252,16 @@
   $('#id_city').val(cities.toString());
 
 
-  // state = $('#state-select').val();
-  // city = $('#city-select').val();
-  // $('#id_state_job').val(parseInt(state));
-  // $('#id_city_job').val(parseInt(city));
-
-  // $( "#state-select" ).change(function () {    
-  //   alert('here');
-  //   document.getElementById("filter_places").innerHTML="You selected: "+document.getElementById("state-select").value;  
-  // }); 
-
+  // if(state!='0'){
+  //           $('#id_state_c').val(parseInt(state));
+  //       }else{
+  //           $('#id_state_c').val(null);
+  //       }
+  //       if(city!='0'){
+  //           $('#id_city_c').val(parseInt(city));
+  //       }else{
+  //           $('#id_city_c').val(null);
+  //       }
 
 });
    

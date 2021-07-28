@@ -360,7 +360,7 @@ class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
     template_name = 'emp/employer_update_form.html'
     permission_required = 'emp.change_company'
     model = Company
-    fields = ['name','emp_name','emp_contact','state_c','city_c','address','email','logo','description','domain','company_size','website'] 
+    fields = ['name','emp_name','emp_contact','state_c','city_c','address','email','logo','description','domain','company_size','website','status','rating'] 
     success_message ="%(name)s was updated successfully"
 
     def get_context_data(self, **kwargs):
@@ -373,6 +373,7 @@ class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         form = super(CompanyUpdate, self).get_form()
         form.fields['state_c'].widget = HiddenInput()
         form.fields['city_c'].widget = HiddenInput()
+        update_company_form(self,form)
         return form
 
 #---------------- CBV for Create, Detail, List, Update for Jobs starts ----------------#

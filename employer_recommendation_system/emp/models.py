@@ -238,9 +238,9 @@ class Foss(models.Model):
 class Job(models.Model):
     title = models.CharField(max_length=250,verbose_name="Title of the job page") #filter
     designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
-    state_job = models.IntegerField(null=True)  #spk #filter
+    state_job = models.IntegerField(null=False,blank=False)  #spk #filter
     #state_job = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    city_job = models.IntegerField(null=True)  #spk #filter
+    city_job = models.IntegerField(null=False,blank=False)  #spk #filter
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     skills = models.CharField(max_length=400,null=True,blank=True) 
     description = models.TextField(null=True,blank=True,verbose_name="Job Description") 
