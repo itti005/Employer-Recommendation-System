@@ -68,6 +68,9 @@
     color: green!important;
     font-weight: bold;
   }
+  .c-icon{
+    color: #0066A0;
+  }
 </style>
 {% endblock %}
 {% block content %}
@@ -155,9 +158,9 @@
   <div class="nav  nav-pills me-3 list-group list-group-flush border-bottom scrollarea" id="v-pills-tab" role="tablist" aria-orientation="vertical">
     {% for job in object_list %}
     {% if forloop.first %}
-    <a class="nav-link list-group-item list-group-item list-group-item-action  py-3 lh-tight active" id="v-pills-home-tab" data-bs-toggle="pill" href="#job_detail_{{job.id}}"  role="tab" aria-controls="v-pills-home" aria-selected="true">
+    <a class="nav-link list-group-item list-group-item list-group-item-action  py-3 lh-tight active " id="v-pills-home-tab" data-bs-toggle="pill" href="#job_detail_{{job.id}}"  role="tab" aria-controls="v-pills-home" aria-selected="true" >
       {% else %}
-      <a class="nav-link list-group-item list-group-item list-group-item-action  py-3 lh-tight" id="v-pills-home-tab" data-bs-toggle="pill" href="#job_detail_{{job.id}}"  role="tab" aria-controls="v-pills-home" aria-selected="true">
+      <a class="nav-link list-group-item list-group-item list-group-item-action  py-3 lh-tight " id="v-pills-home-tab" data-bs-toggle="pill" href="#job_detail_{{job.id}}"  role="tab" aria-controls="v-pills-home" aria-selected="true"> 
     {% endif %}
             
             <div class="d-flex w-100 align-items-center justify-content-between">
@@ -180,9 +183,9 @@
   <div class="col-6 tab-content flex-fill job-details">
     {% for job in object_list %}
     {% if forloop.first %}
-    <div class="tab-pane fade show active" id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
+    <div class="tab-pane fade show active mt-3" id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
     {% else %}
-    <div class="tab-pane fade show " id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
+    <div class="tab-pane fade show mt-3" id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
     {% endif %}
     {% if request.user|has_group:"MANAGER" %}
     <div class="alert alert-warning mt-2" role="alert">
@@ -231,7 +234,16 @@
           {% endif %}
         </div>
               </div>
-              
+              <div class="row my-1">
+                <div class="col">
+                  <div class="card border-o">
+  <div class="card-body">
+    <p class="mb-0"><i class="bi bi-calendar-event c-icon"></i> Last Application Date : {{job.last_app_date | default_if_none:''}}<br>
+    <i class="bi bi-clipboard-data c-icon"></i> Skills : {{job.foss | display_foss}}</p>
+  </div>
+</div>
+                </div>
+              </div>
               <div class="row">
                 <div class="col-sm-6 ">
                   <div class="card highlights">
@@ -271,34 +283,23 @@
                     </li>
                     
                     <li class="list-group-item">Spoken Tutorial Test Grade should be <b>greater than {{job.grade}}</b> in one of the following FOSSes :<br>{{job.foss | display_foss}}<hr>
-                      <span><b>State : </b>{{job.state | display_states}}</span><br>
-                      <span><b>City : </b>{{job.city | display_cities}}</span><br>
-                      <span><b>Institution Type : </b>{{job.institute_type | display_institute}}</span><br>
-                      <span><b>Degree : </b>
+                      {% if job.state %}<span><b>State : </b>{{job.state | display_states}}</span><br>{% endif %}
+                      {% if job.city %}<span><b>City : </b>{{job.city | display_cities}}</span><br>{% endif %}
+                      {% if job.institute_type %}<span><b>Institution Type : </b>{{job.institute_type | display_institute}}</span><br>{% endif %}
+                      {% if job.degree.all %}<span><b>Degree : </b>
                         {% for item in job.degree.all %}
                         {{item}} {% if not forloop.last %} ,{% endif %}
-                        {% endfor %}</span><br>
-                      <span><b>Discipline : </b>{% for item in job.discipline.all %}
+                        {% endfor %}</span><br>{% endif %}
+                      {% if job.discipline.all %}<span><b>Discipline : </b>{% for item in job.discipline.all %}
                         {{item}} {% if not forloop.last %} ,{% endif %}
-                      {% endfor %}</span><br>
-                      <span><b>Test Period : </b>{{job.from_date | default_if_none:''}} - {{job.to_date | default_if_none:''}}</span><br>
-
-
+                      {% endfor %}</span><br>{% endif %}
+                      {% if job.from_date or  job.to_date %}<span><b>Test Period : </b>{{job.from_date | default_if_none:''}} - {{job.to_date | default_if_none:''}}</span><br>{% endif %}
                     </li>
                   </ul>
                 </div>
               </div>
 
-              <div class="row mt-1">
-                <div class="col">
-                  <div class="card border-o">
-  <div class="card-body">
-    <p><i class="bi bi-calendar-event"></i> Last Application Date : {{job.last_app_date | default_if_none:''}}<br>
-    <i class="bi bi-clipboard-data"></i> Skills : {{job.foss | display_foss}}</p>
-  </div>
-</div>
-                </div>
-              </div>
+              
               <div class="row">
                 <div class="col">
                   <p><b>Description</b></p>

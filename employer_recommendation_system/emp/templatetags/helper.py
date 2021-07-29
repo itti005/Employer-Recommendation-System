@@ -92,10 +92,10 @@ def format_char(value):
             s+=val[0].capitalize()+' '
     return s
 
-@register.filter()
-def display_foss(value):
-    foss = FossCategory.objects.get(id=int(value)).foss
-    return foss
+# @register.filter()
+# def display_foss(value):
+#     foss = FossCategory.objects.get(id=int(value)).foss
+#     return foss
 
 @register.filter()
 def display_gender(value):

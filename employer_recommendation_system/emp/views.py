@@ -49,9 +49,16 @@ from django.db.models import Value
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
-JOB_RATING=[(2,'Visible to all users'),(0,'Only visible to Admin/HR'),(1,'Display on homepage')]
+
+RATING = {
+    'ONLY_VISIBLE_TO_ADMIN_HR':0,
+    'DISPLAY_ON_HOMEPAGE':1,
+    'VISIBLE_TO_ALL_USERS':2
+}
+JOB_RATING=[(RATING['VISIBLE_TO_ALL_USERS'],'Visible to all users'),(RATING['ONLY_VISIBLE_TO_ADMIN_HR'],'Only visible to Admin/HR'),(RATING['DISPLAY_ON_HOMEPAGE'],'Display on homepage')]
 JOB_STATUS=[(1,'Active'),(0,'Inactive')]
-COMPANY_RATING = [(2,'Visible to all users'),(0,'Only visible to Admin/HR'),(1,'Display on homepage')]
+COMPANY_RATING = [(RATING['VISIBLE_TO_ALL_USERS'],'Visible to all users'),(RATING['ONLY_VISIBLE_TO_ADMIN_HR'],'Only visible to Admin/HR'),(RATING['DISPLAY_ON_HOMEPAGE'],'Display on homepage')]
+
 CURRENT_EDUCATION = 1
 PAST_EDUCATION = 2
 JOB_APP_STATUS = {'RECEIVED_APP':0,'FIRST_SHORTLIST':1,'REJECTED':2}
@@ -59,6 +66,8 @@ DEFAULT_JOB_TYPE=1
 SECOND_SHORTLIST_EMAIL = 2
 MANDATORY_FOSS = 1
 OPTIONAL_FOSS = 2
+
+
 # test functions to limit access to pages start
 def is_student(user):
     b = settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
@@ -222,7 +231,7 @@ def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet app
 def student_homepage(request):
     context={}
     # Top 5 jobs & company to display on student homepage
-    company_display = Company.objects.filter(rating=5).order_by('-date_updated')[:6]
+    company_display = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE']).values('name','logo').order_by('date_updated')[:6]
     context['company_display']=company_display
     rec_student = Student.objects.get(user=request.user)
     applied_jobs = get_applied_joblist(rec_student.spk_usr_id)
@@ -230,7 +239,7 @@ def student_homepage(request):
     rec_jobs = get_recommended_jobs(rec_student)
     context['applied_jobs'] = applied_jobs if len(applied_jobs)<4 else applied_jobs[:4]
     context['awaiting_jobs'] = awaiting_jobs if len(awaiting_jobs)<2 else awaiting_jobs[:2]
-    l = awaiting_jobs if len(applied_jobs)<2 else awaiting_jobs[:2]
+    l = awaiting_jobs if len(awaiting_jobs)<2 else awaiting_jobs[:2]
     context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
     context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
     

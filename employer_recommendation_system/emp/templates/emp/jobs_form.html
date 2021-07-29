@@ -49,7 +49,7 @@
          <div class="col-md-6 mb-3">
             <div id="div_id_state_job" class="form-group">
               
-        <label for="id_state_job" >State <span class="text-muted">(Company Location)</span></label>
+        <label for="id_state_job" >State* <span class="text-muted">(Office Location)</span></label>
         <select class="form-control select-state requiredField" id="id_state_job"  name="state_job" required>
           <option disabled selected value> -- select state -- </option>
         {% for state in filter_form.state %} 
@@ -59,7 +59,7 @@
           </div></div>
           <div class="col-md-6 mb-3">
             <div id="div_id_city_job" class="form-group">
-            <label for="id_state_job" >City <span class="text-muted">(Company Location)</span></label>
+            <label for="id_state_job" >City* <span class="text-muted">(Office Location)</span></label>
         <select class="form-control select-city requiredField" id="id_city_job"  name="city_job" required>
           <option disabled selected value> -- select city -- </option>
         {% for city in filter_form.city %} 
