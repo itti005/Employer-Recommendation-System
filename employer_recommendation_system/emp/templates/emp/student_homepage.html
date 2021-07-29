@@ -37,6 +37,18 @@
     color: green!important;
     font-weight: bold;
   }
+  .c-href{
+    color: inherit;
+    transition: box-shadow .3s;
+  border-radius:10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  float: left;
+  }
+  .c-href:hover{
+    color: inherit;
+    box-shadow: 0 0 11px rgba(33,33,33,.2); 
+  }
 </style>
 {% endblock %}
 {% block content %}
@@ -61,8 +73,8 @@
 <div class="col-4 col-md-2">  
   <div class="border d-flex flex-column p-1" style="height: 100%;">
     {% if company.logo %}
-    <img class="d-block align-self-center m-2" src="{{ company.logo.url|default_if_none:'#' }}" alt="Card image cap" 
-    style=" height: 60px;display: inline;">{% endif %}<br>
+    <img class="d-block align-self-center m-2" src="{{ company.logo.url|default_if_none:'#' }}" 
+    style=" height: 60px;display: inline;" alt="{{company.name}} logo">{% endif %}<br>
     <span class="c-name align-self-center"><b>{{company.name}}</b></span>
     <!-- <span class="text-muted align-self-center">vacancies : 10</span> --> <!-- to do  -->
   </div>
@@ -73,7 +85,7 @@
 <section>
 
 <br>
-<div class="row rec-wrap">
+<div class="row rec-wrap mb-3">
   <div class="col-12 ">
     <div class="text-center py-2">
     <b class="title c-name">Recommended Jobs</b>
@@ -96,9 +108,15 @@
             </div>
           </div>
           <p class="card-text mb-5">{{job.description | slice:":255"}}...</p>
-          <a href="#" class="btn btn-info post-apply disabled" style="display: none;" id="applied_{{job.id}}"><i class="fas fa-check mr-3"></i>Applied</a>
-          <!-- <a class="btn btn-info pre-apply " href="{% url 'student_profile_confirm' pk=request.user.student.id job=job.id %}" id="apply_{{job.id}}">Apply</a> -->
-          <a class="btn btn-info pre-apply " href="{% url 'student_profile_details' request.user.student.spk_usr_id job.id %}" id="apply_{{job.id}}">Apply</a>
+          <div class="row">
+            <div class="col-6">
+            <a href="#" class="btn btn-info post-apply disabled" style="display: none;" id="applied_{{job.id}}"><i class="fas fa-check mr-3"></i>Applied</a>
+          <a class="btn btn-info pre-apply " href="{% url 'student_profile_details' request.user.student.spk_usr_id job.id %}" id="apply_{{job.id}}">Apply</a>    
+            </div>
+            <div class="col-6">
+              <a class="btn btn-outline-secondary " href="{% url 'job-list' %}?id={{job.id}}" id="apply_{{job.id}}">View Details</a>    
+            </div>
+          </div>
         </div>
         </div>
     </div>
@@ -110,59 +128,40 @@
 </div> 
 {% endif %}    
 </div>
-
+<div class="col-12"><a href="{% url 'student_jobs' %}">View all recommended jobs >> </a></div>
 </section>
 <section>
 
 <br>
-<div class="row">
-  <div class="col-12 col-md-4 py-3">
-    <div>
-      <ul class="list-group ">
-        <li class="list-group-item  list-group-item-success d-flex justify-content-between align-items-start">
-        <div class="ms-2 me-auto">
-          <div class="fw-bold">APPLIED JOBS</div>
-        </div>
-      </li>
 {% if applied_jobs %}
+<div class="row mb-3">
+  <div class="text-center w-100 fs-5 border-bottom mb-3 col-12">Applied Jobs</div>
   {% for item in applied_jobs %}
-  <li class="list-group-item d-flex justify-content-between align-items-start">
-    <div class="ms-2 me-auto">
-      <div class="fw-bold">{{item.job.title}}</div>
-      {{item.job.company.name}}
-    </div>
-    <span class="badge bg-{{item.status | format_status}} rounded-pill">
+  <div class="col-md-3">
+    <div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{item.job.title}}</h5>
+    <h6 class="card-subtitle mb-2 text-muted">{{item.job.company.name}}</h6>
+    <p class="card-text"></p>
+    <a href="#" class="card-link"><span class="badge bg-{{item.status | format_status}} rounded-pill">
       {{item.status | status_value }}
-    </span>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-start">
-    <div class="ms-2 me-auto">
-
-      <div class="fw-bold"><a>View All Applications</a></div>
-      
-    </div>
-    
-  </li>
-
-  {% endfor %}
-{% else %}
-<li class="list-group-item d-flex justify-content-between align-items-start">
-    <div class="ms-2 me-auto">
-      <div>You have not yet applied for any job! </div>
-      
-    </div>
-    
-  </li>
-
-{% endif %}
-</ul>
-</div>
-    
+    </span></a>
+    <a href="#" class="card-link"></a>
   </div>
+</div>
+  </div>
+  {% endfor %}
+</div>
+<div class="col-12"><a href="{% url 'student_jobs' %}">View all applications >> </a></div>
+{% endif %}
 
+
+<div class="row">
+  <div class="text-center w-100 fs-5 border-bottom mb-3 col-12">Posted Jobs</div>
   {% if awaiting_jobs %}
     {% for job in awaiting_jobs %}
-    <div class="col-12 col-md-4 py-3">  
+    <div class="col-12 col-md-4 py-3"> 
+    <a href="{% url 'job-list' %}?id={{job.id}}" class="c-href">
       <div class="card" style="width: 100%;height: 100%;">
         <div class="card-body">
           <div class="d-flex justify-content-between">
@@ -181,6 +180,7 @@
         </div>
 
         </div>
+        </a> 
     </div>
     {% endfor %}
     
@@ -189,7 +189,7 @@
 <p>No New Jobs Posted Yet. Please Check Later</p>
 </div> 
 {% endif %}
-
+<div class="col-12"><a href="{% url 'job-list' %}">View all posted jobs >> </a></div>
 </div>  
 </section>
 {% endblock %}

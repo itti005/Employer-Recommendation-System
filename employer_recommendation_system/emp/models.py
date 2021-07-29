@@ -194,7 +194,7 @@ class Company(models.Model):
     
     name = models.CharField(max_length=200)
     emp_name = models.CharField(max_length=200,verbose_name="Company HR Representative Name") #Name of the company representative
-    emp_contact = models.CharField(validators=[phone_regex], max_length=17, null=True,blank=True,verbose_name="Phone Number")
+    emp_contact = models.CharField(validators=[phone_regex], max_length=17,verbose_name="Phone Number")
     state_c = models.IntegerField(null=True,verbose_name='State (Company Headquarters)',blank=True)
     city_c = models.IntegerField(null=True,verbose_name='City (Company Headquarters)',blank=True)    
     # state_c = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
@@ -262,7 +262,7 @@ class Job(models.Model):
     gender = models.CharField(max_length=10,choices=GENDER,default='a')
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
-    last_app_date = models.DateTimeField(null=True,blank=True,verbose_name="Last Application Date")
+    last_app_date = models.DateTimeField(verbose_name="Last Application Date")
     rating = models.IntegerField(null=True,blank=True)
     foss = models.CharField(max_length=200)
     # institute_type = models.CharField(max_length=200,null=True,blank=True)

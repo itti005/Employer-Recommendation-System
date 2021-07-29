@@ -45,7 +45,7 @@
             {{ form.skills | as_crispy_field }}
           </div>
           <div class="col-md-6 mb-3">
-                <label for="state">State</label>
+                <label for="state">State* <span class="text-muted">(Office Location)</span></label>
                 <select class="form-control select-state" id="select-state">
                 	<option value="{{job.state_job}}">{{job.state_job}}</option>
                   {% for s in state %} 
@@ -54,7 +54,7 @@
                 </select>
           </div>
           <div class="col-md-6 mb-3">
-                    <label for="city">City</label>
+                    <label for="city">City* <span class="text-muted">(Office Location)</span></label>
                     <select class="form-control select-city" id="select-city" disabled>
                     	<option value="{{job.city_job}}">{{ job.city_job }}</option>
                       {% for c in city %} 
@@ -241,23 +241,17 @@
   var insti_type = $('#insti-select').val() ? $('#insti-select').val().toString() : ''; 
   var states = $('#state-select').val() ? $('#state-select').val().toString() : ''; //filter states
   var cities = $('#city-select').val() ? $('#city-select').val().toString() : ''; //filter cities
-  alert(insti_type)
+  
   $('#id_foss').val(foss.toString());
   if (insti_type) {
-    alert(1)
       $('#id_institute_type').val(insti_type);
   }
-  alert(2)
   if (states) {$('#id_state').val(states);}
   if (cities) {$('#id_city').val(cities);}
-  alert(3)
-  
 
   state = $('#select-state').val();
   city = $('#select-city').val();
-  alert(state);
-  alert(city);
-  alert($('#select-city').val());
+  
   $('#id_state_job').val(parseInt(state));
   $('#id_city_job').val(parseInt(city));
   
