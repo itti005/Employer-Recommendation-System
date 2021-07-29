@@ -17,6 +17,9 @@
     color: green!important;
     font-weight: bold;
   }
+  .c-icon{
+    color: #0066A0;
+  }
 </style>
 {% endblock %}
 {% block content %}
@@ -55,32 +58,32 @@
 			<ul class="list-group">
         <li class="list-group-item list-group-item-info"><span>Student Details</span></li>
   <li class="list-group-item">
-  	<b><i class="bi bi-person-square"></i></b><span>{{student.user.get_full_name | title}}</span><br>
-  	<b><i class="bi bi-geo-alt-fill"></i><small>(Address)</small></b> <span>{{student.address |default_if_none:'Data Not Available'}}</span><br>
+  	<b><i class="bi bi-person-square c-icon"></i></b><span> {{student.user.get_full_name | title}}</span><br>
+  	<b><i class="bi bi-geo-alt-fill c-icon"></i><small>(Address)</small></b> <span>{{student.address |default_if_none:'Data Not Available'}}</span><br>
   	<!-- <b><i class="bi bi-bank2"></i><small>(Institute)</small></b> <span>{{student.spk_institute |default_if_none:'Data Not Available'}}</span><br> -->
     {% if request.user|has_group:"STUDENT" %}
-    <b><i class="bi bi-envelope"></i> <small>Email</small>: </b><span>{{student.user.email}}</span><br>
-    <b><i class="bi bi-envelope"></i> <small>Alternate Email</small>: </b><span>{{student.alternate_email}}</span><br>
-    <b><i class="bi bi-telephone"></i> <small>Contact</small>: </b><span>{{student.phone}}</span><br>
+    <b><i class="bi bi-envelope c-icon"></i> <small>Email</small>: </b><span>{{student.user.email}}</span><br>
+    <b><i class="bi bi-envelope c-icon"></i> <small>Alternate Email</small>: </b><span>{{student.alternate_email}}</span><br>
+    <b><i class="bi bi-telephone c-icon"></i> <small>Contact</small>: </b><span>{{student.phone}}</span><br>
     {% endif %}
     <hr>
     <b>Gender : </b><span>{{student.gender | title}}</span><br>
-    <b>Spoken User Id: </b><span>{{student.spk_usr_id | title}}</span><br>
+    <!-- <b>Spoken User Id: </b><span>{{student.spk_usr_id | title}}</span><br> -->
   </li>
   <li class="list-group-item list-group-item-info"><span>Current Education Details</span></li>
   <li class="list-group-item">
     {% for e in current_education %}
-    <span><i class="bi bi-bank2"></i> {{e.institute | get_institute_name}}</span><br>
-    <span><i class="bi bi-book"></i> {{e.degree}} | {{e.acad_discipline}}</span><br>
-    <span><i class="far fa-clipboard"></i> GPA : {{e.gpa | default_if_none:'-'}}</span><br>
-    <span><i class="bi bi-calendar"></i> {{e.start_year | default_if_none:'-'}} - {{e.end_year | default_if_none:'-'}}</span><br>
+    <span><i class="bi bi-bank2 c-icon"></i> {{e.institute | get_institute_name}}</span><br>
+    <span><i class="bi bi-book c-icon"></i> {{e.degree}} | {{e.acad_discipline}}</span><br>
+    <span><i class="far fa-clipboard c-icon"></i> GPA : {{e.gpa | default_if_none:'-'}}</span><br>
+    <span><i class="bi bi-calendar c-icon"></i> {{e.start_year | default_if_none:'-'}} - {{e.end_year | default_if_none:'-'}}</span><br>
     {% endfor %}
     <hr>
     {% if past_education %}
-    <span><i class="bi bi-bank2"></i> {{past_education.institute | get_institute_name}}</span><br>
-    <span><i class="bi bi-book"></i> {{past_education.degree}} | {{past_education.acad_discipline}}</span><br>
-    <span><i class="far fa-clipboard"></i> GPA : {{past_education.gpa | default_if_none:'-'}}</span><br>
-    <span><i class="bi bi-calendar"></i> {{past_education.start_year | default_if_none:'-'}} - {{past_education.end_year | default_if_none:'-'}}</span><br>
+    <span><i class="bi bi-bank2 c-icon"></i> {{past_education.institute | get_institute_name}}</span><br>
+    <span><i class="bi bi-book c-icon"></i> {{past_education.degree}} | {{past_education.acad_discipline}}</span><br>
+    <span><i class="far fa-clipboard c-icon"></i> GPA : {{past_education.gpa | default_if_none:'-'}}</span><br>
+    <span><i class="bi bi-calendar c-icon"></i> {{past_education.start_year | default_if_none:'-'}} - {{past_education.end_year | default_if_none:'-'}}</span><br>
     {% endif %}
   </li>
   <li class="list-group-item list-group-item-info"><span>Spoken Tutorial Test Scores</span>
@@ -116,8 +119,8 @@
   </li>
   <li class="list-group-item list-group-item-info"><span>Links</span></li>
   <li class="list-group-item">
-  	<b><i class="bi bi-github"></i><span class="me-1">Github</span></b><span>{{student.github}}</span><br>
-  	<b><i class="bi bi-linkedin"></i><span class="me-1">LinkedIn</span></b><span>{{student.linkedin}}</span>
+  	<b><i class="bi bi-github c-icon"></i><span class="me-1"> Github </span></b><span>{{student.github}}</span><br>
+  	<b><i class="bi bi-linkedin c-icon"></i><span class="me-1"> LinkedIn </span></b><span>{{student.linkedin}}</span>
   </li>
   <li class="list-group-item list-group-item-info"><span>Certifications</span></li>
   <li class="list-group-item">

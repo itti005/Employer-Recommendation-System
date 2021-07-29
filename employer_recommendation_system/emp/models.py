@@ -16,6 +16,7 @@ START_YEAR_CHOICES = []
 END_YEAR_CHOICES = []
 DEFAULT_NUM_EMP = '100_500'
 NUM_OF_EMPS = [('less_than_50','< 50'),('50_100','50 - 100'),('100_500','100 - 500'),('greater_than_500','> 500'),]
+STATUS = {'ACTIVE' :1,'INACTIVE' :0}
 
 phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Invalid.")
 
@@ -28,7 +29,12 @@ def profile_picture(instance, filename):
     ext = ext.lower()
     return '/'.join(['user', str(instance.user.id), str(instance.user.id) + ext])
 
+class CustomDegreeManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('name')
+
 class Degree(models.Model): # eg. BTech-Mechanical, MCA, BSc 
+    objects = CustomDegreeManager()
     name = models.CharField(max_length=200,verbose_name='Degree',unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
@@ -73,8 +79,12 @@ class Domain(models.Model):
     #     print("******************************* get queryset")
     #     return super().get_queryset().order_by('name')
 
+class CustomJobTypeManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('jobtype')
 
 class JobType(models.Model):
+    objects = CustomJobTypeManager()
     jobtype = models.CharField(max_length=200,unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
@@ -108,7 +118,12 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
+class CustomDisciplineManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('name')
+
 class Discipline(models.Model):
+    objects = CustomDisciplineManager()
     name = models.CharField(max_length=200,unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
@@ -233,7 +248,6 @@ class Foss(models.Model):
 
     def __str__(self):
         return self.foss
-
 
 class Job(models.Model):
     title = models.CharField(max_length=250,verbose_name="Title of the job page") #filter

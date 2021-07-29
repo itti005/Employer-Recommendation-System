@@ -83,6 +83,23 @@
       <th>Last Application Date</th>
       <td>{{object.last_app_date}}</td>
     </tr>
+    <tr>
+      <th >Other</th>
+      <td>
+        <table class="table table-bordered ">
+          <tr>
+            <th>Rating</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>{{object.rating | get_rating}}</td>
+            <td>{{object.status | get_status}}</td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+
     <tr class="table-info">
       <td colspan="2"><center><b>Student Eligibility Criteria</b></center></td>
     </tr>

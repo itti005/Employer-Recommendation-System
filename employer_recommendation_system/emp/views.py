@@ -45,7 +45,8 @@ import itertools
 from django.db.models import OuterRef, Subquery
 from django.db.models.functions import Concat
 from django.db.models import Value
-
+from .models import STATUS
+# STATUS = {'ACTIVE' :1,'INACTIVE' :0}
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
@@ -55,6 +56,7 @@ RATING = {
     'DISPLAY_ON_HOMEPAGE':1,
     'VISIBLE_TO_ALL_USERS':2
 }
+
 JOB_RATING=[(RATING['VISIBLE_TO_ALL_USERS'],'Visible to all users'),(RATING['ONLY_VISIBLE_TO_ADMIN_HR'],'Only visible to Admin/HR'),(RATING['DISPLAY_ON_HOMEPAGE'],'Display on homepage')]
 JOB_STATUS=[(1,'Active'),(0,'Inactive')]
 COMPANY_RATING = [(RATING['VISIBLE_TO_ALL_USERS'],'Visible to all users'),(RATING['ONLY_VISIBLE_TO_ADMIN_HR'],'Only visible to Admin/HR'),(RATING['DISPLAY_ON_HOMEPAGE'],'Display on homepage')]
@@ -223,7 +225,7 @@ def get_applied_joblist(spk_user_id):
     return JobShortlist.objects.filter(spk_user=spk_user_id,status__in=[APPLIED,APPLIED_SHORTLISTED])
 
 def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet applied
-    all_jobs = Job.objects.all().filter(rating=RATING['DISPLAY_ON_HOMEPAGE'])
+    all_jobs = Job.objects.all().filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=STATUS['ACTIVE'])
     applied_jobs = [x.job for x in get_applied_joblist(spk_user_id)]
     return list(set(all_jobs)-set(applied_jobs))
 
@@ -231,7 +233,7 @@ def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet app
 def student_homepage(request):
     context={}
     # Top 5 jobs & company to display on student homepage
-    company_display = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE']).values('name','logo').order_by('date_updated')[:6]
+    company_display = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=STATUS['ACTIVE']).values('name','logo').order_by('date_updated')[:6]
     context['company_display']=company_display
     rec_student = Student.objects.get(user=request.user)
     applied_jobs = get_applied_joblist(rec_student.spk_usr_id)
@@ -308,7 +310,6 @@ class CompanyCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.added_by = self.request.user
-
         self.object.save()
         messages.success(self.request, 'Company information added successfully.')
         return super(ModelFormMixin, self).form_valid(form)
@@ -482,7 +483,10 @@ class JobListView(FormMixin,ListView):
         job_id = self.request.GET.get('id', '')
         if job_id:
             queryset = Job.objects.filter(id=job_id)
-            return queryset
+            if is_manager(self.request.user):
+                return queryset
+            else:
+                return queryset.filter(status=STATUS['ACTIVE'])
         queries =[place,keyword,company]
         if keyword or company or place:
             q_kw=q_place=q_com=Job.objects.all()
@@ -501,11 +505,20 @@ class JobListView(FormMixin,ListView):
             if company:
                 q_com = Job.objects.filter(company__name=company)
             queryset = (q_kw & q_place & q_com)
-        return queryset
+        print('********* here ******')
+        if is_manager(self.request.user):
+            return queryset
+        else:
+            return queryset.filter(status=STATUS['ACTIVE'])
 
 class JobListingView(UserPassesTestMixin,ListView):
     template_name = 'emp/job_list_tabular.html'
     model = Job
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset
+
     def test_func(self):
         return is_manager(self.request.user)
 
@@ -965,7 +978,7 @@ class DegreeCreateView(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        degrees = Degree.objects.values('id','name')
+        degrees = Degree.objects.values('id','name').order_by('name')
         context['degrees']=degrees
         return context
 
@@ -999,7 +1012,8 @@ class DisciplineCreateView(PermissionRequiredMixin,SuccessMessageMixin,CreateVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        disciplines = Discipline.objects.values('id','name')
+        disciplines = Discipline.objects.values('id','name').order_by('name')
+        print(f"disciplines ----------------------- {disciplines}")
         context['disciplines']=disciplines
         return context
 

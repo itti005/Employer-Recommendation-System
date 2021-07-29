@@ -46,14 +46,14 @@
 	<table class="table table-bordered table-striped" id="tb-job-type">
   <thead>
     <tr>
-      <th scope="col">Id</th>
+      <th scope="col">#</th>
       <th scope="col">Job Type</th>
     </tr>
   </thead>
   <tbody>
   	{% for item in job_types %}
     <tr>
-      <td>{{item.id}}</td>
+      <td>{{forloop.counter}}</td>
       <td><a href="{% url 'update_job_type' slug=item.id %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to edit">{{item.jobtype}}</a></td>
     </tr>
    
