@@ -223,7 +223,7 @@ def get_applied_joblist(spk_user_id):
     return JobShortlist.objects.filter(spk_user=spk_user_id,status__in=[APPLIED,APPLIED_SHORTLISTED])
 
 def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet applied
-    all_jobs = Job.objects.all()
+    all_jobs = Job.objects.all().filter(rating=RATING['DISPLAY_ON_HOMEPAGE'])
     applied_jobs = [x.job for x in get_applied_joblist(spk_user_id)]
     return list(set(all_jobs)-set(applied_jobs))
 
@@ -238,8 +238,8 @@ def student_homepage(request):
     awaiting_jobs = get_awaiting_jobs(rec_student.spk_usr_id)
     rec_jobs = get_recommended_jobs(rec_student)
     context['applied_jobs'] = applied_jobs if len(applied_jobs)<4 else applied_jobs[:4]
-    context['awaiting_jobs'] = awaiting_jobs if len(awaiting_jobs)<2 else awaiting_jobs[:2]
-    l = awaiting_jobs if len(awaiting_jobs)<2 else awaiting_jobs[:2]
+    context['awaiting_jobs'] = awaiting_jobs if len(awaiting_jobs)<6 else awaiting_jobs[:6]
+    l = awaiting_jobs if len(awaiting_jobs)<6 else awaiting_jobs[:6]
     context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
     context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
     
