@@ -225,7 +225,7 @@ def get_rating(value):
 @register.filter()
 def get_status(value):
     if value:
-        return 'Active (The company will appear in search results & job can be added.)'
-    return 'Inactive (The company will NOT appear in search results & job cannot be added for this company.)'
+        return 'Active'
+    return 'Inactive'
 
     

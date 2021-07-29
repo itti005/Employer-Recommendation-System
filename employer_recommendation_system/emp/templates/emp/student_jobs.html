@@ -22,6 +22,7 @@
 {% endfor %}
 {% include "emp/page_header.html" with title="Recommended Jobs Status" icon="<i class='bi bi-briefcase-fill'></i>" %}
 <div class="row">
+  {% if applied_jobs %}
   <div class="col">
     <table class="table" id="tb-applied-jobs">
   <thead>
@@ -61,9 +62,13 @@
     {% endfor %}
   </tbody>
 </table> 
-
-
   </div>
+  {% else %}
+  <div class="col">
+    <p class="text-center">No recommended job at this moment.</p>
+  </div>
+  {% endif %}
+  
   
 </div>
 {% endblock %}
