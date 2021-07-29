@@ -965,7 +965,7 @@ class DegreeCreateView(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        degrees = Degree.objects.values('id','name')
+        degrees = Degree.objects.values('id','name').order_by('name')
         context['degrees']=degrees
         return context
 
@@ -999,7 +999,8 @@ class DisciplineCreateView(PermissionRequiredMixin,SuccessMessageMixin,CreateVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        disciplines = Discipline.objects.values('id','name')
+        disciplines = Discipline.objects.values('id','name').order_by('name')
+        print(f"disciplines ----------------------- {disciplines}")
         context['disciplines']=disciplines
         return context
 

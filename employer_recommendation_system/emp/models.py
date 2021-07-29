@@ -28,7 +28,12 @@ def profile_picture(instance, filename):
     ext = ext.lower()
     return '/'.join(['user', str(instance.user.id), str(instance.user.id) + ext])
 
+class CustomDegreeManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('name')
+
 class Degree(models.Model): # eg. BTech-Mechanical, MCA, BSc 
+    objects = CustomDegreeManager()
     name = models.CharField(max_length=200,verbose_name='Degree',unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
@@ -73,8 +78,12 @@ class Domain(models.Model):
     #     print("******************************* get queryset")
     #     return super().get_queryset().order_by('name')
 
+class CustomJobTypeManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('jobtype')
 
 class JobType(models.Model):
+    objects = CustomJobTypeManager()
     jobtype = models.CharField(max_length=200,unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
@@ -108,7 +117,12 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
+class CustomDisciplineManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('name')
+
 class Discipline(models.Model):
+    objects = CustomDisciplineManager()
     name = models.CharField(max_length=200,unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )

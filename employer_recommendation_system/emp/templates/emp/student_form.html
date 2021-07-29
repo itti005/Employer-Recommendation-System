@@ -228,26 +228,22 @@
         <div class="col-sm-6 mb-3">
           <label for="state">Degree<sup>*</sup></label>
           <select name="degree" class="form-select" id="id_degree" required>
-            {% if current_edu %}
-              <option value="{{current_edu.degree.id}}" selected>{{current_edu.degree.name}}</option>
-            {% else %}
+            {% if not current_edu %}
             <option value="" selected="">---------</option>
             {% endif %}
             {% for degree in degrees %} 
-              <option value="{{degree.id}}">{{ degree.name }}</option>
+              <option value="{{degree.id}}" {% if degree.name == current_edu.degree.name %} selected{% endif %}>{{ degree.name }}</option>
               {% endfor %}
           </select>
       </div>
       <div class="col-sm-6 mb-3">
         <label for="state">Academic Discipline<sup>*</sup></label>
           <select name="acad_discipline" class="form-select" id="id_acad_discipline" required>
-            {% if current_edu %}
-              <option value="{{current_edu.acad_discipline.id}}" selected>{{current_edu.acad_discipline.name}}</option>
-            {% else %}
+            {% if not current_edu %}
             <option value="" selected="">---------</option>
             {% endif %}
             {% for d in acad_disciplines %} 
-              <option value="{{d.id}}">{{ d.name }}</option>
+              <option value="{{d.id}}" {% if d.name == current_edu.acad_discipline.name %} selected{% endif %}>{{ d.name }}</option>
               {% endfor %}
           </select>
       </div>
@@ -255,9 +251,7 @@
           <label for="state">Institute<sup>*</sup></label><small class="fw-lighter"> (Loading colleges may take some time. Please wait.)</small>
           <!-- <select class="form-control" id="institute-select"> -->
           <select class="form-select" name="institute" required>
-            {% if current_edu %}
-              <option value="{{current_edu.institute}}" selected>{{current_edu.institute | get_institute_name }}</option>
-            {% else %}
+            {% if not current_edu %}
             <option value="" selected="">---------</option>
             {% endif %}
             {% for i in institutes %} 
@@ -300,26 +294,22 @@
         <div class="col-sm-6 mb-3">
         <label for="state">Degree</label>
           <select class="form-select" id="institute-select" name="p_degree">
-            {% if past_edu.degree %}
-            <option value="{{past_edu.degree.id}}" selected="">{{past_edu.degree}}</option>
-            {% else %}
-            <option value="" selected="">---------</option>
+            {% if not past_edu.degree %}
+            <option value="" >---------</option>
             {% endif %}
             {% for degree in degrees %} 
-              <option value="{{degree.id}}">{{ degree.name }}</option>
+              <option value="{{degree.id}}" {% if degree.name == past_edu.degree.name %} selected{% endif %}>{{ degree.name }}</option>
               {% endfor %}
           </select>
       </div>
       <div class="col-sm-6 mb-3">
         <label for="state">Academic Discipline</label>
           <select class="form-select" id="institute-select" name="p_discipline">
-            {% if past_edu.acad_discipline %}
-            <option value="{{past_edu.acad_discipline.id}}" selected="">{{past_edu.acad_discipline}}</option>
-            {% else %}
+            {% if not past_edu.acad_discipline %}
             <option value="" selected="">---------</option>
             {% endif %}
             {% for d in acad_disciplines %} 
-              <option value="{{d.id}}">{{ d.name }}</option>
+              <option value="{{d.id}}" {% if d.name == past_edu.acad_discipline.name %} selected{% endif %}>{{ d.name }}</option>
               {% endfor %}
           </select>
       </div>
