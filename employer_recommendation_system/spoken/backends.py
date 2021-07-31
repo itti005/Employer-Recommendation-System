@@ -34,12 +34,8 @@ class SpokenStudentBackend(ModelBackend):
                                 st_profile = Profile.objects.filter(user=sp_user).first()
                                 spk_student_id = SpokenStudent.objects.get(user=sp_user).id
                                 Student.objects.create(user=user, 
-                                    state=st_profile.state.name if st_profile.state else "", 
-                                    phone=st_profile.phone, address=st_profile.address, 
                                     spk_usr_id=sp_user.id, spk_student_id=spk_student_id,gender=student.gender, 
-                                    location=st_profile.location.name if st_profile.location else "", 
-                                    district=st_profile.district.name if st_profile.district else "", 
-                                    city=st_profile.city.name if st_profile.city else "")
+                                    )
                             else:
                                 return None
                         except SpokenStudent.DoesNotExist:

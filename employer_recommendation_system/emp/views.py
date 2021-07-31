@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 from .models import *
 from emp.models import Student as RecStudent
-from spoken.models import TestAttendance, FossMdlCourses,FossCategory,Profile, SpokenState, SpokenCity
+from spoken.models import TestAttendance, FossMdlCourses,FossCategory,Profile, SpokenState, SpokenCity, InstituteType
 from moodle.models import MdlQuizGrades,MdlUser
 from django.views.generic.edit import UpdateView
 from spoken.models import SpokenStudent 
@@ -140,7 +140,7 @@ def get_job_app_status(job):
 
 def get_recommended_jobs(student):
     #get jobs having status 0 & last app submission date greater than equal to today
-    jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=1)
+    jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=STATUS['ACTIVE'])
     applied_jobs = [x.job for x in get_applied_joblist(student.spk_usr_id)]
     jobs = [x for x in jobs if x not in applied_jobs ]
     scores = fetch_student_scores(student)
@@ -167,7 +167,6 @@ def get_recommended_jobs(student):
         else:
             insti_type = ''
         valid_fosses = [   d['foss'] for d in scores if str(d['foss']) in job.foss and int(d['grade'])>=job.grade]
-        
         if valid_fosses:
             mdl_quiz_ids = [x.mdlquiz_id for x in FossMdlCourses.objects.filter(foss_id__in=valid_fosses)] #Student passes 1st foss & grade criteria
             mdluser_id = TestAttendance.objects.filter(student=spk_student).first().mdluser_id
@@ -177,7 +176,7 @@ def get_recommended_jobs(student):
                                                 test__academic__state__in=states if states!='' else SpokenState.objects.all(),
                                                 test__academic__city__in=cities if cities!='' else SpokenCity.objects.all(),
                                                 status__gte=3,
-                                                test__academic__institution_type__in=insti_type,
+                                                test__academic__institution_type__in=insti_type if insti_type!='' else InstituteType.objects.all(),
                                                 test__academic__status__in=[job.activation_status] if job.activation_status else [1,3],
                                                 )
             if job.from_date and job.to_date:
@@ -186,7 +185,6 @@ def get_recommended_jobs(student):
                 test_attendance = test_attendance.filter(test__tdate__gte=job.from_date)
             if test_attendance:
                 rec_jobs.append(job)
-            
         else:
             pass
         count+=1
@@ -418,7 +416,6 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
-        print(f"shift -------- {form.cleaned_data.get('shift_time')}")
         self.object = form.save(commit=False)
         # form.save()
         self.object.save()
@@ -505,7 +502,6 @@ class JobListView(FormMixin,ListView):
             if company:
                 q_com = Job.objects.filter(company__name=company)
             queryset = (q_kw & q_place & q_com)
-        print('********* here ******')
         if is_manager(self.request.user):
             return queryset
         else:
@@ -552,7 +548,6 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
-        print(f"shift -------- {form.cleaned_data.get('shift_time')}")
         form.save()
         # self.object = form.save(commit=False)
         # self.object.save()
@@ -1160,15 +1155,12 @@ def student_filter(request):
         multiple_grade = request.POST.getlist('multiple_grade') #grades from any one of query
 
         num = request.POST.get('num') if request.POST.get('num') else 0
-        print(f"1 num ----------------- {num}")
         
         #list of list of any of the fosses criteria
         # multiple_fosses = [ request.POST.getlist('fosses_'+str(item)) for item in range(int(num)+1) ]
         multiple_fosses = []
         for item in range(int(num)+1):
             multiple_fosses.append(request.POST.getlist('fosses_'+str(item)))
-        print(f"2 multiple_fosses ------------------ {multiple_fosses}")
-        print(f"3 foss, grades,criteria_type --------- {foss}, {grades}, {criteria_type}")
         grade_filter = zip(foss, grades,criteria_type)
         mandatory = {} #mandatorry fosses
         optional = [] #optional fosses
@@ -1177,8 +1169,6 @@ def student_filter(request):
                 mandatory[int(foss)]=grade
             else:
                 optional[foss]=grade
-        print(f"4 mandatory -------------- {mandatory}")
-        print(f"5 optional -------------- {optional}")
         #get queryset 
         start_time = time.time()
         mdlusers = MdlUser.objects.using('moodle').all()
@@ -1188,8 +1178,6 @@ def student_filter(request):
         # 'mdlquiz_id' : for filtering students based on quizzes
         foss_mdl_courses = FossMdlCourses.objects.filter(foss_id__in=mandatory).values_list('foss','mdlquiz_id')
         mdl_quizzes = list(map(lambda x: x[1], foss_mdl_courses))
-        print(f"6 foss_mdl_courses -------------- {foss_mdl_courses}")
-        print(f"7 mdl_quizzes -------------- {mdl_quizzes}")
         q = []
 
         # q1= mdlusers.filter(Q(mdlquizgrades__quiz=9) & Q(mdlquizgrades__grade__gt=90)).values('mdlquizgrades__quiz')
@@ -1199,7 +1187,6 @@ def student_filter(request):
         mdl_users = []
         q = []
         for item in foss_mdl_courses:
-            print(f"item ------------- {item}")
             if mdl_users:
                 q = MdlUser.objects.filter(Q(mdlquizgrades__quiz=item[1]) & Q(mdlquizgrades__grade__gt=mandatory[item[0]]),id__in=mdl_users).values_list('id')
             else:
@@ -1208,16 +1195,10 @@ def student_filter(request):
             # q = Q(mdlquizgrades__quiz=item[1]) & Q(mdlquizgrades__grade__gt=mandatory[item[0]])
             # mdlusers = mdlusers.filter(q)
         mdlusers = q.values('id')
-        print(mdlusers.query)
-        print("************************************************************")
-        print(f"mdlusers ------------ {len(mdlusers)}")
-        print("************************************************************")
         
         # users_id = users.values_list('id').annotate(key=F('mdlquizgrades__userid')+'_'+F('mdlquizgrades__quiz')).annotate(grade=F('mdlquizgrades__grade'))
         # users_id = users.values('id')
         users_id = mdlusers.annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
-        
-        print(f"8 users_id -------------- {users_id}")
         unzipped = list(zip(*users_id))
         d_data = MdlUser.objects.filter(id__in=list(unzipped[0]),mdlquizgrades__quiz__in=mdl_quizzes).annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
         d_unzipped = list(zip(*d_data))
@@ -1226,23 +1207,18 @@ def student_filter(request):
         d1 = {}
         for elem in enumerate(d_key):
             d1[d_key[elem[0]]] = d_values[elem[0]]
-        print(f"d1 ---------- {d1}")
         key = unzipped[1] #mdluserid_quizid
         values = unzipped[2] #grade
-        print(f"users_id ---------- {users_id}")
         d = {}
         for elem in enumerate(key):
             d[key[elem[0]]] = values[elem[0]]
-        print(f"9 d--------- {d} ")
             # print(key[elem[0]],values[elem[0]])
         # users_id = users.values_list('id')
         context['users_id'] = users_id
         # mdl_user_lst = list(itertools.chain(*users_id))
         mdl_user_lst = unzipped[0]
-        print(f"10 mdl_user_lst--------- {mdl_user_lst} ")
         context['mdl_user_lst']=mdl_user_lst
         user_subquery = SpokenUser.objects.filter(spokenstudent=OuterRef('student_id')).values('first_name')
-        print(f"11 -----------------")
         ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst).filter(mdlquiz_id__in=mdl_quizzes).values('student_id','mdlquiz_id','mdluser_id')
         ta = ta.annotate(student_name=Subquery(user_subquery))
         
@@ -1253,12 +1229,8 @@ def student_filter(request):
         foss_subquery = FossCategory.objects.filter(id=OuterRef('foss_id')).values('foss')[:1]
         # grade_subquery = MdlQuizGrades.objects.using('moodle').filter(quiz=OuterRef('mdlquiz_id'),userid=OuterRef('mdluser_id')).values('timemodified')[:1]
         grade_subquery = MdlQuizGrades.objects.using('moodle').filter(userid=OuterRef('mdluser_id')).values('grade')[:1]
-        print(f"12 ta ----------------- {ta}")
         ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade=d1.get(Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField()),Value('0'))).values('student_name','foss_name','grade')
-        print(f"13 -----------------")
         students = list(map(lambda x: x['student_name'], ta))
-        print(f"14 -----------------")
-        print(f"15 ta ----------------- {ta}")
 
         mdl_user_data = mdlusers.values_list('id','firstname')
         context['mdl_user_data']=mdl_user_data
