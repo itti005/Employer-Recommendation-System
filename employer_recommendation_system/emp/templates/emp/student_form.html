@@ -159,6 +159,7 @@
           {{ form.alternate_email | as_crispy_field }}
       </div>
       <div class="col-md-8 mb-3">
+        <label>Address</label>
         <div class="input-group">
           <div class="input-group-text"><i class="bi bi-house"></i></div>
           <input type="text" class="form-control" value="{{student.address | default_if_none:'' }}" name="address">
@@ -169,17 +170,19 @@
     	</div>
       <div class="col-sm-8">
         <hr>
-        <p>Project Work & Experience (Maximum 5 projects can be added)</p>
-        <span class="btn btn-outline-success mb-2" id="btn-add-project"><span><i class="bi bi-plus-circle"></i> Add </span>    </span>
+        <div class="alert alert-info" role="alert">
+        <b>Project Work & Experience (Maximum 5 projects can be added)</b>
+        </div>
+        <span class="btn btn-info mb-2" id="btn-add-project"><span><i class="bi bi-plus-circle"></i> Add Project</span>    </span>
         <div class="all_projects">
           <!-- {{form.projects}} -->
           {% for project in projects %}
             <div class="wrapper mb-3">
               <span>
                 <div class="remove mb-1"><i class="bi bi-dash-circle"></i> Remove <b>Project # {{ forloop.counter }}</b></div>
-                <input class="textinput textInput form-control mb-3 input-url" placeholder="Add Project URL" name="pr_url" type="url"value="{{project.url}}">
+                <input class="textinput textInput form-control input-url border-info" placeholder="Add Project URL" name="pr_url" type="text" value="{{project.url}}">
               </span>
-              <div>
+              <div class="mt-1">
                 <textarea class="textarea form-control mb-3 text-desc" placeholder="Add Project Description (Max 300 characters allowed)" name="pr_desc" maxlength="300" cols="80" rows="10" >{{project.desc}}</textarea>
               </div>
             </div>
@@ -208,14 +211,14 @@
       	{{ form.cover_letter | as_crispy_field }}
     	</div>
       <div class="col-sm-2 mb-3">
-        {% if form.cover_letter %} <a href="{% url 'document_view' pk=request.user.id %}?type=cover_letter" target="_blank">View Cover Letter</a> {% endif %}
+        {% if form.cover_letter %} <a class="btn btn-warning" href="{% url 'document_view' pk=request.user.id %}?type=cover_letter" target="_blank">View Cover Letter</a> {% endif %}
       </div>
       <div class="col-sm-6 mb-3">
         <span>Upload only .pdf file</span>
         {{ form.resume | as_crispy_field }}
       </div>
       <div class="col-sm-2 mb-3">
-        {% if form.resume %} <a href="{% url 'document_view' pk=request.user.id %}?type=resume" target="_blank">View Resume</a> {% endif %}
+        {% if form.resume %} <a class="btn btn-warning" href="{% url 'document_view' pk=request.user.id %}?type=resume" target="_blank">View Resume</a> {% endif %}
       </div>
     	<!-- Add Education 1 -->
     	<div class="col-sm-4 mb-3"></div>
@@ -294,6 +297,7 @@
         <div class="col-sm-6 mb-3">
         <label for="state">Degree</label>
           <select class="form-select" id="institute-select" name="p_degree">
+
             {% if not past_edu.degree %}
             <option value="" >---------</option>
             {% endif %}
@@ -445,7 +449,8 @@ $(document).ready(function() {
     $( "#update_profile" ).click(function() {
       // email validation
       e = $('#id_alternate_email').val();
-      if (!validateEmail(e)) {
+      if (e) {
+        if (!validateEmail(e)) {
         elem = document.getElementById('div_id_alternate_email');
         console.log(elem)
         var node = document.createElement("p");
@@ -459,6 +464,7 @@ $(document).ready(function() {
         scrollTop: $("#div_id_alternate_email").offset().top - 100
     }, 100);
 
+      }
       }
 
       insti = $('#institute-select').val();
@@ -566,7 +572,7 @@ var options = '';
   e_url.innerHTML=url_val;
 
   e_url.setAttribute("name","pr_url");
-  e_url.setAttribute("type","url");
+  e_url.setAttribute("type","text");
   d_url.appendChild(e_url);
   d_w = document.createElement("div");
   d_w.setAttribute("id", "w_"+p_num);

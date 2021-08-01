@@ -168,7 +168,7 @@ class Project(models.Model):
 
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
-    phone = models.CharField(validators=[phone_regex], max_length=17, null=True,blank=True)
+    phone = models.CharField(validators=[phone_regex], max_length=17)
     address = models.CharField(max_length=400, null=True,blank=True,verbose_name='Home Address')  #spk
     #spk_institute = models.CharField(max_length=200) #spk
     education = models.ManyToManyField(Education, null=True)
@@ -206,7 +206,6 @@ class Student(models.Model):
         return reverse('student_profile',kwargs={'pk':self.id}) 
 
 class Company(models.Model):
-    
     name = models.CharField(max_length=200)
     emp_name = models.CharField(max_length=200,verbose_name="Company HR Representative Name") #Name of the company representative
     emp_contact = models.CharField(validators=[phone_regex], max_length=17,verbose_name="Phone Number")
@@ -226,7 +225,7 @@ class Company(models.Model):
     status = models.BooleanField(default=True)
     added_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
-    rating = models.IntegerField(null=True,blank=True)
+    rating = models.IntegerField(null=True,blank=True,verbose_name="Visibility")
 
     def __str__(self):
         return self.name
@@ -277,7 +276,7 @@ class Job(models.Model):
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
     last_app_date = models.DateTimeField(verbose_name="Last Application Date")
-    rating = models.IntegerField(null=True,blank=True)
+    rating = models.IntegerField(null=True,blank=True,verbose_name="Visibility")
     foss = models.CharField(max_length=200)
     # institute_type = models.CharField(max_length=200,null=True,blank=True)
     institute_type = models.CharField(max_length=200,blank=True)

@@ -13,7 +13,7 @@ class StudentGradeFilterForm(forms.Form):
     state = forms.ModelMultipleChoiceField(queryset=SpokenState.objects.using('spk').all(), required=False)
     city = forms.ModelMultipleChoiceField(queryset=SpokenCity.objects.using('spk').all().order_by('name'), required=False)
     grade = forms.IntegerField(min_value=0, max_value=100)
-    institution_type = forms.ModelMultipleChoiceField(queryset=InstituteType.objects.using('spk').all(), required=False)
+    institution_type = forms.ModelMultipleChoiceField(queryset=InstituteType.objects.using('spk').all().order_by('name'), required=False)
     activation_status = forms.ChoiceField(choices = ACTIVATION_STATUS, required=False)
     from_date = forms.DateField(widget=DateInput(), required=False)
     to_date = forms.DateField(widget=DateInput(), required=False)
@@ -38,6 +38,7 @@ class EducationForm(ModelForm):
         super(EducationForm, self).__init__(*args, **kwargs)
         self.fields['degree'].queryset = Degree.objects.order_by('name')
         self.fields['acad_discipline'].queryset = Discipline.objects.order_by('name')
+        self.fields['institute'].queryset = AcademicCenter.objects.order_by('institution_name')[:10]
 
 
 class PrevEducationForm(EducationForm):
