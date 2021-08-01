@@ -22,7 +22,7 @@
 {% endfor %}
 {% include "emp/page_header.html" with title="Recommended Jobs Status" icon="<i class='bi bi-briefcase-fill'></i>" %}
 <div class="row">
-  {% if applied_jobs %}
+  {% if applied_jobs or rec_jobs %}
   <div class="col">
     <table class="table" id="tb-applied-jobs">
   <thead>

@@ -42,14 +42,14 @@
         </form> 
       </div>
       <div class="alert alert-warning" role="alert">
-        <p>The following profile will be submitted to recruiter. <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link" >Click here to edit your profile.</a></p>
+        <p>The following profile will be submitted to recruiter. <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link text-decoration-underline" >Click here to edit your profile.</a></p>
         <hr>
         <span><button class="btn btn-success" type="submit" form="form-job-app" type="submit" id="confirm_apply">Confirm Profile & Apply</button></span>
       </div>
     </div>
     {% else %}
     <div class="alert alert-danger" role="alert">
-      <span>Please <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link text-decoration-underline" ><i class="bi bi-pencil-square"></i> add education details in your profile</a> to apply for jobs! </span>
+      <span>Please <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link text-decoration-underline" ><i class="bi bi-pencil-square"></i> add education & contact details in your profile</a> to apply for jobs! </span>
     </div>
     {% endif %}
   {% endif %}
@@ -70,7 +70,7 @@
     <b>Gender : </b><span>{{student.gender | title}}</span><br>
     <!-- <b>Spoken User Id: </b><span>{{student.spk_usr_id | title}}</span><br> -->
   </li>
-  <li class="list-group-item list-group-item-info"><span>Current Education Details</span></li>
+  <li class="list-group-item list-group-item-info"><span>Education Details</span></li>
   <li class="list-group-item">
     {% for e in current_education %}
     <span><i class="bi bi-bank2 c-icon"></i> {{e.institute | get_institute_name}}</span><br>
@@ -113,26 +113,29 @@
   <li class="list-group-item list-group-item-info"><span>Profile</span></li>
   <li class="list-group-item">
   	<b>About</b>
-  	<p>{{student.about}}</p>
-  	<b>Experience</b>
-  	<p>{{student.experience}}</p>
+  	<p>{{student.about|default:'-'}}</p>
   </li>
   <li class="list-group-item list-group-item-info"><span>Links</span></li>
   <li class="list-group-item">
-  	<b><i class="bi bi-github c-icon"></i><span class="me-1"> Github </span></b><span>{{student.github}}</span><br>
-  	<b><i class="bi bi-linkedin c-icon"></i><span class="me-1"> LinkedIn </span></b><span>{{student.linkedin}}</span>
+  	<b><i class="bi bi-github c-icon"></i><span class="me-1"> Github </span></b><span>{{student.github|default:'-'}}</span><br>
+  	<b><i class="bi bi-linkedin c-icon"></i><span class="me-1"> LinkedIn </span></b><span>{{student.linkedin|default:'-'}}</span>
   </li>
   <li class="list-group-item list-group-item-info"><span>Certifications</span></li>
   <li class="list-group-item">
-    <p>{{student.certifications}}</p>
+    <p>{{student.certifications | default:'No certificates added.'}}</p>
   </li>
   <li class="list-group-item list-group-item-info"><span>Projects</span></li>
+  {% if student.projects.all %}
   {% for item in student.projects.all %}
   <li class="list-group-item">
     <a href="{{item.url}}">{{item.url}}</a>
     <p>{{item.desc}}</p>
   </li>
   {% endfor %}
+  {% else %}
+  <li class="list-group-item">No projects added.</li>
+  {% endif %}
+  
   
 </ul>
 		</div>
@@ -141,7 +144,7 @@
         {% if student.resume %}
         <embed src="{{ MEDIA_URL }}students/{{student.user.id}}/resume{{student.user.id}}.pdf" width="800px" height="2100px" /> 
         {% else %}
-        <div class="alert alert-dark" role="alert">No Resume Available.</div>
+        <div class="alert alert-dark" role="alert">No Resume Available. It is recommended to upload resume.</div>
         {% endif %}
         {% if student.cover_letter %}
         <embed src="{{ MEDIA_URL }}students/{{student.user.id}}/cover_letter{{student.user.id}}.pdf" width="800px" height="2100px" />
