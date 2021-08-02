@@ -251,7 +251,7 @@
                       <p class="card-title"><b>Job Highlights</b></p>
                       <ul class="p-0 my-0 small" style="list-style-type: none;">
                         <li>Type : {{job.job_type}}</li>
-                        <li>Salary : {{job.salary_range_min}} - {{job.salary_range_min}}</li>
+                        <li>Salary : {{job.salary_range_min | default:''}} - {{job.salary_range_min | default:''}}</li>
                         
                       </ul>
                       
@@ -264,7 +264,7 @@
                       <p class="card-title"><b>Company</b></p>
                       <ul class="p-0 my-0 small" style="list-style-type: none;">
                         <li>Domain : {{job.company.domain}}</li>
-                        <li>Employees : {{job.company.company_size}}</li>
+                        <li>Employees : {{job.company.company_size | get_employees}}</li>
                         <li>Website : <a class="c-link" href="{{job.company.website}}" target="_blank">{{job.company.website}}</a></li>
                       </ul>
                       
