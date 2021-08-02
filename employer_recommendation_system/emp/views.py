@@ -224,6 +224,8 @@ def get_applied_joblist(spk_user_id):
 
 def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet applied
     all_jobs = Job.objects.all().filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=STATUS['ACTIVE'])
+    if not all_jobs:
+        all_jobs = Job.objects.all().filter(status=STATUS['ACTIVE'])
     applied_jobs = [x.job for x in get_applied_joblist(spk_user_id)]
     return list(set(all_jobs)-set(applied_jobs))
 

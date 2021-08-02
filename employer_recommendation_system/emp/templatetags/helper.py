@@ -228,4 +228,12 @@ def get_status(value):
         return 'Active'
     return 'Inactive'
 
+@register.filter()
+def get_employees(value):
+    l,v = zip(*NUM_OF_EMPS)
+    try:
+        return v[l.index(value)]
+    except:
+        return ''
+
     
