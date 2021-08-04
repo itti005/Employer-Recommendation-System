@@ -279,12 +279,11 @@
       </div>
       <div class="col-md-12 mb-3">
           <label for="state">Institute<sup>*</sup></label><small class="fw-lighter"> (Loading colleges may take some time. Please wait.)</small>
-          <!-- <select class="form-control" id="institute-select"> -->
-          <select class="form-select select-insti" name="institute" required>
+          <select class="form-select select-insti" name="institute" id="current-insti" required>
             {% if not current_edu %}
             <option value="" selected="">---------</option>
             {% else %}
-            <option value="" selected="">{{current_edu.institute | get_institute_name}}</option>
+            <option value="{{current_edu.institute}}" selected>{{current_edu.institute | get_institute_name}}</option>
             {% endif %}
             
 
@@ -325,7 +324,7 @@
         </div>
         <div class="col-sm-6 mb-3">
         <label for="state">Degree</label>
-          <select class="form-select" id="institute-select" name="p_degree">
+          <select class="form-select" name="p_degree">
 
             {% if not past_edu.degree %}
             <option value="" >---------</option>
@@ -337,7 +336,7 @@
       </div>
       <div class="col-sm-6 mb-3">
         <label for="state">Academic Discipline</label>
-          <select class="form-select" id="institute-select" name="p_discipline">
+          <select class="form-select" name="p_discipline">
             {% if not past_edu.acad_discipline %}
             <option value="" selected="">---------</option>
             {% endif %}
@@ -451,6 +450,81 @@ function apply_for_job(spk_user_id,job_id,student_id){
 
 $(document).ready(function() {
 
+  // get current insti
+  var c_insti = $('#current-insti').val()
+  if (c_insti) {
+    $.ajax({
+                  url: "/ajax-get-state-city/",
+                  type: "POST",
+                  data: {
+                      insti : c_insti
+                  },
+                  success: function(data) {
+                      if(data){
+                          $('#current_state').val(data['state_id'])
+                          $('#current_city').val(data['city_id'])
+                          var city = data['city_id']
+                          var institute = data['insti_id']
+                          $.ajax({
+                                  url: "/ajax-institute-list/",
+                                  type: "POST",
+                                  data: {
+                                      city : city
+                                  },
+                                  success: function(data) {
+                                      if(data){
+                                          $('.select-insti').html(data.institutes);
+                                          $('.select-insti').val(institute)
+                                      } else{
+                                         
+                                      }
+                                  }
+                              });
+                      } 
+                  }
+              });
+
+  }
+  var p_insti = $('#institute-select').val()
+  if (p_insti) {
+    $.ajax({
+                  url: "/ajax-get-state-city/",
+                  type: "POST",
+                  data: {
+                      insti : p_insti
+                  },
+                  success: function(data) {
+                      if(data){
+                          $('#prev_state').val(data['state_id'])
+                          $('#prev_city').val(data['city_id'])
+                          var city = data['city_id']
+                          var institute = data['insti_id']
+                          $.ajax({
+                                  url: "/ajax-institute-list/",
+                                  type: "POST",
+                                  data: {
+                                      city : city
+                                  },
+                                  success: function(data) {
+                                      if(data){
+                                          $('.p-select-insti').html(data.institutes);
+                                          $('.p-select-insti').val(institute)
+                                      } else{
+                                         
+                                      }
+                                  }
+                              });
+                      } else{
+                          
+                      }
+                  }
+              });
+
+  }
+
+  // get city & state from currennt insti
+  //set value of state & city in current education
+
   e = document.querySelectorAll('#div_id_resume label')[1];
   e.style.display="none";
   e = document.querySelectorAll('#div_id_cover_letter label')[1];
@@ -461,11 +535,10 @@ $(document).ready(function() {
   e.style.display="none";
 
     if ($('#disable-form').html()) {
-      alert('here');
       $("#form-student :input").prop("disabled", true);
     }
-    insti = $('#id_institute').val();
-    $('#institute-select').val(parseInt(insti));
+    // insti = $('#id_institute').val();
+    // $('#institute-select').val(parseInt(insti));
     var degree_list = [];
     var institute_list = [];
     var start_year_list = [];
@@ -504,7 +577,7 @@ $(document).ready(function() {
       if (e) {
         if (!validateEmail(e)) {
         elem = document.getElementById('div_id_alternate_email');
-        console.log(elem)
+        
         var node = document.createElement("p");
         var textnode = document.createTextNode("Invalid Email")
         node.appendChild(textnode);
@@ -518,33 +591,16 @@ $(document).ready(function() {
 
       }
       }
-
-      insti = $('#institute-select').val();
-      $('#id_institute').val(parseInt(insti));
-	 var res = $('.dropdown-selected').text();
-	 var res1 = $('.dropdown-chose').text();
-	 var x =[];
-	 $('.dropdown-chose').each(function(index, obj)
-	 {
-	  x.push($(this).text());
-	 });
+  	 var res = $('.dropdown-selected').text();
+  	 var res1 = $('.dropdown-chose').text();
+  	 var x =[];
+  	 $('.dropdown-chose').each(function(index, obj)
+  	 {
+  	  x.push($(this).text());
+  	 });
 	$('#skills_m').val(x);
-	// degree_id = $('#id_degree').val();
-	// document.getElementById("id_degree").setAttribute('value',degree_id);
-	// d=$('#id_degree option:selected').val();
-	// $('select[name="degree"]').val(d);
-	// $('#id_degree').val(degree_id);
-	// institute_id = $('#id_institute').val();
-	// document.getElementById("id_institute").setAttribute('value',institute_id);
-  // all_urls = document.querySelectorAll('.input-url');
-  // for (var i=0;i<all_urls.length; i++){
-  //   $('.url'+i).val(all_urls[i].value);
-  // } 
-  // all_desc = document.querySelectorAll('.text-desc');
-  // for (var i=0;i<all_desc.length; i++){
-  //   $('.desc'+i).val(all_desc[i].value);
-  // } 
-
+  
+	
 
 
 	});
