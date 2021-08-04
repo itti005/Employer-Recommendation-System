@@ -46,6 +46,86 @@
     
     hide_reject_labels();
 
+    // $( ".state-select" ).change(function() {
+    //       alert( "State" );
+    //       $.ajax({
+    //               url: "/ajax-state-city/",
+    //               type: "POST",
+    //               data: {
+    //                   state : state
+    //               },
+    //               success: function(data) {
+    //                   if(data){
+    //                       $('.select-city').html(data.cities);
+    //                       $( ".select-city" ).prop( "disabled", false );
+    //                   } else{
+    //                       $( ".select-city" ).prop( "disabled", true );
+    //                   }
+    //               }
+    //           });
+
+    // });
+    $( ".select-city" ).change(function() {
+          var city = $(this).val();
+          $.ajax({
+                  url: "/ajax-institute-list/",
+                  type: "POST",
+                  data: {
+                      city : city
+                  },
+                  success: function(data) {
+
+                      if(data){
+                          $('.select-insti').html(data.institutes);
+                          $( ".select-insti" ).prop( "disabled", false );
+                      } else{
+                          $( ".select-insti" ).prop( "disabled", true );
+                      }
+                  }
+              });
+    });
+
+    $('.p-select-state').change(function() {
+          var state = $(this).val();
+          if(state){
+              $.ajax({
+                  url: "/ajax-state-city/",
+                  type: "POST",
+                  data: {
+                      state : state
+                  },
+                  success: function(data) {
+                      if(data){
+                          $('.p-select-city').html(data.cities);
+                          $( ".p-select-city" ).prop( "disabled", false );
+                      } else{
+                          $( ".p-select-city" ).prop( "disabled", true );
+                      }
+                  }
+              });
+          }
+      });
+
+    $( ".p-select-city" ).change(function() {
+          var city = $(this).val();
+          $.ajax({
+                  url: "/ajax-institute-list/",
+                  type: "POST",
+                  data: {
+                      city : city
+                  },
+                  success: function(data) {
+
+                      if(data){
+                          $('.p-select-insti').html(data.institutes);
+                          $( ".p-select-insti" ).prop( "disabled", false );
+                      } else{
+                          $( ".p-select-insti" ).prop( "disabled", true );
+                      }
+                  }
+              });
+    });
+
     
 
     });

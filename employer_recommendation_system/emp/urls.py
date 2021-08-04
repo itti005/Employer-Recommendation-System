@@ -45,6 +45,7 @@ urlpatterns = [
 
     ################### ajax
     path('ajax-state-city/', views.ajax_state_city, name='ajax_state_city'),
+    path('ajax-institute-list/', views.ajax_institute_list, name='ajax_institute_list'),
     path('ajax-send-mail/', views.ajax_send_mail, name='ajax_send_mail'),
 
 

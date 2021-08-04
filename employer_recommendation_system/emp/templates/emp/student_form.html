@@ -226,7 +226,7 @@
       <div class="col-md-8">
         <div class="row border border-success mb-3 rounded p-2">
           <div class="col-12 ">
-          <p class="fs-6 fw-bold">Add Current Education Details</p>
+          <p class="fs-6 fw-bold">Add Current Education Details : </p>
         </div>
         <div class="col-sm-6 mb-3">
           <label for="state">Degree<sup>*</sup></label>
@@ -251,15 +251,44 @@
           </select>
       </div>
       <div class="col-md-12 mb-3">
+        <label for="current_state">State<sup>*</sup></label>
+         <select class="form-select select-state" aria-label="Default select example" id="current_state">
+          
+            <option value="" selected="">---------</option>
+            {% for state in states %}
+          <option value="{{state.id}}">{{state.name}}</option>
+          {% endfor %}
+           
+            
+           
+          
+        </select>
+      </div>
+      <div class="col-md-12 mb-3">
+        <label for="current_city">City<sup>*</sup></label>
+         <select class="form-select select-city" aria-label="Default select example" id="current_city">
+          
+            <option value="" selected="">---------</option>
+            
+            {% for city in cities %}
+          <option value="{{city.id}}">{{city.name}}</option>
+          {% endfor %}
+           
+          
+        </select>
+      </div>
+      <div class="col-md-12 mb-3">
           <label for="state">Institute<sup>*</sup></label><small class="fw-lighter"> (Loading colleges may take some time. Please wait.)</small>
           <!-- <select class="form-control" id="institute-select"> -->
-          <select class="form-select" name="institute" required>
+          <select class="form-select select-insti" name="institute" required>
             {% if not current_edu %}
             <option value="" selected="">---------</option>
+            {% else %}
+            <option value="" selected="">{{current_edu.institute | get_institute_name}}</option>
             {% endif %}
-            {% for i in institutes %} 
-              <option value="{{i.id}}">{{ i.institution_name }}</option>
-              {% endfor %}
+            
+
+            
           </select>
       </div>
       <div class="col-sm-4 mb-3">
@@ -317,19 +346,42 @@
               {% endfor %}
           </select>
       </div>
-      
+      <div class="col-md-12 mb-3">
+        <label for="prev_state">State<sup>*</sup></label>
+         <select class="form-select p-select-state" aria-label="Default select example" id="prev_state">
+           
+            <option value="" selected="">---------</option>
+           
+           {% for state in states %}
+          <option value="{{state.id}}">{{state.name}}</option>
+          {% endfor %}
+           
+          
+        </select>
+      </div>
+      <div class="col-md-12 mb-3">
+        <label for="prev_city">City<sup>*</sup></label>
+         <select class="form-select p-select-city" aria-label="Default select example" id="prev_city">
+          
+            <option value="" selected="">---------</option>
+          
+            {% for city in cities %}
+          <option value="{{city.id}}">{{city.name}}</option>
+          {% endfor %}
+          
+          
+        </select>
+      </div>
       <div class="col-md-12 mb-3">
       <div>
           <label for="state">Institute</label><small class="fw-lighter"> (Loading colleges may take some time. Please wait.)</small>
-          <select class="form-select" id="institute-select" name="p_institute">
+          <select class="form-select p-select-insti" id="institute-select" name="p_institute">
             {% if past_edu.institute %}
             <option value="{{past_edu.institute}}" selected="">{{past_edu.institute | get_institute_name }}</option>
             {% else %}
             <option value="" selected="">---------</option>
             {% endif %}
-            {% for i in institutes %} 
-              <option value="{{i.id}}">{{ i.institution_name }}</option>
-              {% endfor %}
+           
           </select>
       </div>
       </div>
