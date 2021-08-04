@@ -45,27 +45,7 @@
       });
     
     hide_reject_labels();
-
-    // $( ".state-select" ).change(function() {
-    //       alert( "State" );
-    //       $.ajax({
-    //               url: "/ajax-state-city/",
-    //               type: "POST",
-    //               data: {
-    //                   state : state
-    //               },
-    //               success: function(data) {
-    //                   if(data){
-    //                       $('.select-city').html(data.cities);
-    //                       $( ".select-city" ).prop( "disabled", false );
-    //                   } else{
-    //                       $( ".select-city" ).prop( "disabled", true );
-    //                   }
-    //               }
-    //           });
-
-    // });
-    $( ".select-city" ).change(function() {
+    $(".select-city").change(function() {
           var city = $(this).val();
           $.ajax({
                   url: "/ajax-institute-list/",
@@ -106,7 +86,7 @@
           }
       });
 
-    $( ".p-select-city" ).change(function() {
+    $(".p-select-city").change(function() {
           var city = $(this).val();
           $.ajax({
                   url: "/ajax-institute-list/",
@@ -126,6 +106,7 @@
               });
     });
 
+    
     
 
     });

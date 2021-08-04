@@ -940,6 +940,26 @@ def ajax_institute_list(request):
         data['institutes']=tmp
         return JsonResponse(data)
 
+@csrf_exempt
+def ajax_get_state_city(request):
+    # if request.method == 'POST':
+    data = {}
+    insti = request.POST.get('insti')
+    val = AcademicCenter.objects.filter(id=insti).values('state_id','city_id')
+    state_id = val[0]['state_id']
+    city_id = val[0]['city_id']
+    state = SpokenState.objects.filter(id=state_id)
+    state = state[0].name
+    city = SpokenCity.objects.filter(id=city_id)
+    city = city[0].name
+    data['state_id']=state_id
+    data['city_id']=city_id
+    data['state']=state
+    data['city']=city
+    data['insti_id']=insti
+    return JsonResponse(data)
+
+
 # @user_passes_test(is_manager)
 @access_profile
 def student_profile_details(request,id,job):
@@ -1026,7 +1046,6 @@ class DisciplineCreateView(PermissionRequiredMixin,SuccessMessageMixin,CreateVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         disciplines = Discipline.objects.values('id','name').order_by('name')
-        print(f"disciplines ----------------------- {disciplines}")
         context['disciplines']=disciplines
         return context
 
