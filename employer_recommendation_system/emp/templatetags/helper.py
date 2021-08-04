@@ -236,4 +236,6 @@ def get_employees(value):
     except:
         return ''
 
-    
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key) 
