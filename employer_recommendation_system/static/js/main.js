@@ -1,4 +1,19 @@
+function myFunction() {
+  var copyText = document.getElementById("myInput");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  
+  var tooltip = document.getElementById("myTooltip");
+  // tooltip.innerHTML = "Copied: " + copyText.value;
+  tooltip.innerHTML = "Copied Job URL" ;
+}
 
+function outFunc() {
+  var tooltip = document.getElementById("myTooltip");
+  // tooltip.innerHTML = "Copy to clipboard";
+  tooltip.innerHTML = "Copy Job URL";
+}
   function hide_reject_labels(){
     $('.rejected').hide();
   }
