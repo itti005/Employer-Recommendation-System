@@ -1,4 +1,27 @@
-{% extends 'emp/base.html' %}
-{% block main %}     
-   
+{% extends 'emp/base_generic.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}Homepage{% endblock %}
+{% block css %}
+<style type="text/css">
+	
+</style>
+{% endblock %}
+{% block main %}
+<div class="container px-4">
+  <div class="row gx-5">
+    <div class="col">
+     <p>Homepage <a class="btn btn-primary" href="{% url 'login' %}" role="button">Login</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+{% block js %}
+<script type = "text/javascript">
+    $(document).ready(function(){
+        
+    });
+</script>
 {% endblock %}

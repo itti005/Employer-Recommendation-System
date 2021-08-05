@@ -279,7 +279,7 @@ def handlelogout(request):
 
 def index(request):
      context={}
-     return render(request,'accounts/login.html',context)
+     return render(request,'emp/index.html',context)
 
 def get_state_city_lst():
     states = SpokenState.objects.all()
@@ -1204,7 +1204,7 @@ def student_filter(request):
         multiple_grade = request.POST.getlist('multiple_grade') #grades from any one of query
         num = request.POST.get('num') if request.POST.get('num') else 0 #key to track number of multiple foss selection
         multiple_fosses = [] #list of list of any of the fosses criteria
-        for item in range(1,int(num)+1):
+        for item in range(1,int(num)+2):
             # print(f"item ******************* {item}")
             multiple_fosses.append(request.POST.getlist('fosses_'+str(item)))
         # -------------------------------------------------------- 2. get input for multiple foss selection ends
@@ -1231,6 +1231,26 @@ def student_filter(request):
             mdl_users = list(itertools.chain(*q))
             # q = Q(mdlquizgrades__quiz=item[1]) & Q(mdlquizgrades__grade__gt=mandatory[item[0]])
             # mdlusers = mdlusers.filter(q)
+        print(f"num ****************************** {num}")
+        print(f"range(int(num)+1)*************** {list(range(int(num)+1))}")
+        print(f"multiple_fosses ************************** {multiple_fosses}")
+        print(f"multiple_grade ************************** {multiple_grade}")
+        # for item in range(int(num)):
+        #     print(f"num ---------- {num}")
+        #     print(f"num ********* {num}. multiple_fosses[item] ********* {multiple_fosses[item]}. multiple_grade[item] ************** {multiple_grade[item]}")
+        #     if mdl_users:
+        #         q = MdlUser.objects.filter(Q(mdlquizgrades__quiz__in=multiple_fosses[item]) & Q(mdlquizgrades__grade__gt=multiple_grade[item]),id__in=mdl_users).values_list('id')
+        #         # print(f"q1 query ------------------------------ {q.query}")
+        #         # print(f"q1 ------------------------------ {q}")
+        #     else:
+        #         q = MdlUser.objects.filter(Q(mdlquizgrades__quiz__in=multiple_fosses[item]) & Q(mdlquizgrades__grade__gt=multiple_grade[item])).values_list('id')
+        #         # print(f"q2 query------------------------------ {q.query}")
+        #         # print(f"q2 ------------------------------ {q}")
+        #     mdl_users = list(itertools.chain(*q))
+            
+            
+
+        print("0 ******************************")
         mdlusers = q.values('id')
         # -------------------------------------------------------- 3. get mdl_users satisfying the single mandatory foss criteria (mdlusers) ends
 
@@ -1245,6 +1265,7 @@ def student_filter(request):
         # -------------------------------------------------------- 5. d_data : mdluser ids with all selected mandatory quiz; this is to get the grade for all selected foss for selected mdlusers irrespective of grade criteria
         # d1 : dictionary of user_quiz & grades | key : mdluserid_quizid | value : grade
         unzipped = list(zip(*users_id))
+        print(f"unzipped **************** {unzipped}")
         d_data = MdlUser.objects.filter(id__in=list(unzipped[0]),mdlquizgrades__quiz__in=mdl_quizzes).annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
         print(f"d_data ******************* {d_data}")
         d_unzipped = list(zip(*d_data))
