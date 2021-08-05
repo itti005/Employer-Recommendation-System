@@ -447,6 +447,7 @@ class JobDetailView(PermissionRequiredMixin,DetailView):
     model = Job
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['base_url'] = settings.BASE_URL
         return context
 
 class JobListView(FormMixin,ListView):
@@ -457,6 +458,7 @@ class JobListView(FormMixin,ListView):
     form_class = JobSearchForm
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['base_url']=settings.BASE_URL
         if self.request.user.groups.filter(name='STUDENT'):
             jobShortlist = JobShortlist.objects.filter(spk_user=self.request.user.student.spk_usr_id)
             job_short_list = get_applied_joblist(self.request.user.student.spk_usr_id)

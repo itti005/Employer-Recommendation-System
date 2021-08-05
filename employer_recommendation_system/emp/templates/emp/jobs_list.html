@@ -71,6 +71,7 @@
   .c-icon{
     color: #0066A0;
   }
+  
 </style>
 {% endblock %}
 {% block content %}
@@ -188,9 +189,21 @@
     <div class="tab-pane fade show mt-3" id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
     {% endif %}
     {% if request.user|has_group:"MANAGER" %}
+    
     <div class="alert alert-warning mt-2" role="alert">
-  To notify students for the job; please copy <span class="fw-bold">JOB ID : </span> <span class="fw-bold text-decoration-underline" id="job">{{job.id}}</span> & <a href="{{grade_filter_url}}" class="alert-link text-decoration-underline" target="_blank">login here</a>. 
+  To notify students for the job; please copy <span class="fw-bold">JOB ID : </span> <span class="fw-bold text-decoration-underline" id="job">{{job.id}}</span> & <a href="{{grade_filter_url}}" class="alert-link text-decoration-underline" target="_blank">login here</a>. <br>
+  <hr>
+  <div style="display: block;">
+  <input type="text" value="{{base_url}}{% url 'job-list' %}?id={{job.id}}" id="myInput" readonly style="width: 80%;">
+  <span class="c-tooltip">
+  <button class="btn btn-outline-primary btn-sm" onclick="myFunction()" onmouseout="outFunc()">
+    <span class="c-tooltiptext" id="myTooltip">Click to copy Job URL</span>
+  Copy Job URL
+  </button>
+</span>
 </div>
+</div>
+
 {% endif %}
               <div class="d-flex">
                 <div class="">
