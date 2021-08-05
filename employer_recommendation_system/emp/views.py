@@ -1175,6 +1175,7 @@ def ajax_send_mail(request):
     
     return JsonResponse(data)
 
+@user_passes_test(is_manager)
 def student_filter(request):
     context = {}
     foss = FossCategory.objects.values_list('id','foss') #get foss list to show in drop down
