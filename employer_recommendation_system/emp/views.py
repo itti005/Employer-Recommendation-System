@@ -280,9 +280,9 @@ def handlelogout(request):
 
 def index(request):
     context={}
-    context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'])[:3]
-    context['gallery'] = GalleryImage.objects.filter(display_on_homepage=True)[:6]
-    context['testimonials'] = Testimonial.objects.filter(display_on_homepage=True)[:3]
+    context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=True)[:3]
+    context['gallery'] = GalleryImage.objects.filter(display_on_homepage=True,active=True)[:6]
+    context['testimonials'] = Testimonial.objects.filter(display_on_homepage=True,active=True)[:3]
     form = ContactForm()
     context['contact_form'] = form
     
