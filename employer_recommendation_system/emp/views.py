@@ -8,7 +8,7 @@ from django.views.generic.edit import UpdateView
 from spoken.models import SpokenStudent 
 from spoken.models import SpokenUser as SpkUser 
 from django.views.generic import FormView
-from emp.forms import StudentGradeFilterForm, EducationForm,StudentForm,DateInput,PrevEducationForm
+from emp.forms import StudentGradeFilterForm, EducationForm,StudentForm,DateInput,PrevEducationForm,ContactForm
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import CreateView,UpdateView,ModelFormMixin,FormMixin
 from django.views.generic.detail import DetailView
@@ -46,6 +46,7 @@ from django.db.models import OuterRef, Subquery
 from django.db.models.functions import Concat
 from django.db.models import Value
 from .models import STATUS
+import datetime
 # STATUS = {'ACTIVE' :1,'INACTIVE' :0}
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
@@ -278,8 +279,15 @@ def handlelogout(request):
     return redirect('login')
 
 def index(request):
-     context={}
-     return render(request,'emp/index.html',context)
+    context={}
+    context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'])[:3]
+    context['gallery'] = GalleryImage.objects.filter(display_on_homepage=True)[:6]
+    context['testimonials'] = Testimonial.objects.filter(display_on_homepage=True)[:3]
+    form = ContactForm()
+    context['contact_form'] = form
+    
+    
+    return render(request,'emp/index.html',context)
 
 def get_state_city_lst():
     states = SpokenState.objects.all()
@@ -961,6 +969,19 @@ def ajax_get_state_city(request):
     data['insti_id']=insti
     return JsonResponse(data)
 
+@csrf_exempt
+def ajax_contact_form(request):
+    if request.method == 'POST':
+        try:
+            data = {}
+            name = request.POST.get('name')
+            email = request.POST.get('email')
+            message = request.POST.get('message')
+            feedback = Feedback.objects.create(name=name,email=email,message=message) 
+            data['status']=1
+        except:
+            data['status']=0
+        return JsonResponse(data)
 
 # @user_passes_test(is_manager)
 @access_profile
@@ -1304,7 +1325,10 @@ def student_filter(request):
         # grade_subquery = MdlQuizGrades.objects.using('moodle').filter(quiz=OuterRef('mdlquiz_id'),userid=OuterRef('mdluser_id')).values('timemodified')[:1]
         # grade_subquery = MdlQuizGrades.objects.using('moodle').filter(userid=OuterRef('mdluser_id')).values('grade')[:1]
         # ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade=d1.get(Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField()),Value('0'))).values('student_name','foss_name','grade')
-        ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).values('student_name','foss_name','grade_key')
+        # test__tdate__gte=job.from_date
+        # d = datetime.datetime.strptime('2019-07-01', "%Y-%m-%d").date()
+        cus_date = datetime.datetime.strptime("01072019", "%d%m%Y").date()
+        ta = ta.annotate(test__tdate__gte=Value(cus_date),foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).values('student_name','foss_name','grade_key')
         print(f"ta ************ {ta}")
         students = list(map(lambda x: x['student_name'], ta))
 
@@ -1316,35 +1340,95 @@ def student_filter(request):
         # spk_users = SpokenUser.objects.filter(spokenstudent__in=students).values('id','first_name')
         # context['spk_users']=spk_users
         context['ta']=ta
+        l = len(ta)
         context['len']=len(ta)
+
     return render(request,'emp/student_filter.html',context)
 
-    
-    # def form_invalid(self, form):
-    #     print(f"hjklkn-------------{form}")
-    #     return self.render_to_response(self.get_context_data(form=form))
 
-    # def form_valid(self, form):
-    #     self.object = form.save(commit=False)
-    #     print(f'slef.user ---- -------------------------------------------------')
-    #     self.object.save()
-    #     return super(ModelFormMixin, self).form_valid(form)
-# class JobDetailView(DetailView):
-#     template_name = 'emp/jobs_detail.html'
-#     model = Job
-#     def get_context_data(self, **kwargs):
-#         print("inside job detial view *****************")
-#         context = super().get_context_data(**kwargs)
-#         return context
-# class JobListView(ListView):
-#     template_name = 'emp/jobs_list.html'
-#     model = Job
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         print("************ context : ",context)
-#         return context
-# class JobUpdate(SuccessMessageMixin,UpdateView):
-#     template_name = 'emp/jobs_update_form.html'
-#     model = Job
-#     fields = ['company','title','designation','state','city','skills','description','domain','salary_range_min','salary_range_max','job_type','benefits','requirements','shift_time','key_job_responsibilities','gender']
-#     success_message ="%(title)s was updated successfully"
+
+# landing page views 
+class GalleryImageCreate(CreateView):
+    model = GalleryImage
+    fields = ['desc','location','display_on_homepage','active']
+    template_name = 'emp/image_gallery.html'
+
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'Image is added successfully.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print(f"Form Errors : {form.errors}")
+        messages.error(self.request, 'Error in adding image.')
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        images = GalleryImage.objects.all()
+        context['images'] = images
+        return context
+
+class GalleryImageUpdate(UpdateView):
+    model = GalleryImage
+    fields = ['desc','location','display_on_homepage','active']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        images = GalleryImage.objects.all()
+        context['images'] = images
+        context['MEDIA'] = settings.MEDIA_ROOT
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'Image is updated successfully.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print(f"Form Errors : {form.errors}")
+        messages.error(self.request, 'Error in updating image.')
+        return self.render_to_response(self.get_context_data(form=form))
+
+class TestimonialCreate(CreateView):
+    model = Testimonial
+    fields = ['name','about','desc','location','display_on_homepage','active']
+    template_name = 'emp/testimonial.html'
+
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'Testimonial is added successfully.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print(f"Form Errors : {form.errors}")
+        messages.error(self.request, 'Error in adding testimonial.')
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        testimonials = Testimonial.objects.all()
+        context['testimonials'] = testimonials
+        return context
+
+class TestimonialUpdate(UpdateView):
+    model = Testimonial
+    fields = ['name','about','desc','location','display_on_homepage','active']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        testimonials = Testimonial.objects.all()
+        context['testimonials'] = testimonials
+        context['MEDIA'] = settings.MEDIA_ROOT
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'Testimonial is updated successfully.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print(f"Form Errors : {form.errors}")
+        messages.error(self.request, 'Error in updating testimonial.')
+        return self.render_to_response(self.get_context_data(form=form))
+    
