@@ -364,7 +364,7 @@ class Testimonial(models.Model):
     display_on_homepage = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(blank=True, unique=True)
+    # slug = models.SlugField(blank=True, unique=True)
     active = models.BooleanField(default=True)
 
     def __str__(self):
