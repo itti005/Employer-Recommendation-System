@@ -198,52 +198,37 @@ div#navbarSupportedContent>ul>li>a{
   <div class="row" id="testimonial">
     {% for testimonial in testimonials %}
     <div class="col-12 col-sm-6 col-lg-3 py-3">
-      <div class="c-card">
+      <div class="c-card d-flex flex-column justify-content-between">
         <video width="100%" height="auto" controls oncontextmenu="return false;">
                 <source src="{{testimonial.location}}" type="video/mp4">
               Your browser does not support the video tag.
               </video>
-      <p class="text-muted" style="font-size: 0.9rem;" data-bs-toggle="modal" data-bs-target="#testimonialModal">{{testimonial.desc | truncatechars:255}}</p>
+      <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p>
+      <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span>
       </div>
     </div>
     {% endfor %}
 </div>
-  <div class="modal fade" id="testimonialModal" tabindex="-1" role="dialog" aria-hidden="true">
+{% for testimonial in testimonials %}
+  <div class="modal fade" id="testimonialModal_{{testimonial.id}}" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-      <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-             {% for testimonial in testimonials %}
-             <div class="carousel-item {% if forloop.counter == 1 %}active{% endif %}">
-              <video width="100%" height="auto" controls>
+      <video width="100%" height="auto" controls>
                 <source src="{{testimonial.location}}" type="video/mp4">
               Your browser does not support the video tag.
               </video>
               <p class="text-muted" style="font-size: 0.9rem;">{{testimonial.desc}}</p>
-            </div>
-              {% endfor %}
-          </div>
-          <a class="carousel-control-prev" role="button" data-bs-slide="prev" data-bs-target="#testimonialCarousel">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-          </a>
-          <a class="carousel-control-next" data-bs-target="#testimonialCarousel" role="button" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-          </a>
-        </div>
       </div>
-
       <div class="modal-footer">
-        
       </div>
     </div>
   </div>
 </div>
+ {% endfor %}
 </div>
 
 <div class="container-fluid py-5 c-bg">
