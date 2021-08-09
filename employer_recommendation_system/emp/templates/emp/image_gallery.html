@@ -1,0 +1,102 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}Add Company{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+	
+</style>
+{% endblock %}
+{% block content %}
+{% for message in messages %}
+         <div class="text-center alert {{ message.tags }}">
+             {{ message|safe }}
+         </div>
+{% endfor %}
+{% include "emp/page_header.html" with title="Image Gallery" icon="<i class='far fa-image'></i>" %}
+
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <button class="nav-link active" id="nav-add-tab" data-bs-toggle="tab" data-bs-target="#nav-add" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Add</button>
+    <button class="nav-link" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">View / Edit</button>
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade show active py-3" id="nav-add" role="tabpanel" aria-labelledby="nav-add-tab">
+  	<form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <div class="row">
+    	<div class="col-md-6 mb-3">
+    		{{form.desc | as_crispy_field}}
+    	</div>
+    	<div class="col-12 mb-3">
+    		{{form.location | as_crispy_field}}
+    	</div>
+    	<div class="col-3 mb-3">
+    		{{form.display_on_homepage | as_crispy_field}}
+    	</div>
+    	<div class="col-3 mb-3">
+    		{{form.active | as_crispy_field}}
+    	</div>
+    	
+    </div>
+    <input type="submit" value="Save" class="btn btn-success">
+</form>
+  </div>
+  <div class="tab-pane fade py-3" id="nav-edit" role="tabpanel" aria-labelledby="nav-edit-tab">
+  	<div class="row">
+  		{% for image in images %}
+  		<div class="col-sm-6 col-lg-4">
+  			<div class="card" style="width: 100%;">
+			  <img src="{{image.location}}" class="card-img-top" alt="...">
+			  <div class="card-body">
+			  	<div class="d-flex justify-content-between">
+			  		<span class="fw-bold">Display</span> |
+			    <span>
+			    	Homepage :
+			    	{% if image.display_on_homepage %}<i class="far fa-check-circle text-success fw-bold"></i>
+			    	{% else %}<i class="far fa-times-circle text-danger fw-bold"></i>
+			    	{% endif %}
+			    </span> 
+			     <span>
+			     	Image Gallery :
+			    	{% if image.active %}<i class="far fa-check-circle text-success fw-bold"></i>
+			    	{% else %}<i class="far fa-times-circle text-danger fw-bold"></i>
+			    	{% endif %}
+			    </span>
+			  	</div><hr>
+			    <p class="card-text">{{image.desc | truncatechars:255}}</p>
+			    <a href="{% url 'update_image' pk=image.id%}" class="btn btn-outline-secondary float-end">Edit</a>
+			  </div>
+			</div>
+  			<img src="">
+  			<div>
+  				
+  				
+  			</div>
+  		</div>
+  		{% endfor %}
+  		
+  	</div>
+  </div>
+  		
+</div>
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block js %}
+<script type = "text/javascript">
+    $(document).ready(function(){
+        // alert('here');
+        // get current url
+        var pathname = window.location.pathname; // Returns path only (/path/example.html)
+		console.log(pathname)
+		// var someTabTriggerEl = document.querySelector('#nav-edit-tab')
+		// var tab = new bootstrap.Tab(someTabTriggerEl)
+		// tab.show()
+
+    });
+</script>
+{% endblock %}
