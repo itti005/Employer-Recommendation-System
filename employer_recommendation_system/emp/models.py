@@ -330,5 +330,52 @@ class ShortlistEmailStatus(models.Model):
     success_mails = models.IntegerField()
     job_id = models.IntegerField()
     log_file = models.CharField(max_length=250)
-    
 
+# landing page models
+class GalleryImage(models.Model):
+    desc = models.TextField(null=True,blank=True,verbose_name='Description about image')
+    location = models.FileField(upload_to=settings.GALLERY_IMAGES)    #spk
+    display_on_homepage = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(blank=True, unique=True)
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.desc
+    
+    def get_absolute_url(self):
+        # return reverse('gallery-image-detail', kwargs={'pk': self.pk})
+        return reverse('add_image')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.slug:
+            obj = GalleryImage.objects.get(location=self.location,date_created=self.date_created,desc=self.desc)
+            obj.slug = slugify(obj.id) 
+            obj.save()
+
+
+class Testimonial(models.Model):
+    name = models.CharField(max_length=250) #name of the person giving testimonial
+    about = models.CharField(max_length=250,null=True,blank=True,verbose_name='About attestant') # about person givingn testimonial
+    desc = models.TextField(null=True,blank=True,verbose_name='Text Testimonial (If any)') #text testimonial
+    location = models.FileField(upload_to=settings.GALLERY_TESTIMONIAL, null=True, blank=True)    #spk
+    display_on_homepage = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(blank=True, unique=True)
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        # return reverse('gallery-image-detail', kwargs={'pk': self.pk})
+        return reverse('add_testimonial')
+
+class Feedback(models.Model):
+    name = models.CharField(max_length=250,verbose_name='Your Name')
+    email = models.EmailField(null=True,blank=True)
+    message = models.TextField()
+    date_created = models.DateTimeField(auto_now_add=True)

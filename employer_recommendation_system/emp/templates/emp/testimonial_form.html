@@ -1,0 +1,68 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}Add Testimonial{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+	
+</style>
+{% endblock %}
+{% block content %}
+{% for message in messages %}
+         <div class="text-center alert {{ message.tags }}">
+             {{ message|safe }}
+         </div>
+{% endfor %}
+{% include "emp/page_header.html" with title="Testimonial" icon="<i class='far fa-image'></i>" %}
+
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+	<div class="row">
+        <div class="col-md-6 mb-3">
+            {{form.name | as_crispy_field}}
+        </div><div class="col-md-6 mb-3"></div>
+        <div class="col-md-6 mb-3">
+            {{form.about | as_crispy_field}}
+        </div><div class="col-md-6 mb-3"></div>
+        <div class="col-md-6 mb-3">
+            {{form.desc | as_crispy_field}}
+        </div><div class="col-md-6 mb-3"></div>
+        <div class="col-md-3 mb-3">
+            {{form.location | as_crispy_field}}
+        </div><div class="col-md-8 mb-3"></div>
+      <div class="col-md-3 mb-3">
+        {{form.display_on_homepage | as_crispy_field}}
+      </div>
+      <div class="col-md-3 mb-3">
+        {{form.active | as_crispy_field}}
+      </div>
+    </div>
+    
+	<input type="submit" value="Save" class="btn btn-success">
+</form>
+<hr>
+<a class="btn btn-outline-dark" href="{% url 'add_testimonial' %}" role="button"><i class="fas fa-angle-double-left"></i> Proceed back to add new testimonial </a>
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block js %}
+<script type = "text/javascript">
+    $(document).ready(function(){
+        // alert('here');
+        // get current url
+        var pathname = window.location.pathname; // Returns path only (/path/example.html)
+		console.log(pathname)
+		// var someTabTriggerEl = document.querySelector('#nav-edit-tab')
+		// var tab = new bootstrap.Tab(someTabTriggerEl)
+		// tab.show()
+
+    });
+</script>
+{% endblock %}
+
+
+
+
+

@@ -1,6 +1,6 @@
 from django import forms
 from spoken.models import *
-from .models import Education,Student,Job,Company,Degree,Discipline
+from .models import Education,Student,Job,Company,Degree,Discipline,Feedback
 from django.forms import ModelForm
 
 class DateInput(forms.DateInput):
@@ -78,3 +78,11 @@ class JobSearchForm(forms.Form):
         #foss
 
         #get company
+class ContactForm(ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['name','email','message']
+        widgets = {
+            'message' : forms.Textarea(attrs={'rows':3, 'cols':15,'maxlength':500}),
+        }
+

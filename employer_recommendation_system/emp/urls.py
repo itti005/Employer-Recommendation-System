@@ -48,9 +48,21 @@ urlpatterns = [
     path('ajax-institute-list/', views.ajax_institute_list, name='ajax_institute_list'),
     path('ajax-send-mail/', views.ajax_send_mail, name='ajax_send_mail'),
     path('ajax-get-state-city/', views.ajax_get_state_city, name='ajax_get_state_city'),
+    path('ajax-contact-form/', views.ajax_contact_form, name='ajax_contact_form'),
 
 
     path('student_filter',views.student_filter,name='student_filter'),
+
+    #landing page
+    path('add_image', GalleryImageCreate.as_view(),name='add_image' ),
+    # path('image_details/<int:pk>', GalleryImageDetail.as_view(),name='gallery_image_detail' ),
+    path('update_image/<int:pk>', GalleryImageUpdate.as_view(),name='update_image' ),
+    path('add_testimonial', TestimonialCreate.as_view(),name='add_testimonial' ),
+    # path('image_details/<int:pk>', GalleryImageDetail.as_view(),name='gallery_image_detail' ),
+    path('update_testimonial/<int:pk>', TestimonialUpdate.as_view(),name='update_testimonial' ),
+    
+
+    # path('<slug:slug>/', GalleryImageDetail.as_view(), name='gallery-image-detail'),
     # path('degree/<slug:slug>/', DegreeDetailView.as_view(), name='degree-detail'),
     # path('degree/', CompanyListView.as_view(), name='company-list'),
     # path('degree/<slug:slug>/', CompanyDetailView.as_view(), name='company-detail'),
