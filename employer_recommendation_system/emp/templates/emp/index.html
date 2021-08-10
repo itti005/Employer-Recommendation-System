@@ -236,6 +236,12 @@ div#navbarSupportedContent>ul>li>a{
     <div class="row">
     <div class="col-12 col-md-6 divider">
       <div class="alert" role="alert" style="display: none;" id="msg-status"></div>
+<div id="notify" style="display: none;">
+<span class="spinner-border spinner-border-sm text-success" role="status">
+  <span class="sr-only">Loading...</span>
+</span> Sending message, please wait ....
+</div>
+
       <p class="display-6 border-bottom pe-5" style="font-size: 1.5rem;color: #002648;">Contact Us</p>
       <form id="contact_form">
         {% csrf_token %}
@@ -340,6 +346,7 @@ div#navbarSupportedContent>ul>li>a{
       var email = $('#id_email').val();
       var message = $('#id_message').val();
       if(name && email && message){
+              $('#notify').show();
               $.ajax({
                   url: "/ajax-contact-form/",
                   type: "POST",
@@ -355,6 +362,7 @@ div#navbarSupportedContent>ul>li>a{
                           element.classList.add("alert-success");
                           $('#msg-status').html('Thank you for contacting Spoken Tutorial.');
                           $('#msg-status').show();
+                          $('#notify').hide();
                         }
                         if (data['status']==0) {
                           var element = document.getElementById("msg-status");
