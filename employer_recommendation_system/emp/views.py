@@ -47,6 +47,8 @@ from django.db.models.functions import Concat
 from django.db.models import Value
 from .models import STATUS
 import datetime
+from django.core.mail import send_mail
+from smtplib import SMTPException
 # STATUS = {'ACTIVE' :1,'INACTIVE' :0}
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
@@ -971,17 +973,27 @@ def ajax_get_state_city(request):
 
 @csrf_exempt
 def ajax_contact_form(request):
+    data = {}
     if request.method == 'POST':
         try:
-            data = {}
             name = request.POST.get('name')
             email = request.POST.get('email')
             message = request.POST.get('message')
-            feedback = Feedback.objects.create(name=name,email=email,message=message) 
+            feedback = Feedback.objects.create(name=name,email=email,message=message)
+            subject = 'ERS - Job Recommendation System'
+            mail_body = 'Name : ' + name +'\n' + 'Email : ' + email + '\n' + 'message : ' + message
+            mail_from = settings.CONTACT_MAIL
+            send_to = settings.CONTACT_MAIL
+            send_mail(subject,mail_body,mail_from,[send_to],fail_silently=False)
             data['status']=1
-        except:
+            return JsonResponse(data)
+        except SMTPException as e:
+            print(e)
+        except Exception as e:
+            print(e)
             data['status']=0
-        return JsonResponse(data)
+    data['status']=0
+    return JsonResponse(data)
 
 # @user_passes_test(is_manager)
 @access_profile
