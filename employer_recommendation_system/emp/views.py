@@ -1408,12 +1408,21 @@ class TestimonialCreate(CreateView):
     template_name = 'emp/testimonial.html'
 
     def form_valid(self, form):
-        self.object = form.save()
+        try:
+            print("Testimonial valid 1 ****************************")
+            self.object = form.save()
+            print("Testimonial valid 2 ****************************")
+        except Exception as e:
+            print("Testimonial error ****************************")
+            print(e)
+            print("****************************")
+        print("3 ****************************")
         messages.success(self.request, 'Testimonial is added successfully.')
         return super().form_valid(form)
 
     def form_invalid(self, form):
         print(f"Form Errors : {form.errors}")
+        print("Testimonial form invalid ****************************")
         messages.error(self.request, 'Error in adding testimonial.')
         return self.render_to_response(self.get_context_data(form=form))
 
