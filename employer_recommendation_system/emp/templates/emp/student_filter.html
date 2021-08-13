@@ -78,20 +78,28 @@
 	<div>
 		<table style="width:100%">
   <tr>
-    <th>Firstname</th>
+    <th>Name</th>
+    <th>Email</th>
     <th>Foss</th>
     
     <th>grade_key</th>
-
+	<th>Student Id</th>
+	<th>mdluser_id</th>
 
     
   </tr>
   {% for item in ta %}
   <tr>
-  	<td>{{item.student_name}}</td>
+  	<td>{{item.mdluser_firstname}} {{item.mdluser_lastname}}</td>
+  	<td>{{item.student_email | default_if_none:'-'}}</td>
   	<td>{{item.foss_name}}</td>
   	
   	<td>{{d1 | get_item:item.grade_key}}</td>
+  	<td>{{item.student_id}}</td>
+  	<td>{{item.mdluser_id}}</td>
+
+
+
 
 
   	
