@@ -18,7 +18,7 @@ from django.http import HttpResponse, JsonResponse
 from .filterset import CompanyFilterSet,JobFilter
 from .forms import ACTIVATION_STATUS, JobSearchForm, JobApplicationForm
 import numpy as np
-from django.db.models import Q,F,ExpressionWrapper,CharField
+from django.db.models import Q,F,ExpressionWrapper,CharField,FloatField
 from django.db.models.expressions import RawSQL
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
@@ -49,6 +49,7 @@ from .models import STATUS
 import datetime
 from django.core.mail import send_mail
 from smtplib import SMTPException
+from collections import defaultdict
 # STATUS = {'ACTIVE' :1,'INACTIVE' :0}
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
@@ -273,7 +274,8 @@ def employer_homepage(request):
 @user_passes_test(is_manager)
 def manager_homepage(request):
     context={}
-    return render(request,'emp/manager_homepage.html',context)
+    response = render(request,'emp/manager_homepage.html',context)
+    return response
 
 def handlelogout(request):
     logout(request)
@@ -1220,103 +1222,129 @@ def student_filter(request):
     
     
     if request.method == 'POST':
-        # -------------------------------------------------------- 1. get input for single foss selection
+        # -------------------------------------------------------- 1. get input for single foss selection (mandatory / optional)
         foss = request.POST.getlist('foss') #get mandatory / optional single foss
         grades = request.POST.getlist('grade') #get mandatory / optional single foss grade
         criteria_type = request.POST.getlist('criteria-type') #get mandatory / optional type
-
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        
+        all_quiz_ids = []
         grade_filter = zip(foss, grades,criteria_type)
         mandatory = {} #mandatorry fosses
-        optional = [] #optional fosses
+        optional = {} #optional fosses
         for foss,grade,criteria_type in grade_filter:
             if int(criteria_type)==MANDATORY_FOSS:
                 mandatory[int(foss)]=grade
             else:
-                optional[foss]=grade
-        # -------------------------------------------------------- 1. get input for  single foss selection ends
+                optional[int(foss)]=grade
+        # -------------------------------------------------------- 1. end - get input for  single foss selection
 
         # -------------------------------------------------------- 2. get input for multiple foss selection
         multiple_grade = request.POST.getlist('multiple_grade') #grades from any one of query
+
+
         num = request.POST.get('num') if request.POST.get('num') else 0 #key to track number of multiple foss selection
         multiple_fosses = [] #list of list of any of the fosses criteria
-        for item in range(1,int(num)+2):
-            # print(f"item ******************* {item}")
-            multiple_fosses.append(request.POST.getlist('fosses_'+str(item)))
+        if num==0:
+            multiple_fosses.append(request.POST.getlist('fosses_1'))
+        else:
+            for item in range(1,int(num)+1):
+                multiple_fosses.append(request.POST.getlist('fosses_'+str(item)))
         # -------------------------------------------------------- 2. get input for multiple foss selection ends
         
         # -------------------------------------------------------- 3. get mdl_users satisfying the single mandatory foss criteria (mdlusers)
         mdlusers = MdlUser.objects.using('moodle').all()
+        # mdlusers = MdlUser.objects.none()
         users_id = []
-        print(f"mandatory ****************** {mandatory}")
         # foss_mdl_courses dictionary | key : foss id| value : corresponding mdl quiz id
         foss_mdl_courses = FossMdlCourses.objects.filter(foss_id__in=mandatory).values_list('foss','mdlquiz_id')
         mdl_quizzes = list(map(lambda x: x[1], foss_mdl_courses))
-        mdl_users = []
+        all_quiz_ids = mdl_quizzes #used for filter in testattendance query
+        mdl_users = [] #keep track of eligible students
         q = []
-        print(f"1 foss_mdl_courses ************************ {foss_mdl_courses}")
         if foss_mdl_courses:
             for item in foss_mdl_courses:
                 if mdl_users:
                     q = MdlUser.objects.filter(Q(mdlquizgrades__quiz=item[1]) & Q(mdlquizgrades__grade__gt=mandatory[item[0]]),id__in=mdl_users).values_list('id')
                 else:
                     q = MdlUser.objects.filter(Q(mdlquizgrades__quiz=item[1]) & Q(mdlquizgrades__grade__gt=mandatory[item[0]])).values_list('id')
-                mdl_users = list(itertools.chain(*q))
+                mdl_users = list(itertools.chain(*q)) #To get a single list from a list of tuples (q)
+                
                 # q = Q(mdlquizgrades__quiz=item[1]) & Q(mdlquizgrades__grade__gt=mandatory[item[0]])
                 # mdlusers = mdlusers.filter(q)
-            mdlusers = q.values('id')
-            for item in range(int(num)):
-                print(f"num ---------- {num}")
-                print(f"num ********* {num}. multiple_fosses[item] ********* {multiple_fosses[item]}. multiple_grade[item] ************** {multiple_grade[item]}")
-                if mdl_users:
-                    q = MdlUser.objects.filter(Q(mdlquizgrades__quiz__in=multiple_fosses[item]) & Q(mdlquizgrades__grade__gt=multiple_grade[item]),id__in=mdl_users).values_list('id')
-                    # print(f"q1 query ------------------------------ {q.query}")
-                    # print(f"q1 ------------------------------ {q}")
-                else:
-                    q = MdlUser.objects.filter(Q(mdlquizgrades__quiz__in=multiple_fosses[item]) & Q(mdlquizgrades__grade__gt=multiple_grade[item])).values_list('id')
-                    # print(f"q2 query------------------------------ {q.query}")
-                    # print(f"q2 ------------------------------ {q}")
-                mdl_users = list(itertools.chain(*q))
+            # mdlusers = q.values('id')
+
+            if any(multiple_fosses):
+                
+                # for item in range(int(num)):
+                for count,elem in enumerate(multiple_fosses):
+                    foss_mdl_courses = FossMdlCourses.objects.filter(foss_id__in=elem).values_list('mdlquiz_id')
+                    mdl_quizzes = list(map(lambda x: x[0], foss_mdl_courses))
+                    all_quiz_ids += mdl_quizzes
+                    if mdl_users:
+                        q = MdlUser.objects.filter(Q(mdlquizgrades__quiz__in=mdl_quizzes) & Q(mdlquizgrades__grade__gt=multiple_grade[count]),id__in=mdl_users).values_list('id')
+                    else:
+                        print("mdl users not exists")
+                        q = MdlUser.objects.filter(Q(mdlquizgrades__quiz__in=mdl_quizzes) & Q(mdlquizgrades__grade__gt=multiple_grade[count])).values_list('id')
+                        # print(f"q2 query------------------------------ {q.query}")
+                        # print(f"q2 ------------------------------ {q}")
+                    mdl_users = list(itertools.chain(*q))
             # -------------------------------------------------------- 3. get mdl_users satisfying the single mandatory foss criteria (mdlusers) ends
 
             # users_id = users.values_list('id').annotate(key=F('mdlquizgrades__userid')+'_'+F('mdlquizgrades__quiz')).annotate(grade=F('mdlquizgrades__grade'))
             # users_id = users.values('id')
             # -------------------------------------------------------- 4. users_id : (user_id, user_quiz, grade) satisfying only mandatory quiz, grade criteria
+            # users_id = mdl_users.annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
+            mdlusers = MdlUser.objects.using('moodle').filter(id__in=mdl_users)
+            #list of tuple(mdluserid,mdluserid_quiz,grade ) #this is all the mdl_quiz_grade table data eligible mdlusers! 
             users_id = mdlusers.annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
-            context['users_id'] = users_id
-            print(f"users_id ******************* {users_id}")
+            context['users_id'] = users_id # contains mdluser_id, mdluserid_quiz, grade
             # -------------------------------------------------------- 4. users_id : (user_id, user_quiz, grade) mdluser ids satisfying only mandatory quiz, grade criteria ends
             
             # -------------------------------------------------------- 5. d_data : mdluser ids with all selected mandatory quiz; this is to get the grade for all selected foss for selected mdlusers irrespective of grade criteria
-            # d1 : dictionary of user_quiz & grades | key : mdluserid_quizid | value : grade
+            # d1 : dictionary of userid_quiz & grades | key : mdluserid_quizid | value : grade
+            print(f"UNSERS_ID *********** {users_id[:10]}")
             unzipped = list(zip(*users_id))
-            print(f"unzipped **************** {unzipped}")
-            d_data = MdlUser.objects.filter(id__in=list(unzipped[0]),mdlquizgrades__quiz__in=mdl_quizzes).annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
-            print(f"d_data ******************* {d_data}")
+            # d_data = MdlUser.objects.filter(id__in=list(unzipped[0]),mdlquizgrades__quiz__in=mdl_quizzes).annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
+            d_data = users_id
             d_unzipped = list(zip(*d_data))
 
+            mdl_user_lst = unzipped[0]
             d_key = d_unzipped[1] #mdluserid_quizid
             d_values = d_unzipped[2] #grade
             d1 = {}
             for elem in enumerate(d_key):
-                d1[d_key[elem[0]]] = d_values[elem[0]]
+                d1[d_key[elem[0]]] = d_values[elem[0]] #elem[0] gives index
             context['d_data'] = d_data
+            print(f"d1 ********* {d1}")
             context['d1'] = d1 #dictionary to get quiz grades
             # -------------------------------------------------------- 5. d_data : mdluser ids with all selected mandatory quiz; this is to get the grade for all selected foss for selected mdlusers irrespective of grade criteria
             # -------------------------------------------------------- ??
-            key = unzipped[1] #mdluserid_quizid
-            values = unzipped[2] #grade
-            d = {}
-            for elem in enumerate(key):
-                d[key[elem[0]]] = values[elem[0]]
+            # key = unzipped[1] #mdluserid_quizid
+            # values = unzipped[2] #grade
+            # d = {}
+            # for elem in enumerate(key):
+            #     d[key[elem[0]]] = values[elem[0]]
                 # print(key[elem[0]],values[elem[0]])
             # users_id = users.values_list('id')
             # -------------------------------------------------------- ??
             # mdl_user_lst = list(itertools.chain(*users_id))
-            mdl_user_lst = unzipped[0]
+            
             context['mdl_user_lst']=mdl_user_lst
             user_subquery = SpokenUser.objects.filter(spokenstudent=OuterRef('student_id')).values('first_name')
             email_subquery = SpokenUser.objects.filter(spokenstudent=OuterRef('student_id')).values('email')
-            ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst).filter(mdlquiz_id__in=mdl_quizzes).values('student_id','mdlquiz_id','mdluser_id')
+
+            if start_date and end_date:
+                ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst,mdlquiz_id__in=all_quiz_ids,status__gte=3,test__tdate__range=[start_date,end_date]).values('student_id','mdlquiz_id','mdluser_id')
+            elif start_date:
+                ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst,mdlquiz_id__in=all_quiz_ids,status__gte=3,test__tdate__gte=start_date).values('student_id','mdlquiz_id','mdluser_id')
+            elif end_date:
+                ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst,mdlquiz_id__in=all_quiz_ids,status__gte=3,test__tdate__lte=end_date).values('student_id','mdlquiz_id','mdluser_id')
+            else:
+                ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst,mdlquiz_id__in=all_quiz_ids,status__gte=3).values('student_id','mdlquiz_id','mdluser_id')
+            # ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst).filter(mdlquiz_id__in=all_quiz_ids).values('student_id','mdlquiz_id','mdluser_id')
+            # ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst).values('student_id','mdlquiz_id','mdluser_id')
             ta = ta.annotate(student_name=Subquery(user_subquery))
             ta = ta.annotate(student_email=Subquery(email_subquery))
             
@@ -1330,13 +1358,27 @@ def student_filter(request):
             # ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade=d1.get(Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField()),Value('0'))).values('student_name','foss_name','grade')
             # test__tdate__gte=job.from_date
             # d = datetime.datetime.strptime('2019-07-01', "%Y-%m-%d").date()
-            cus_date = datetime.datetime.strptime("01072019", "%d%m%Y").date()
-            ta = ta.annotate(test__tdate__gte=Value(cus_date),foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).values('student_email','student_name','foss_name','grade_key','student_id','mdluser_id','mdluser_firstname','mdluser_lastname')
-            print(f"ta ************ {ta}")
+            # cus_date = datetime.datetime.strptime("01072019", "%d%m%Y").date()
+            # ta = ta.annotate(test__tdate__gte=Value(cus_date),foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).values('student_email','student_name','foss_name','grade_key','student_id','mdluser_id','mdluser_firstname','mdluser_lastname')
+            # ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).annotate(grade=d1.get(F('grade_key'),Value('-'))).values('student_email','student_name','foss_name','grade_key','student_id','mdluser_id','mdluser_firstname','mdluser_lastname','grade')
+            d = defaultdict(lambda: -1,d1)
+            # d= {'a':2}
+
+            # ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).annotate(grade=Value(d[Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())])).values('student_email','student_name','foss_name','grade_key','student_id','mdluser_id','mdluser_firstname','mdluser_lastname','grade')
+            ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).values('student_email','student_name','foss_name','grade_key','student_id','mdluser_id','mdluser_firstname','mdluser_lastname')
+            # ta = ta.annotate(grade=Value(d1.get(F('grade_key'),"PP")))
+            ta = ta.annotate(grade=Concat(d[F('grade_key')],Value('_'),output_field=CharField()))
+            for item in ta[:10]:
+                print(f"{d.get(item['grade_key'])}")
+            print(f"ta ************ {ta[:5]}")
             students = list(map(lambda x: x['student_name'], ta))
 
             mdl_user_data = mdlusers.values_list('id','firstname')
             context['mdl_user_data']=mdl_user_data
+            emails = ta.values_list('student_email')
+            context['emails'] = set(emails)
+            print(f"len *********** {len(emails)}")
+            print(f"len set *********** {len(set(emails))}")
             
             # spk_students = SpokenStudent.objects.filter(id__in=students).values('id','user_id')
             # users = list(map(lambda x: x[1], spk_students))
@@ -1346,21 +1388,11 @@ def student_filter(request):
             l = len(ta)
             context['len']=len(ta)
             df = pd.DataFrame(ta)
-            print(df)
+            df1 = df.pivot(df.index.name, 'foss_name', 'grade')
+            print(df1)
 
         else:
             print("NO ENTRY FOR GIVEN FOSS")
-        # print(f"num ****************************** {num}")
-        # print(f"range(int(num)+1)*************** {list(range(int(num)+1))}")
-        # print(f"multiple_fosses ************************** {multiple_fosses}")
-        # print(f"multiple_grade ************************** {multiple_grade}")
-        
-            
-            
-
-        
-        
-        
 
     return render(request,'emp/student_filter.html',context)
 
