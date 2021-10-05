@@ -8,7 +8,6 @@ from spoken.models import AcademicCenter
 import os
 from spoken.models import SpokenUser, SpokenState, SpokenCity
 from django.core.validators import RegexValidator
-from django.db.models.signals import m2m_changed
 
 
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
@@ -381,10 +380,3 @@ class Feedback(models.Model):
     message = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
 
-def user_group_changed(sender,**kwargs):
-    user_instance =  kwargs['instance']
-    user = SpokenUser.objects.get(username=user_instance.username)
-    user_instance.password = user.password
-    user_instance.save()
-    
-m2m_changed.connect(user_group_changed, sender=User.groups.through)
