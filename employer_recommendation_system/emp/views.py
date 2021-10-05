@@ -581,7 +581,6 @@ def add_education(student,degree,discipline,institute,start_year,end_year,gpa,or
         education.acad_discipline = discipline if discipline else None
         education.order = order
         if institute:
-            print(f"institute 3 -------------- {institute}")
             education.institute = institute
         if start_year:
             education.start_year = start_year
@@ -1219,6 +1218,7 @@ def student_filter(request):
     context['foss'] = foss
     context['MANDATORY_FOSS']=MANDATORY_FOSS #key to mark manndatory foss
     context['OPTIONAL_FOSS']=OPTIONAL_FOSS #key to mark optional foss
+    context['MASS_MAIL']=settings.MASS_MAIL
     
     
     if request.method == 'POST':
@@ -1285,10 +1285,7 @@ def student_filter(request):
                     if mdl_users:
                         q = MdlUser.objects.filter(Q(mdlquizgrades__quiz__in=mdl_quizzes) & Q(mdlquizgrades__grade__gt=multiple_grade[count]),id__in=mdl_users).values_list('id')
                     else:
-                        print("mdl users not exists")
                         q = MdlUser.objects.filter(Q(mdlquizgrades__quiz__in=mdl_quizzes) & Q(mdlquizgrades__grade__gt=multiple_grade[count])).values_list('id')
-                        # print(f"q2 query------------------------------ {q.query}")
-                        # print(f"q2 ------------------------------ {q}")
                     mdl_users = list(itertools.chain(*q))
             # -------------------------------------------------------- 3. get mdl_users satisfying the single mandatory foss criteria (mdlusers) ends
 
@@ -1304,7 +1301,6 @@ def student_filter(request):
             
             # -------------------------------------------------------- 5. d_data : mdluser ids with all selected mandatory quiz; this is to get the grade for all selected foss for selected mdlusers irrespective of grade criteria
             # d1 : dictionary of userid_quiz & grades | key : mdluserid_quizid | value : grade
-            print(f"UNSERS_ID *********** {users_id[:10]}")
             unzipped = list(zip(*users_id))
             # d_data = MdlUser.objects.filter(id__in=list(unzipped[0]),mdlquizgrades__quiz__in=mdl_quizzes).annotate(key=Concat(F('mdlquizgrades__userid'),Value('_'),F('mdlquizgrades__quiz'),output_field=CharField())).annotate(grade=F('mdlquizgrades__grade')).values_list('id','key','grade')
             d_data = users_id
@@ -1317,7 +1313,6 @@ def student_filter(request):
             for elem in enumerate(d_key):
                 d1[d_key[elem[0]]] = d_values[elem[0]] #elem[0] gives index
             context['d_data'] = d_data
-            print(f"d1 ********* {d1}")
             context['d1'] = d1 #dictionary to get quiz grades
             # -------------------------------------------------------- 5. d_data : mdluser ids with all selected mandatory quiz; this is to get the grade for all selected foss for selected mdlusers irrespective of grade criteria
             # -------------------------------------------------------- ??
@@ -1343,60 +1338,33 @@ def student_filter(request):
                 ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst,mdlquiz_id__in=all_quiz_ids,status__gte=3,test__tdate__lte=end_date).values('student_id','mdlquiz_id','mdluser_id')
             else:
                 ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst,mdlquiz_id__in=all_quiz_ids,status__gte=3).values('student_id','mdlquiz_id','mdluser_id')
-            # ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst).filter(mdlquiz_id__in=all_quiz_ids).values('student_id','mdlquiz_id','mdluser_id')
-            # ta = TestAttendance.objects.filter(mdluser_id__in=mdl_user_lst).values('student_id','mdlquiz_id','mdluser_id')
+
             ta = ta.annotate(student_name=Subquery(user_subquery))
             ta = ta.annotate(student_email=Subquery(email_subquery))
             
-            # foss_subquery = FossMdlCourses.objects.filter(mdlcourse_id=OuterRef('mdlcourse_id')).values('foss')[:1]
             foss_id_subquery = FossMdlCourses.objects.filter(mdlcourse_id=OuterRef('mdlcourse_id')).values('foss')[:1]
-            # ta = ta.annotate(foss_name=FossCategory.objects.filter(id=Subquery(foss_subquery)))
-            # foss_subquery = FossCategory.objects.filter(id=OuterRef('foss_id')).MdlQuizGrades.objectsvalues('foss')[:1]
             foss_subquery = FossCategory.objects.filter(id=OuterRef('foss_id')).values('foss')[:1]
-            # grade_subquery = MdlQuizGrades.objects.using('moodle').filter(quiz=OuterRef('mdlquiz_id'),userid=OuterRef('mdluser_id')).values('timemodified')[:1]
-            # grade_subquery = MdlQuizGrades.objects.using('moodle').filter(userid=OuterRef('mdluser_id')).values('grade')[:1]
-            # ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade=d1.get(Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField()),Value('0'))).values('student_name','foss_name','grade')
-            # test__tdate__gte=job.from_date
-            # d = datetime.datetime.strptime('2019-07-01', "%Y-%m-%d").date()
-            # cus_date = datetime.datetime.strptime("01072019", "%d%m%Y").date()
-            # ta = ta.annotate(test__tdate__gte=Value(cus_date),foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).values('student_email','student_name','foss_name','grade_key','student_id','mdluser_id','mdluser_firstname','mdluser_lastname')
-            # ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).annotate(grade=d1.get(F('grade_key'),Value('-'))).values('student_email','student_name','foss_name','grade_key','student_id','mdluser_id','mdluser_firstname','mdluser_lastname','grade')
+            
             d = defaultdict(lambda: -1,d1)
-            # d= {'a':2}
-
-            # ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).annotate(grade=Value(d[Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())])).values('student_email','student_name','foss_name','grade_key','student_id','mdluser_id','mdluser_firstname','mdluser_lastname','grade')
             ta = ta.annotate(foss_id=Subquery(foss_id_subquery)).annotate(foss_name=Subquery(foss_subquery)).annotate(grade_key=Concat(F('mdluser_id'),Value('_'),F('mdlquiz_id'),output_field=CharField())).values('student_email','student_name','foss_name','grade_key','student_id','mdluser_id','mdluser_firstname','mdluser_lastname')
-            # ta = ta.annotate(grade=Value(d1.get(F('grade_key'),"PP")))
+            
             ta = ta.annotate(grade=Concat(d[F('grade_key')],Value('_'),output_field=CharField()))
-            for item in ta[:10]:
-                print(f"{d.get(item['grade_key'])}")
-            print(f"ta ************ {ta[:5]}")
+            
             students = list(map(lambda x: x['student_name'], ta))
 
             mdl_user_data = mdlusers.values_list('id','firstname')
             context['mdl_user_data']=mdl_user_data
             emails = ta.values_list('student_email')
             context['emails'] = set(emails)
-            print(f"len *********** {len(emails)}")
-            print(f"len set *********** {len(set(emails))}")
-            
-            # spk_students = SpokenStudent.objects.filter(id__in=students).values('id','user_id')
-            # users = list(map(lambda x: x[1], spk_students))
-            # spk_users = SpokenUser.objects.filter(spokenstudent__in=students).values('id','first_name')
-            # context['spk_users']=spk_users
             context['ta']=ta
             l = len(ta)
             context['len']=len(ta)
             df = pd.DataFrame(ta)
             df1 = df.pivot(df.index.name, 'foss_name', 'grade')
-            print(df1)
-
         else:
             print("NO ENTRY FOR GIVEN FOSS")
 
     return render(request,'emp/student_filter.html',context)
-
-
 
 # landing page views 
 class GalleryImageCreate(CreateView):
@@ -1410,7 +1378,6 @@ class GalleryImageCreate(CreateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print(f"Form Errors : {form.errors}")
         messages.error(self.request, 'Error in adding image.')
         return self.render_to_response(self.get_context_data(form=form))
 
@@ -1437,7 +1404,6 @@ class GalleryImageUpdate(UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print(f"Form Errors : {form.errors}")
         messages.error(self.request, 'Error in updating image.')
         return self.render_to_response(self.get_context_data(form=form))
 
@@ -1448,20 +1414,13 @@ class TestimonialCreate(CreateView):
 
     def form_valid(self, form):
         try:
-            print("Testimonial valid 1 ****************************")
             self.object = form.save()
-            print("Testimonial valid 2 ****************************")
         except Exception as e:
-            print("Testimonial error ****************************")
             print(e)
-            print("****************************")
-        print("3 ****************************")
         messages.success(self.request, 'Testimonial is added successfully.')
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print(f"Form Errors : {form.errors}")
-        print("Testimonial form invalid ****************************")
         messages.error(self.request, 'Error in adding testimonial.')
         return self.render_to_response(self.get_context_data(form=form))
 
@@ -1488,7 +1447,6 @@ class TestimonialUpdate(UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print(f"Form Errors : {form.errors}")
         messages.error(self.request, 'Error in updating testimonial.')
         return self.render_to_response(self.get_context_data(form=form))
     

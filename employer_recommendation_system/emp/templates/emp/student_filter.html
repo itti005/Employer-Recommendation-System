@@ -214,36 +214,20 @@
 		// console.log(clone)
 		document.getElementById("wrapper-criteria").appendChild(clone);
 		});
-
 		$( "#add_multiple_btn" ).click(function() {
-
 		multi_foss = multi_foss + 1;
-
 		var item = document.getElementById("multiple_filter_1");
 		var clone = item.cloneNode(true);
 		count = num+1
 		clone.id = 'multiple_filter_'+ count ;
 		clone.getElementsByClassName("fosses")[0].setAttribute('name', 'fosses_' + multi_foss);
 		num = num + 1;
-		// console.log(clone)
 		document.getElementById("wrapper-criteria-multiple").appendChild(clone);
-		// alert(multi_foss)
 		$('#num').val(multi_foss);
-		// alert($('#num').val());
 		});
 
 		var multi_foss_first = document.getElementsByName("fosses_1");
 		$('#tb_emails').dataTable({"pageLength": 25});
-		// if(document.getElementsByClassName('fosses')[0].value==""){
-		// 	alert('if');
-		// 	$('#num').val(0);
-		// }else{
-		// 	alert('else');
-		// }
-
-		
-		//  alert($('#num').val());
-		
 	});
 	// $("#btn_mail").on("click", function(event){
 	$("#create_mail").on("click", function(event){
@@ -252,10 +236,6 @@
         var job_id = $('#f_jobid').val();
         var subject = $('#f_subject').val();
         message = CKEDITOR.instances['f_message'].getData()
-
-        console.log(job_id);
-        console.log(subject);
-        console.log(message);
         table = $('#tb_emails').DataTable()
         if (table.data().any() == false){
           alert('Email list is empty. Please filter emails for mass mail.')
@@ -265,61 +245,29 @@
         }
          
         emails = table.column(1).data();
-        console.log(emails);
         data = []
         for (i = 0; i < emails.length; i++) {
               data.push([emails[i]])
             }
-        console.log(data);
         var username = $('#f_username').val();
         var pwd = $('#f_pwd').val();
         
-      // modal = $('#taskModal').modal()
-      // subject = modal.find('.modal-body input[name="subject"]').val()
-      // job = modal.find('.modal-body input[name="job_id"]').val()
-      // message = CKEDITOR.instances['task_message'].getData()
       data = JSON.stringify({ 'data': data ,'subject': subject,'job': job_id, 'message': message,'username':username,'password':pwd});
-      // mail_data = {'subject': subject,'job': job, 'message': message, 'data': data}
-      // m_url = $(this).attr('action');
-      // var myOffcanvas = document.getElementById('offcanvasTop')
-      // var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
-      // bsOffcanvas.show()
-      // $('#taskModal').modal('toggle');
+      mail_data = {'subject': subject,'job': 'job', 'message': message, 'data': data,'username':username,'password':pwd};
       
-      // emails = ['ankitamk@gmail.com','abc@gmail.com']
-      // data = []
-      // for(let i=0; i<emails.length; i++){
-      // 		data.push([emails[i]])
-      // }
-      // data = JSON.stringify({ 'data': data });
       var user = $('#user').val();
-      // mail_data = {'subject': subject,'job': job_id, 'message': message,'data':data,'user':user}
+      
       $.ajax({
-          type: "POST",
-          // url: $(this).attr('action'),
-          url: 'http://127.0.0.1:8081/cron/upload_task/',
-          // data: mail_data,
-          body : data,
-          // headers: { 'Content-Type': 'application/json','X-Bender': 'some value' ,'Access-Control-Allow-Origin': 'http://localhost:8000, http://localhost:8081','Accept': 'application/json'},
+          method: "POST",
+          url: '{{MASS_MAIL}}',
+          data: mail_data,
           dataType : 'json',
           success:function(data) {
-              // $('#sending_status').hide();
-              alert('success');
-              // var el = document.getElementById('spinner');
-              // el.remove(); 
-              // $("#mail_status").show();
-
-              // $("#sent").text(data['sent']);
-              // $("#errors").text(data['errors']);
+              alert('mass mail created successfully !');
             },
           error:function(data) {
           	alert('error');
-
-            // $('#sending_status').hide();
-            // var el = document.getElementById('spinner');
-            //   el.remove(); 
-            //   $('#error_status').show();
-            },
+},
           })
     });
 </script>
