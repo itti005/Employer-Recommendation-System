@@ -1,7 +1,6 @@
-
-
 {% extends 'emp/base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% load helper %}
 {% block content-header %}{{ object.title}}{% endblock %}
 {% block css %}
@@ -21,7 +20,7 @@
 {% for message in messages %}
     <div class="text-center alert {{ message.tags }}">
                 {{ message|safe }}
-            </div>
+    </div>
 {% endfor %}
 <form method="post">
 	{% csrf_token %}
@@ -66,43 +65,123 @@
 		
 	</div>
 	</div>
+	<div class="row">
+		<div class="col-6">
+		<label for="start_date">Start Date</label>
+		<input type="date" id="start_date" name="start_date">
+	</div>
+		<div class="col-6">
+		<label for="end_date">End Date</label>
+		<input type="date" id="end_date" name="end_date">
+	</div>
+		
+	</div>
 	
 	<input type="text" name="num" id="num">
 	<input type="submit" name="filter" class="mt-3">
+	<input type="hidden" name="user" id="user" value="{{request.user.username}}">
 </form>
-
+<div>
+	<a data-bs-toggle="modal" href="#exampleModalToggle" role="button" href="http://127.0.0.1:8081/cron/mail_list_create/" class="btn btn-primary" target="_blank" id="btn_mail">Send 1st Mail</a>
+	<div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalToggleLabel">Modal 1</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div>
+        	<form id="mail_content">
+        		<div>
+        			<label class="form-label" for="f_jobid">Job Id</label>
+        			<input class="form-control" type="text" name="jobid" id="f_jobid">
+        		</div>
+        		<div>
+        			<label class="form-label" for="f_subject">Subject</label>
+        			<input class="form-control" type="text" name="subject" id="f_subject">
+        		</div>
+        		<div>
+        			<label class="form-label" for="f_message">Message</label>
+        			<textarea class="form-control" type="text" name="message" rows="3" id="f_message"></textarea>
+        		</div>
+        	</form>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: block!important;">
+      	<div class="row">
+      		<div class="col">
+      			<label class="form-label" for="f_username">Username</label>
+        		<input form="mail_content" class="form-control" type="text" name="username" id="f_username">
+      		</div>
+      		<div class="col">
+      			<label class="form-label" for="f_pwd">Password</label>
+        		<input form="mail_content" class="form-control" type="password" name="pwd" id="f_pwd">
+      		</div>
+      		<div class="col">
+      			<button id="create_mail" class="btn btn-primary" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal" data-bs-dismiss="modal" style="margin-top: 28px!important;">Create Mass Mail</button>
+      		</div>
+      		
+      	</div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div>
+	<table class="table table-bordered" id="tb_emails">
+		<thead>
+			<tr>
+				<td>Sr#</td>
+				<td>Email</td>
+			</tr>
+			
+		</thead>
+		<tbody>
+			{% for item in emails %}
+			<tr>
+				<td>{{forloop.counter}}</td>
+				<td>{{item.0}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
 <div>
 	<hr>
-	{{mdl_user_data}}
-	<hr>
-	<div>
+	<!-- <div style="border: 2px solid blue;">
+		<table>
+			{% for item in users_id %}
+			<tr>
+				<td>{{item.0}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div> -->
+	<!-- {{mdl_user_data}} -->
+	
+	<!-- <div>
 		<table style="width:100%">
   <tr>
     <th>Name</th>
     <th>Email</th>
     <th>Foss</th>
-    
     <th>grade_key</th>
 	<th>Student Id</th>
 	<th>mdluser_id</th>
-
-    
   </tr>
   {% for item in ta %}
   <tr>
   	<td>{{item.mdluser_firstname}} {{item.mdluser_lastname}}</td>
   	<td>{{item.student_email | default_if_none:'-'}}</td>
   	<td>{{item.foss_name}}</td>
-  	
+  	{% comment %}
   	<td>{{d1 | get_item:item.grade_key}}</td>
-  	<td>{{item.student_id}}</td>
-  	<td>{{item.mdluser_id}}</td>
-
-
-
-
-
+  	{% endcomment %}
   	
+  	<td>{{item.student_id}}</td>
+  	<td>{{item.mdluser_id}}</td>  	
   </tr>
   {% endfor %}
 </table>
@@ -111,7 +190,7 @@
 	<hr><hr>
 	{{mdl_user_lst}}
 	<hr><hr>
-	{{ta}}
+	{{ta}} -->
 	
 </div>
 
@@ -123,7 +202,7 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
 	$(document).ready(function (){
-		var num = 1;
+		var num = 0;
 		var multi_foss = 1;
 		
 		$( "#add_btn" ).click(function() {
@@ -135,27 +214,69 @@
 		// console.log(clone)
 		document.getElementById("wrapper-criteria").appendChild(clone);
 		});
-
 		$( "#add_multiple_btn" ).click(function() {
-
 		multi_foss = multi_foss + 1;
-
 		var item = document.getElementById("multiple_filter_1");
 		var clone = item.cloneNode(true);
 		count = num+1
 		clone.id = 'multiple_filter_'+ count ;
 		clone.getElementsByClassName("fosses")[0].setAttribute('name', 'fosses_' + multi_foss);
 		num = num + 1;
-		// console.log(clone)
 		document.getElementById("wrapper-criteria-multiple").appendChild(clone);
-		// alert(multi_foss)
 		$('#num').val(multi_foss);
-		// alert($('#num').val());
 		});
-		
-		// alert('hi');
-		
+
+		var multi_foss_first = document.getElementsByName("fosses_1");
+		$('#tb_emails').dataTable({"pageLength": 25});
 	});
+	// $("#btn_mail").on("click", function(event){
+	$("#create_mail").on("click", function(event){
+        event.preventDefault();
+        alert('here');
+        var job_id = $('#f_jobid').val();
+        var subject = $('#f_subject').val();
+        message = CKEDITOR.instances['f_message'].getData()
+        table = $('#tb_emails').DataTable()
+        if (table.data().any() == false){
+          alert('Email list is empty. Please filter emails for mass mail.')
+          return
+        }else{
+        	alert('table is not empty');
+        }
+         
+        emails = table.column(1).data();
+        data = []
+        for (i = 0; i < emails.length; i++) {
+              data.push([emails[i]])
+            }
+        var username = $('#f_username').val();
+        var pwd = $('#f_pwd').val();
+        
+      data = JSON.stringify({ 'data': data ,'subject': subject,'job': job_id, 'message': message,'username':username,'password':pwd});
+      mail_data = {'subject': subject,'job': 'job', 'message': message, 'data': data,'username':username,'password':pwd};
+      
+      var user = $('#user').val();
+      
+      $.ajax({
+          method: "POST",
+          url: '{{MASS_MAIL}}',
+          data: mail_data,
+          dataType : 'json',
+          success:function(data) {
+              alert('mass mail created successfully !');
+            },
+          error:function(data) {
+          	alert('error');
+},
+          })
+    });
+</script>
+<script type="text/javascript" src="{% static '/ckeditor/ckeditor-init.js' %}"></script>
+<script type="text/javascript" src="{% static '/ckeditor/ckeditor/ckeditor.js' %}"></script>
+<script>
+  // Replace the <textarea id="editor1"> with a CKEditor
+  // instance, using default configuration.
+  CKEDITOR.replace( 'f_message' );
 </script>
 
 {% endblock %}

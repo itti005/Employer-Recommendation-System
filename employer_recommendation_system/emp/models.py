@@ -379,3 +379,4 @@ class Feedback(models.Model):
     email = models.EmailField(null=True,blank=True)
     message = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
+
