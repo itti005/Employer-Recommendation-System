@@ -30,6 +30,19 @@ class SpokenUser(models.Model):
     def __str__(self):
         return self.first_name + ' ' + self.last_name
 
+class SpokenGroup(models.Model):
+    name = models.CharField(max_length=200)
+    class Meta:
+        managed = False
+        db_table = 'auth_group'
+
+class SpokenUserGroup(models.Model):
+    user = models.ForeignKey(SpokenUser, on_delete=models.PROTECT )
+    group = models.ForeignKey(SpokenGroup, on_delete=models.PROTECT )
+    class Meta:
+        managed = False
+        db_table = 'auth_user_groups'
+
 class SpokenStudent(models.Model):
     gender = models.CharField(max_length=15)
     verified = models.PositiveSmallIntegerField()
