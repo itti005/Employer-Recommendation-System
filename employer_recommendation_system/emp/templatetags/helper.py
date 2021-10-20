@@ -239,3 +239,13 @@ def get_employees(value):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key) 
+
+
+@register.filter()
+def format_date(value):
+    if value is not None:
+        
+
+        print(value)
+        return "new date"
+    return 'new date 1'

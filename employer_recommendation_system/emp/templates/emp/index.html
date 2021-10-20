@@ -69,6 +69,9 @@ div#navbarSupportedContent>ul>li>a{
   color: rgba(0,38,72,1)!important;
   font-weight: bold;
 }
+.company{
+  border: 1px solid rgba(0,0,0,0.2);
+}
 </style>
 {% endblock %}
 {% block main %}
@@ -119,12 +122,52 @@ div#navbarSupportedContent>ul>li>a{
  	</div>
  </div>
 </div>
-
+<br>
 <div class="container mt-3 px-0">
-	<div class="d-flex justify-content-around" style="width: 100%;" >
+  <div class="d-flex justify-content-between">
+    <p class="display-6 border-bottom" style="font-size: 1.5rem;color: #002648;">Past Collaborations</p>
+    <p><a type="button" class="btn btn-outline-primary c-btn" href="{% url 'companies' %}" target="_blank">View all companies</a></p>
+  </div>
+	<!-- <div class="d-flex justify-content-center" style="width: 100%;" >
     {% for company in companies %}
-    <div class="text-center  me-2 ">
+    <div class="text-center  me-2 p-2 company">
       <img src="{{company.logo}}" style="width: 140px; height: auto;">
+    </div>
+    {% endfor %}
+	</div> -->
+  <div class="row" >
+    {% for company in companies %}
+    <div class="col-sm-6 col-md-2   ">
+      <div class="company text-center d-flex align-items-center justify-content-center" style="height: 100%;">
+        <img src="{{company.logo}}" style="width: 60%; height: auto;" >
+      </div>
+      
+    </div>
+    {% endfor %}
+	</div>
+</div>
+<br>
+<hr>
+<br>
+<div class="container mt-3 px-0">
+  <div class="d-flex justify-content-between">
+    <p class="display-6 border-bottom" style="font-size: 1.5rem;color: #002648;">Events</p>
+    <p><a type="button" class="btn btn-outline-primary c-btn" href="{% url 'event-list' %}" target="_blank">View all events</a></p>
+  </div>
+	<!-- <div class="d-flex justify-content-center" style="width: 100%;" >
+    {% for company in companies %}
+    <div class="text-center  me-2 p-2 company">
+      <img src="{{company.logo}}" style="width: 140px; height: auto;">
+    </div>
+    {% endfor %}
+	</div> -->
+  <div class="row" >
+    {% for event in events %}
+    <div class="col-sm-6 col-md-2   ">
+      <div class="company text-center d-flex align-items-center justify-content-center" style="height: 100%;">
+        <img src="/media/{{ event.logo }}" style="width: 60%; height: auto;" >
+      </div>
+      
     </div>
     {% endfor %}
 	</div>
