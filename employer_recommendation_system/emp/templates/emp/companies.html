@@ -1,0 +1,52 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}Add Company{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+	
+</style>
+{% endblock %}
+{% block content %}
+
+{% include "emp/page_header.html" with title="Companies" icon="<i class='far fa-image'></i>" %}
+
+<div>
+    <table class="table" id="tb-company">
+        <thead>
+          <tr>
+            <th scope="col">Sr. #</th>
+            <th scope="col">Company</th>
+            <th scope="col">Domain</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for object in object_list %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{ object.name }}</td>
+            <td>{{ object.domain }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table> 
+</div>
+
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block js %}
+<script type = "text/javascript">
+    $(document).ready(function(){
+        $('#tb-company').DataTable(
+            {
+                "pageLength": 50
+            }
+        );
+
+    });
+</script>
+{% endblock %}
