@@ -1,5 +1,6 @@
 {% extends 'emp/base_generic.html' %}
 {% load crispy_forms_tags %}
+{% load helper %}
 {% block content-header %}Homepage{% endblock %}
 {% block css %}
 <style type="text/css">
@@ -72,32 +73,16 @@ div#navbarSupportedContent>ul>li>a{
 .company{
   border: 1px solid rgba(0,0,0,0.2);
 }
+.event .e-date{
+  color : rgba(0,0,0,0.6);
+}
+.event .e-icon{
+  color : rgba(0,0,0,0.6);
+}
 </style>
 {% endblock %}
 {% block main %}
-<div class="container-fluid">
-	<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Spoken Tutorial</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#about">About Us</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#contact_form">Contact</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-</div>
+{% include "emp/header.html" %}
 <div class="container mt-5" >
  <div class="row p-4 p-lg-5">
  	<div class="col-lg-9">
@@ -163,10 +148,17 @@ div#navbarSupportedContent>ul>li>a{
 	</div> -->
   <div class="row" >
     {% for event in events %}
-    <div class="col-sm-6 col-md-2   ">
-      <div class="company text-center d-flex align-items-center justify-content-center" style="height: 100%;">
-        <img src="/media/{{ event.logo }}" style="width: 60%; height: auto;" >
-      </div>
+    <div class="col-sm-6 col-md-2 event">
+      <a href="{% url 'public-event' pk=event.id %}">
+        <div class="company text-center py-3" style="height: 100%;">
+          <p><span>{{event.name | capfirst}}</span></p>
+          
+          <hr>
+          <p ><span class="e-icon"><i class="fas fa-calendar-alt"></i> </span><span class="e-date">{{ event.start_date | format_date:event.end_date}}</span></p>
+        </div>
+
+      </a>
+      
       
     </div>
     {% endfor %}
