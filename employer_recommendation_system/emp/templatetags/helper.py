@@ -241,11 +241,23 @@ def get_item(dictionary, key):
     return dictionary.get(key) 
 
 
-@register.filter()
-def format_date(value):
+@register.filter
+def format_date(value,arg):
     if value is not None:
-        
-
-        print(value)
-        return "new date"
-    return 'new date 1'
+        start = value
+        end = arg
+        s = ''   
+        if start.year!=end.year:
+            s = str(start.day) + " "+start.strftime("%b") + " "+str(start.year)
+            e = str(end.day) +" "+ end.strftime("%b")+" " + str(end.year)
+        else:
+            if start.month!=end.month:
+                s = str(start.day) + " "+start.strftime("%b")+" - "+ str(end.day) + end.strftime("%b") + str(start.year)
+            else:
+                if start.day == end.day:
+                    s = str(start.day) + " "+start.strftime("%b") + " "+str(start.year)
+                else:
+                    s = str(start.day) + " - "+ str(end.day) + " "+end.strftime("%b") + " "+ str(start.year)
+                
+        return s
+    return ''

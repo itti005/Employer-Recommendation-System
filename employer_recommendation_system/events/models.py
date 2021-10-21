@@ -21,6 +21,7 @@ class Event(models.Model):
     type = models.CharField(max_length=200,choices=EVENT_TYPE,default="JOB")
     status = models.BooleanField(default=True) # if inactive , it will not be made public
     show_on_homepage = models.BooleanField(default=True)
+    description = models.TextField(blank=True,null=True)
 
     def get_absolute_url(self):
         print(" ****************** GETIING ABSOLUTE URL ****************** ")
