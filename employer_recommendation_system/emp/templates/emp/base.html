@@ -120,7 +120,7 @@
 </head>
 <body>
   <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow d-flex justify-content-between">
-  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="{% url 'student' %}">Recommendation System</a>
+  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="{% url 'index' %}"> <i class="fas fa-home"></i> Recommendation System</a>
     <ul class="navbar-nav px-3">
     <li class="nav-item text-nowrap">
       {% include "emp/navbar.html" %}
@@ -188,6 +188,15 @@
             <a class="nav-link" href="{% url 'job-list' %}" style="margin-left: 30px;">
               <span>View Jobs</span>
             </a>
+          </li>
+          <li class="nav-item"><hr></li>
+          <li class="nav-item" id="nav-add-company">
+            <a class="nav-link" href="{% url 'event-create' %}">
+              <i class="bi bi-bank2 icons-nav"></i> <span>Add Event</span>
+            </a>
+          </li>
+          <li class="nav-item" id="nav-view-company">
+            <a class="nav-link " href="{% url 'event-list' %}" style="margin-left: 30px;">View Events</a>
           </li>
           <li class="nav-item"><hr></li>
           <li class="nav-item" id="grade-filter">

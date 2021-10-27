@@ -1,5 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
+
+from events.models import Event,Testimonial,GalleryImage
 from .models import *
 from emp.models import Student as RecStudent
 from spoken.models import TestAttendance, FossMdlCourses,FossCategory,Profile, SpokenState, SpokenCity, InstituteType
@@ -50,6 +52,7 @@ import datetime
 from django.core.mail import send_mail
 from smtplib import SMTPException
 from collections import defaultdict
+
 # STATUS = {'ACTIVE' :1,'INACTIVE' :0}
 
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
@@ -284,9 +287,10 @@ def handlelogout(request):
 
 def index(request):
     context={}
-    context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=True)[:3]
+    context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=True)[:6]
     context['gallery'] = GalleryImage.objects.filter(display_on_homepage=True,active=True)[:6]
     context['testimonials'] = Testimonial.objects.filter(display_on_homepage=True,active=True)[:3]
+    context['events'] = Event.objects.filter(show_on_homepage=True,status=True)[:6]
     form = ContactForm()
     context['contact_form'] = form
     
@@ -1450,3 +1454,13 @@ class TestimonialUpdate(UpdateView):
         messages.error(self.request, 'Error in updating testimonial.')
         return self.render_to_response(self.get_context_data(form=form))
     
+
+class CompanyList(ListView):
+    model = Company
+    template_name = 'emp/companies.html'
+    
+    def get_queryset(self):
+        queryset = Company.objects.filter(rating=RATING['VISIBLE_TO_ALL_USERS']) | Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'])
+        return queryset
+        
+

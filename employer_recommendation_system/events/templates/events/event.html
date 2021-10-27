@@ -1,0 +1,171 @@
+{% load static %}
+{% load helper %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
+  <link rel="stylesheet" type="text/css" href="{% static '/bootstrap-icons/font/bootstrap-icons.css' %}" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}" />
+  <style type="text/css">
+  .event h1,.e-icon{
+    color : #054C77;
+
+  }
+  .divider{
+    border-bottom: 2px solid #054C77;
+  }
+
+
+  </style>
+  {% block css %}
+  {% endblock %}	
+</head>
+<body>
+  {% include "emp/header.html" %}
+  <section class="container">
+    <div class="jumbotron pt-5 event"> 
+        <div class="py-3 divider">
+          <h1 class="display-6 " style="font-size: 2rem;;">{{event.name | capfirst}}</h1>
+          <p><i class="far fa-calendar-alt e-icon"></i> {{ event.start_date | format_date:event.end_date}}</p>
+        <p class="">{{event.description | default:""}}</p>
+        </div>
+        
+    
+      </div>
+  </section>
+  <!-- <section class="container py-3">
+    <div class="d-flex justify-content-between">
+      <p class="display-6 border-bottom pe-5" style="font-size: 1.5rem;color: #002648;">Testimonials</p>
+      
+    </div>
+    <div class="row" id="testimonial">
+      {% for testimonial in testimonials %}
+      <div class="col-12 col-sm-6 col-lg-3 py-3">
+        <div class="c-card d-flex flex-column justify-content-between">
+          <video width="100%" height="auto" controls oncontextmenu="return false;">
+                  <source src="/media/{{testimonial.location}}" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+        </div>
+      </div>
+      {% endfor %}
+  </div>
+  </section> -->
+  <div class="container py-3">
+    <div class="d-flex justify-content-between">
+      <p class="display-6 border-bottom pe-5" style="font-size: 1.5rem;color: #002648;">Testimonials</p>
+    </div>
+    <div class="row" id="testimonial">
+      
+      <div class="col-12 col-sm-6 col-lg-3 py-3">
+        <div class="c-card d-flex flex-column justify-content-between">
+          <video width="100%" height="auto" controls oncontextmenu="return false;">
+                  <source src="{% static 'media/Feedback_1_20200131.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+        <!-- <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p> -->
+        <!-- <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span> -->
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3 py-3">
+        <div class="c-card d-flex flex-column justify-content-between">
+          <video width="100%" height="auto" controls oncontextmenu="return false;">
+                  <source src="{% static 'media/Feedback_2_20200131.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+        <!-- <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p> -->
+        <!-- <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span> -->
+        </div>
+      </div>
+      
+      <div class="col-12 col-sm-6 col-lg-3 py-3">
+        <div class="c-card d-flex flex-column justify-content-between">
+          <video width="100%" height="auto" controls oncontextmenu="return false;">
+                  <source src="{% static 'media/Feedback_3_20200131.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+        <!-- <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p> -->
+        <!-- <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span> -->
+        </div>
+      </div>
+      
+      <div class="col-12 col-sm-6 col-lg-3 py-3">
+        <div class="c-card d-flex flex-column justify-content-between">
+          <video width="100%" height="auto" controls oncontextmenu="return false;">
+                  <source src="{% static 'media/Feedback_4_20200131.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+        <!-- <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p> -->
+        <!-- <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span> -->
+        </div>
+      </div>
+      
+      
+  </div>
+  
+  </div>
+  <div class="container py-3">
+    <div class="d-flex justify-content-between">
+      <p class="display-6 border-bottom" style="font-size: 1.5rem;color: #002648;">Image Gallery</p>
+      <!-- <p><button type="button" class="btn btn-outline-primary c-btn">View Image Gallery</button></p> -->
+    </div>
+    <div class="row" id="gallery" >
+      {% for image in event_images %}
+      <div class="col-12 col-sm-6 col-lg-3 py-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <div class="c-card ">
+          <div>
+          <img class="w-100" src="/media/{{image.location}}" style="width: 100%;" data-target="#carouselExample" data-slide-to="0">  
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  </div>
+  </div>
+  <!-- <div class="container py-3">
+    <div class="d-flex justify-content-between">
+      <p class="display-6 border-bottom" style="font-size: 1.5rem;color: #002648;">Brochure</p>
+      
+    </div>
+    <div class="row" id="gallery" >
+      {% for brochure in brochures %}
+      <div class="col-12 col-sm-6 col-lg-3 py-3" >
+        <div class="c-card ">
+          <div>
+          <img class="w-100" src="{% static brochure.location %}" style="width: 100%;">  
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  </div>
+  </div> -->
+	
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="{% static '/js/main.js' %}"></script>
+{% block js %}
+<script>
+  $( document ).ready(function() {
+    // $('.testimonial').on('shown.bs.modal', function (event) {
+    //  var triggerElement = $(event.relatedTarget); // Button that triggered the modal
+    //  var classname = triggerElement[0].className
+    //  const myArr = classname.split(" ");
+    //  console.log(myArr[3].split("_")[1]);
+    //  var video = document.getElementById('t-video');
+    //  video.src=""
+     
+
+
+// });
+  });
+  </script>
+{% endblock %}
+</body>
+</html>
+

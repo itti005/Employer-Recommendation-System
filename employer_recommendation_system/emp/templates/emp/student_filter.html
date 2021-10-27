@@ -43,6 +43,7 @@
 				{% endfor %}
 			</select>
 			<input type="text" name="grade" value="0">
+			<button type="button" class="btn btn-outline-primary remove_btn" id="remove_btn_1">Remove</button>
 			
 		</div>
 		
@@ -61,6 +62,7 @@
 				{% endfor %}
 			</select>
 			<input type="text" name="multiple_grade" value="0">
+			<button type="button" class="btn btn-outline-primary remove_btn" id="multiple_remove_btn_1">Remove</button>
 		</div>
 		
 	</div>
@@ -202,18 +204,45 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
 	$(document).ready(function (){
-		var num = 0;
+		var num = 1;
 		var multi_foss = 1;
+
+		var first_remove_btn = document.getElementById("remove_btn_1");
+		function remove_btn_func(){
+			
+			btn_prefix = event.srcElement.id.split("_")[0];
+			console.log(btn_prefix);
+			if(btn_prefix=='remove'){
+				btn_id = event.srcElement.id.split("_")[2];
+				let elem_id = 'filter_'+btn_id;
+				document.getElementById(elem_id).remove();
+			}else{
+				btn_id = event.srcElement.id.split("_")[3];
+				let elem_id = 'multiple_filter_'+btn_id;
+				console.log(btn_id);
+				console.log(elem_id);
+				document.getElementById(elem_id).remove();
+			}
+			
+		}
+
+		first_remove_btn.addEventListener('click',remove_btn_func);
 		
 		$( "#add_btn" ).click(function() {
 		var item = document.getElementById("filter_1");
 		var clone = item.cloneNode(true);
 		count = num+1
 		clone.id = 'filter_'+ count ;
+		var remove_btn = clone.lastElementChild;
+		remove_btn.id = 'remove_btn_'+ count;
+
 		num = num + 1;
 		// console.log(clone)
 		document.getElementById("wrapper-criteria").appendChild(clone);
+		// remove_btn.id = 'remove_btn_'+ 'a';
+		remove_btn.addEventListener('click',remove_btn_func);
 		});
+		
 		$( "#add_multiple_btn" ).click(function() {
 		multi_foss = multi_foss + 1;
 		var item = document.getElementById("multiple_filter_1");
@@ -221,6 +250,9 @@
 		count = num+1
 		clone.id = 'multiple_filter_'+ count ;
 		clone.getElementsByClassName("fosses")[0].setAttribute('name', 'fosses_' + multi_foss);
+		var remove_btn = clone.lastElementChild;
+		remove_btn.id = 'multiple_remove_btn_'+ count;
+		remove_btn.addEventListener('click',remove_btn_func);
 		num = num + 1;
 		document.getElementById("wrapper-criteria-multiple").appendChild(clone);
 		$('#num').val(multi_foss);
@@ -229,7 +261,7 @@
 		var multi_foss_first = document.getElementsByName("fosses_1");
 		$('#tb_emails').dataTable({"pageLength": 25});
 	});
-	// $("#btn_mail").on("click", function(event){
+	
 	$("#create_mail").on("click", function(event){
         event.preventDefault();
         alert('here');

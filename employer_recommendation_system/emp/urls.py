@@ -66,4 +66,7 @@ urlpatterns = [
     # path('degree/<slug:slug>/', DegreeDetailView.as_view(), name='degree-detail'),
     # path('degree/', CompanyListView.as_view(), name='company-list'),
     # path('degree/<slug:slug>/', CompanyDetailView.as_view(), name='company-detail'),
+    
+    ################### public urls
+    path('companies',CompanyList.as_view(),name='companies'),
 ]

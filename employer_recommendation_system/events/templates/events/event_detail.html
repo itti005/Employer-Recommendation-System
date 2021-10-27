@@ -1,0 +1,66 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% load helper %}
+{% block content-header %}{{object.name}}{% endblock %}
+{% block content %}
+{% include "emp/page_header.html" with title="Event Details" icon="<i class='bi bi-bank'></i>" %}
+{% for message in messages %}
+    <div class="text-center alert {{ message.tags }}">
+                {{ message|safe }}
+    </div>
+        {% endfor %}
+<table class="table table-bordered">
+  <tbody>
+    <tr class="table-info fs-6">
+      <th scope="row">Event Name</th>
+      <td>{{object.name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Event Start Date</th>
+      <td>{{object.start_date}}</td>
+    </tr>
+    <tr>
+        <th scope="row">Event End Date</th>
+        <td>{{object.end_date}}</td>
+    </tr>
+    
+      <tr>
+        <th scope="row">Event Type</th>
+        <td>{{object.type}}</td>
+      </tr>
+      <tr>
+          <th scope="row">Status</th>
+          <td>{{object.status}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Show on homepage</th>
+        <td>{{object.show_on_homepage}}</td>
+    </tr>
+    <tr>
+        <th scope="row">Logo</th>
+        <td><img src="/media/{{ object.logo }}" style="max-width: 250px;max-height:150px;;"></td>
+        
+      </tr>
+    
+    
+  </tbody>
+</table>
+{% if object.sector %}
+  <ul>
+    {% for s in object.sector.all %}
+      <li>
+        {{ s.name }}
+        {# recursively include template itself #}
+        
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{% if request.user|has_group:"MANAGER" %}
+<a href="{% url 'update-event-detail' pk=object.id %}" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
+{% endif %}
+
+{% endblock %}
+
+
+

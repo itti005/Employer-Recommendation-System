@@ -1,5 +1,7 @@
 {% extends 'emp/base_generic.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
+{% load helper %}
 {% block content-header %}Homepage{% endblock %}
 {% block css %}
 <style type="text/css">
@@ -69,32 +71,19 @@ div#navbarSupportedContent>ul>li>a{
   color: rgba(0,38,72,1)!important;
   font-weight: bold;
 }
+.company{
+  border: 1px solid rgba(0,0,0,0.2);
+}
+.event .e-date{
+  color : rgba(0,0,0,0.6);
+}
+.event .e-icon{
+  color : rgba(0,0,0,0.6);
+}
 </style>
 {% endblock %}
 {% block main %}
-<div class="container-fluid">
-	<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Spoken Tutorial</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#about">About Us</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#contact_form">Contact</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-</div>
+{% include "emp/header.html" %}
 <div class="container mt-5" >
  <div class="row p-4 p-lg-5">
  	<div class="col-lg-9">
@@ -119,12 +108,60 @@ div#navbarSupportedContent>ul>li>a{
  	</div>
  </div>
 </div>
-
+<br>
 <div class="container mt-3 px-0">
-	<div class="d-flex justify-content-around" style="width: 100%;" >
+  <div class="d-flex justify-content-between">
+    <p class="display-6 border-bottom" style="font-size: 1.5rem;color: #002648;">Companies</p>
+    <p><a type="button" class="btn btn-outline-primary c-btn" href="{% url 'companies' %}" target="_blank">View all companies</a></p>
+  </div>
+	<!-- <div class="d-flex justify-content-center" style="width: 100%;" >
     {% for company in companies %}
-    <div class="text-center  me-2 ">
+    <div class="text-center  me-2 p-2 company">
       <img src="{{company.logo}}" style="width: 140px; height: auto;">
+    </div>
+    {% endfor %}
+	</div> -->
+  <div class="row" >
+    {% for company in companies %}
+    <div class="col-sm-6 col-md-2   ">
+      <div class="company text-center py-3" style="height: 100%;">
+        <!-- <img src="{{company.logo}}" style="width: 60%; height: auto;" > -->
+        <p>{{company.name}}</p>
+      </div>
+      
+    </div>
+    {% endfor %}
+	</div>
+</div>
+<br>
+<hr>
+<br>
+<div class="container mt-3 px-0">
+  <div class="d-flex justify-content-between">
+    <p class="display-6 border-bottom" style="font-size: 1.5rem;color: #002648;">Events</p>
+    <!-- <p><a type="button" class="btn btn-outline-primary c-btn" href="{% url 'event-list' %}" target="_blank">View all events</a></p> -->
+  </div>
+	<!-- <div class="d-flex justify-content-center" style="width: 100%;" >
+    {% for company in companies %}
+    <div class="text-center  me-2 p-2 company">
+      <img src="{{company.logo}}" style="width: 140px; height: auto;">
+    </div>
+    {% endfor %}
+	</div> -->
+  <div class="row" >
+    {% for event in events %}
+    <div class="col-sm-6 col-md-4 event">
+      <a href="{% url 'public-event' pk=event.id %}">
+        <div class="company text-center py-3" style="height: 100%;">
+          <p><span>{{event.name | capfirst}}</span></p>
+          
+          <hr>
+          <p ><span class="e-icon"><i class="fas fa-calendar-alt"></i> </span><span class="e-date">{{ event.start_date | format_date:event.end_date}}</span></p>
+        </div>
+
+      </a>
+      
+      
     </div>
     {% endfor %}
 	</div>
@@ -140,7 +177,7 @@ div#navbarSupportedContent>ul>li>a{
     <div class="col-12 col-sm-6 col-lg-3 py-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
       <div class="c-card ">
         <div>
-        <img class="w-100" src="{{image.location}}" style="width: 100%;" data-target="#carouselExample" data-slide-to="0">  
+        <img class="w-100" src="/media/{{image.location}}" style="width: 100%;" data-target="#carouselExample" data-slide-to="0">  
         </div>
         
         <p class="text-muted" style="font-size: 0.9rem;">{{image.desc | truncatechars:255}}</p>
@@ -160,12 +197,12 @@ div#navbarSupportedContent>ul>li>a{
              {% for image in gallery %}
              {% if forloop.counter == 1 %}
              <div class="carousel-item active">
-              <img class="d-block w-100" src="{{image.location}}">
+              <img class="d-block w-100" src="/media/{{image.location}}">
               <p class="text-muted" style="font-size: 0.9rem;">{{image.desc}}</p>
             </div>
             {% else %}
             <div class="carousel-item">
-              <img class="d-block w-100" src="{{image.location}}">
+              <img class="d-block w-100" src="/media/{{image.location}}">
               <p class="text-muted" style="font-size: 0.9rem;">{{image.desc}}</p>
             </div>
              {% endif %}
@@ -190,10 +227,9 @@ div#navbarSupportedContent>ul>li>a{
 </div>
 </div>
 <hr>
-<div class="container py-3">
+<!-- <div class="container py-3">
   <div class="d-flex justify-content-between">
     <p class="display-6 border-bottom pe-5" style="font-size: 1.5rem;color: #002648;">Testimonials</p>
-    <!-- <p><button type="button" class="btn btn-outline-primary c-btn">View Testimonials</button></p> -->
   </div>
   <div class="row" id="testimonial">
     {% for testimonial in testimonials %}
@@ -229,6 +265,59 @@ div#navbarSupportedContent>ul>li>a{
   </div>
 </div>
  {% endfor %}
+</div> -->
+<div class="container py-3">
+  <div class="d-flex justify-content-between">
+    <p class="display-6 border-bottom pe-5" style="font-size: 1.5rem;color: #002648;">Testimonials</p>
+  </div>
+  <div class="row" id="testimonial">
+    
+    <div class="col-12 col-sm-6 col-lg-3 py-3">
+      <div class="c-card d-flex flex-column justify-content-between">
+        <video width="100%" height="auto" controls oncontextmenu="return false;">
+                <source src="{% static 'media/Feedback_1_20200131.mp4' %}" type="video/mp4">
+              Your browser does not support the video tag.
+              </video>
+      <!-- <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p> -->
+      <!-- <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span> -->
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3 py-3">
+      <div class="c-card d-flex flex-column justify-content-between">
+        <video width="100%" height="auto" controls oncontextmenu="return false;">
+                <source src="{% static 'media/Feedback_2_20200131.mp4' %}" type="video/mp4">
+              Your browser does not support the video tag.
+              </video>
+      <!-- <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p> -->
+      <!-- <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span> -->
+      </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-lg-3 py-3">
+      <div class="c-card d-flex flex-column justify-content-between">
+        <video width="100%" height="auto" controls oncontextmenu="return false;">
+                <source src="{% static 'media/Feedback_3_20200131.mp4' %}" type="video/mp4">
+              Your browser does not support the video tag.
+              </video>
+      <!-- <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p> -->
+      <!-- <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span> -->
+      </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-lg-3 py-3">
+      <div class="c-card d-flex flex-column justify-content-between">
+        <video width="100%" height="auto" controls oncontextmenu="return false;">
+                <source src="{% static 'media/Feedback_4_20200131.mp4' %}" type="video/mp4">
+              Your browser does not support the video tag.
+              </video>
+      <!-- <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p> -->
+      <!-- <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span> -->
+      </div>
+    </div>
+    
+    
+</div>
+
 </div>
 
 <div class="container-fluid py-5 c-bg">
