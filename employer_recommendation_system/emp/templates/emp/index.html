@@ -227,45 +227,7 @@ div#navbarSupportedContent>ul>li>a{
 </div>
 </div>
 <hr>
-<!-- <div class="container py-3">
-  <div class="d-flex justify-content-between">
-    <p class="display-6 border-bottom pe-5" style="font-size: 1.5rem;color: #002648;">Testimonials</p>
-  </div>
-  <div class="row" id="testimonial">
-    {% for testimonial in testimonials %}
-    <div class="col-12 col-sm-6 col-lg-3 py-3">
-      <div class="c-card d-flex flex-column justify-content-between">
-        <video width="100%" height="auto" controls oncontextmenu="return false;">
-                <source src="{{testimonial.location}}" type="video/mp4">
-              Your browser does not support the video tag.
-              </video>
-      <p class="text-muted" style="font-size: 0.9rem;" >{{testimonial.desc | truncatechars:255}}</p>
-      <span><button type="button" class="btn btn-outline-dark my-auto" data-bs-toggle="modal" data-bs-target="#testimonialModal_{{testimonial.id}}">View</button></span>
-      </div>
-    </div>
-    {% endfor %}
-</div>
-{% for testimonial in testimonials %}
-  <div class="modal fade" id="testimonialModal_{{testimonial.id}}" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-      <video width="100%" height="auto" controls>
-                <source src="{{testimonial.location}}" type="video/mp4">
-              Your browser does not support the video tag.
-              </video>
-              <p class="text-muted" style="font-size: 0.9rem;">{{testimonial.desc}}</p>
-      </div>
-      <div class="modal-footer">
-      </div>
-    </div>
-  </div>
-</div>
- {% endfor %}
-</div> -->
+
 <div class="container py-3">
   <div class="d-flex justify-content-between">
     <a href="{% url 'list_testimonials' %}" target="_blank"><p class="display-6 border-bottom pe-5" style="font-size: 1.5rem;color: #002648;">Testimonials</p></a>
