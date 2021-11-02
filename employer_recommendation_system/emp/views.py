@@ -1462,5 +1462,13 @@ class CompanyList(ListView):
     def get_queryset(self):
         queryset = Company.objects.filter(rating=RATING['VISIBLE_TO_ALL_USERS']) | Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'])
         return queryset
+
+class TestimonialsList(ListView):
+    model = Testimonial
+    template_name = 'emp/list_testimonials.html'
+    
+    def get_queryset(self):
+        queryset = Testimonial.objects.filter(active=True)
+        return queryset
         
 
