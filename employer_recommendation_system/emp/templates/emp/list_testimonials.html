@@ -1,0 +1,30 @@
+{% extends 'emp/base.html' %}
+{% load crispy_forms_tags %}
+{% block content-header %}List Testimonials{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+	
+</style>
+{% endblock %}
+{% block content %}
+
+{% include "emp/page_header.html" with title="Testimonials" icon="<i class='far fa-image'></i>" %}
+
+  	<div class="row">
+  		{% for object in object_list %}
+  		<div class="col-sm-6 col-lg-4">
+  			<div class="card" style="width: 100%;">
+        <video width="100%" height="auto" controls oncontextmenu="return false;">
+          <source src="/media/testimonial/{{object.location}}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+
+			</div>  			
+  		</div>
+  		{% endfor %}  		
+  	</div>
+
+{% endblock %}
+
+

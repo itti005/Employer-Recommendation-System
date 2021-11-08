@@ -60,6 +60,7 @@ urlpatterns = [
     path('add_testimonial', TestimonialCreate.as_view(),name='add_testimonial' ),
     # path('image_details/<int:pk>', GalleryImageDetail.as_view(),name='gallery_image_detail' ),
     path('update_testimonial/<int:pk>', TestimonialUpdate.as_view(),name='update_testimonial' ),
+    path('list_testimonials/', TestimonialsList.as_view(),name='list_testimonials' ),
     
 
     # path('<slug:slug>/', GalleryImageDetail.as_view(), name='gallery-image-detail'),
