@@ -4,6 +4,7 @@ from moodle.models import *
 from spoken.models import *
 from emp.models import JobShortlist,NUM_OF_EMPS
 from spoken.models import *
+from events.models import Testimonial
 from emp.views import JOB_RATING
 
 register = template.Library()
@@ -261,3 +262,8 @@ def format_date(value,arg):
                 
         return s
     return ''
+
+
+@register.filter()
+def get_event_testimonials(eventid):
+    return Testimonial.objects.filter(event_id=eventid)

@@ -1,5 +1,6 @@
 {% extends 'emp/base.html' %}
 {% load crispy_forms_tags %}
+{% load helper %}
 {% block content-header %}List Testimonials{% endblock %}
 {% block css %}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -11,20 +12,48 @@
 
 {% include "emp/page_header.html" with title="Testimonials" icon="<i class='far fa-image'></i>" %}
 
-  	<div class="row">
-  		{% for object in object_list %}
-  		<div class="col-sm-6 col-lg-4">
-  			<div class="card" style="width: 100%;">
-        <video width="100%" height="auto" controls oncontextmenu="return false;">
-          <source src="/media/testimonial/{{object.location}}" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
 
-			</div>  			
-  		</div>
-  		{% endfor %}  		
-  	</div>
+<div class="accordion" id="accordionExample">
+  {% for event in events %}
+  <div class="accordion-item">
+
+    <h2 class="accordion-header" id="heading{{event.id}}">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{event.id}}" aria-expanded="true" aria-controls="collapse{{event.id}}">
+        {{event.name}} &nbsp;&nbsp; : &nbsp;&nbsp; {{event.start_date}} - {{event.end_date}}
+      </button>
+    </h2>
+
+    <div id="collapse{{event.id}}" class="accordion-collapse collapse " aria-labelledby="heading{{event.id}}" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+
+      {% with testi=event.id|get_event_testimonials %}
+
+      <div class="row">
+          {% for object in testi %}
+          <div class="col-sm-6 col-lg-4">
+            <div class="card" style="width: 100%;">
+            <video width="100%" height="auto" controls oncontextmenu="return false;">
+              <source src="/media/{{object.location}}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            </div>        
+          </div>
+          {% endfor %}
+      </div>
+      {% endwith %}
+
+      </div>
+    </div>
+
+  </div>
+  {% endfor %}
+</div>
+
+
+
 
 {% endblock %}
-
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
 

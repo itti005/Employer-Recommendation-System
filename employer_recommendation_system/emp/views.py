@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 
-from events.models import Event,Testimonial,GalleryImage
+from events.models import *
 from .models import *
 from emp.models import Student as RecStudent
 from spoken.models import TestAttendance, FossMdlCourses,FossCategory,Profile, SpokenState, SpokenCity, InstituteType
@@ -52,6 +52,8 @@ import datetime
 from django.core.mail import send_mail
 from smtplib import SMTPException
 from collections import defaultdict
+
+import random, os
 
 # STATUS = {'ACTIVE' :1,'INACTIVE' :0}
 
@@ -289,7 +291,10 @@ def index(request):
     context={}
     context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=True)[:6]
     context['gallery'] = GalleryImage.objects.filter(display_on_homepage=True,active=True)[:6]
-    context['testimonials'] = Testimonial.objects.filter(display_on_homepage=True,active=True)[:3]
+
+    testimo_list=Testimonial.objects.filter(display_on_homepage=True,active=True)[:3]
+
+    context['testimonials'] = random.choices(testimo_list, k=4)
     context['events'] = Event.objects.filter(show_on_homepage=True,status=True)[:6]
     form = ContactForm()
     context['contact_form'] = form
@@ -1471,5 +1476,12 @@ class TestimonialsList(ListView):
     def get_queryset(self):
         queryset = Testimonial.objects.filter(active=True)
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        events=Event.objects.filter(id__in=Testimonial.objects.filter(active=True).values('event_id'))
+        print(events)
+        context['events']=events
+        return context
         
 
