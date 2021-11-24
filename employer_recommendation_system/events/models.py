@@ -26,6 +26,9 @@ class Event(models.Model):
     def get_absolute_url(self):
         print(" ****************** GETIING ABSOLUTE URL ****************** ")
         return reverse('event-detail', kwargs={'pk': self.id})
+
+    def __str__(self):
+        return self.name
     
 
 

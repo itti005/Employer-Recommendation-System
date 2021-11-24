@@ -6,10 +6,14 @@ from django.views.generic.base import TemplateView
 from .models import Event
 from django.views.generic.detail import DetailView
 from .models import *
+from django.contrib.auth.decorators import user_passes_test
+from django.utils.decorators import method_decorator
+from emp.views import is_manager
 
 # Create your views here.
 # CBVs for event
 
+@method_decorator(user_passes_test(is_manager), name='dispatch')
 class EventCreateView(CreateView):
     model = Event
     fields = '__all__'
@@ -52,7 +56,7 @@ class EventDetailView(DetailView):
         # context['now'] = timezone.now()
         return context
 
-
+@method_decorator(user_passes_test(is_manager), name='dispatch')
 class EventUpdateView(UpdateView):
     model = Event
     fields = '__all__'
@@ -74,7 +78,6 @@ class EventPageView(TemplateView):
         event_pk = kwargs.get('pk')
         print(event_pk)
         event = Event.objects.get(id=event_pk)
-        print(event)
         brochures = Brochure.objects.filter(event=event)
         context['event'] = event
         context['brochures'] = brochures

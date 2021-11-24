@@ -35,8 +35,11 @@ from django.core.files.storage import FileSystemStorage
 from os import listdir
 import re
 from django.utils.datastructures import MultiValueDictKeyError
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
+from django.utils.decorators import method_decorator
+
 from django.utils.functional import wraps
 from django.http import HttpResponseForbidden
 from django.core.exceptions import PermissionDenied,MultipleObjectsReturned,ObjectDoesNotExist
@@ -1376,9 +1379,10 @@ def student_filter(request):
     return render(request,'emp/student_filter.html',context)
 
 # landing page views 
+@method_decorator(user_passes_test(is_manager), name='dispatch')
 class GalleryImageCreate(CreateView):
     model = GalleryImage
-    fields = ['desc','location','display_on_homepage','active']
+    fields = ['desc','event','location','display_on_homepage','active']
     template_name = 'emp/image_gallery.html'
 
     def form_valid(self, form):
@@ -1396,9 +1400,11 @@ class GalleryImageCreate(CreateView):
         context['images'] = images
         return context
 
+@method_decorator(user_passes_test(is_manager), name='dispatch')
 class GalleryImageUpdate(UpdateView):
     model = GalleryImage
-    fields = ['desc','location','display_on_homepage','active']
+    fields = ['desc','event','location','display_on_homepage','active']
+    template_name = 'emp/galleryimage_form.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1416,9 +1422,10 @@ class GalleryImageUpdate(UpdateView):
         messages.error(self.request, 'Error in updating image.')
         return self.render_to_response(self.get_context_data(form=form))
 
+@method_decorator(user_passes_test(is_manager), name='dispatch')
 class TestimonialCreate(CreateView):
     model = Testimonial
-    fields = ['name','about','desc','location','display_on_homepage','active']
+    fields = ['name','about','desc','event','location','display_on_homepage','active']
     template_name = 'emp/testimonial.html'
 
     def form_valid(self, form):
@@ -1439,9 +1446,11 @@ class TestimonialCreate(CreateView):
         context['testimonials'] = testimonials
         return context
 
+
+@method_decorator(user_passes_test(is_manager), name='dispatch')
 class TestimonialUpdate(UpdateView):
     model = Testimonial
-    fields = ['name','about','desc','location','display_on_homepage','active']
+    fields = ['name','about','desc','event','location','display_on_homepage','active']
     template_name = 'emp/testimonial_form.html'
 
     def get_context_data(self, **kwargs):
