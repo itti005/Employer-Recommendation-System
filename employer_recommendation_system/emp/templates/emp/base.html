@@ -25,7 +25,6 @@
  */
 
 .sidebar {
-  position: fixed;
   top: 0;
   /* rtl:raw:
   right: 0;
@@ -136,98 +135,115 @@
   <div class="row">
     <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
       <div class="position-sticky pt-3">
-        {% if request.user|has_group:"MANAGER" %}
+      {% if request.user|has_group:"MANAGER" %}
       <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">
-              <i class="bi bi-speedometer2"></i>
-              Manager Dashboard
-            </a>
-          </li>
-          <!-- <li class="nav-item"><hr></li> -->
-          <li class="nav-item" id="nav-degree">
-            <a class="nav-link" href="{% url 'add_degree' %}">
-              <i class="fas fa-graduation-cap icons-nav"></i> <span>Degree</span>
-            </a>
-          </li>
-          <li class="nav-item" id="nav-discipline">
-            <a class="nav-link" href="{% url 'add_discipline' %}">
-              <i class="fas fa-chalkboard icons-nav"></i> <span>Discipline</span>
-            </a>
-          </li>
-          <li class="nav-item" id="nav-domain">
-            <a class="nav-link" href="{% url 'add_domain' %}">
-              <i class="bi bi-gear-wide icons-nav"></i> <span>Domain</span>
-            </a>
-          </li>
-          <li class="nav-item" id="nav-job-type">
-            <a class="nav-link" href="{% url 'add_job_type' %}">
-              <i class="bi bi-square icons-nav"></i> <span>Job Type</span>
-            </a>
-          </li>
-          <li class="nav-item"><hr></li>
-          <li class="nav-item" id="nav-add-company">
-            <a class="nav-link" href="{% url 'add_company' %}">
-              <i class="bi bi-bank2 icons-nav"></i> <span>Add Company</span>
-            </a>
-          </li>
-          <li class="nav-item" id="nav-view-company">
-            <a class="nav-link " href="{% url 'company-list' %}" style="margin-left: 30px;">View Companies</a>
-          </li>
-          <li class="nav-item"><hr></li>
-          <li class="nav-item" id="nav-add-job">
-            <a class="nav-link" href="{% url 'add_job' %}"> <i class="bi bi-briefcase-fill icons-nav"></i> Add Job</a>
-         </a>
-          </li>
-          <li class="nav-item" id="nav-quick-view-job">
-            <a class="nav-link" href="{% url 'job-listing' %}" style="margin-left: 30px;">
-              <span>View Job List (Quick View)</span>
-            </a>
-          </li>
-          <li class="nav-item" id="nav-view-job">
-            <a class="nav-link" href="{% url 'job-list' %}" style="margin-left: 30px;">
-              <span>View Jobs</span>
-            </a>
-          </li>
-          <li class="nav-item"><hr></li>
-          <li class="nav-item" id="nav-add-company">
-            <a class="nav-link" href="{% url 'event-create' %}">
-              <i class="bi bi-bank2 icons-nav"></i> <span>Add Event</span>
-            </a>
-          </li>
-          <li class="nav-item" id="nav-view-company">
-            <a class="nav-link " href="{% url 'event-list' %}" style="margin-left: 30px;">View Events</a>
-          </li>
-          <li class="nav-item"><hr></li>
-          <li class="nav-item" id="grade-filter">
-            <a class="nav-link" href="{% get_url 'GRADE_FILTER' %}" target="_blank">
-              <i class="bi bi-funnel-fill icons-nav"></i> <span>Student Grade Filter</span>
-            </a>
-          </li>
-          <li class="nav-item" id="mass-mail">
-            <a class="nav-link" href="{% get_url 'MASS_MAIL_PAGE' %}" target="_blank">
-              <i class="bi bi-funnel-fill icons-nav"></i> <span>Send Mass Mail</span>
-            </a>
-          </li>
-          <li class="nav-item" id="job-app-status">
-            <a class="nav-link" href="{% url 'job-app-status' %}">
-              <i class="bi bi-list-check icons-nav"></i> <span>Job Application Status</span>
-            </a>
-          </li>
-          <li class="nav-item"><hr></li>
-          <li class="nav-item" id="image-gallery">
-            <a class="nav-link" href="{% url 'add_image' %}">
-              <i class="far fa-image icons-nav"></i> <span>Image Gallery</span>
-            </a>
-          </li>
-          <li class="nav-item" id="testimonial">
-            <a class="nav-link" href="{% url 'add_testimonial' %}">
-              <i class="far fa-sticky-note icons-nav"></i> <span>Testimonials</span>
-            </a>
-          </li>
-          <li class="nav-item"><hr></li>
-        </ul>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">
+          <i class="bi bi-speedometer2"></i>
+          Manager Dashboard
+          </a>
+        </li>
+
+        <li class="nav-item" id="nav-degree">
+          <a class="nav-link" href="{% url 'add_degree' %}">
+          <i class="fas fa-graduation-cap icons-nav"></i> <span>Degree</span>
+          </a>
+        </li>
+
+        <li class="nav-item" id="nav-discipline">
+          <a class="nav-link" href="{% url 'add_discipline' %}">
+          <i class="fas fa-chalkboard icons-nav"></i> <span>Discipline</span>
+          </a>
+        </li>
+
+        <li class="nav-item" id="nav-domain">
+          <a class="nav-link" href="{% url 'add_domain' %}">
+          <i class="bi bi-gear-wide icons-nav"></i> <span>Domain</span>
+          </a>
+        </li>
+
+        <li class="nav-item" id="nav-job-type">
+          <a class="nav-link" href="{% url 'add_job_type' %}">
+          <i class="bi bi-square icons-nav"></i> <span>Job Type</span>
+          </a>
+        </li>
+
+        <li class="nav-item"><hr></li>
+
+        <li class="nav-item" id="nav-add-company">
+          <a class="nav-link" href="{% url 'add_company' %}">
+          <i class="bi bi-bank2 icons-nav"></i> <span>Add Company</span>
+          </a>
+        </li>
+
+        <li class="nav-item" id="nav-view-company">
+          <a class="nav-link " href="{% url 'company-list' %}" style="margin-left: 30px;">View Companies</a>
+        </li>
+
+         <li class="nav-item"><hr></li>
+        
+        <li class="nav-item" id="nav-add-job">
+          <a class="nav-link" href="{% url 'add_job' %}"> <i class="bi bi-briefcase-fill icons-nav"></i> Add Job</a>
+        </li>
+
+        <li class="nav-item" id="nav-quick-view-job">
+          <a class="nav-link" href="{% url 'job-listing' %}" style="margin-left: 30px;">
+          <span>View Job List (Quick View)</span>
+          </a>
+        </li>
+
+        <li class="nav-item" id="nav-view-job">
+          <a class="nav-link" href="{% url 'job-list' %}" style="margin-left: 30px;">
+          <span>View Jobs</span>
+          </a>
+        </li>
+        <li class="nav-item"><hr></li>
+
+        <li class="nav-item" id="nav-add-company">
+          <a class="nav-link" href="{% url 'event-create' %}">
+          <i class="bi bi-bank2 icons-nav"></i> <span>Add Event</span>
+          </a>
+        </li>
+
+        <li class="nav-item" id="nav-view-company">
+          <a class="nav-link " href="{% url 'event-list' %}" style="margin-left: 30px;">View Events</a>
+        </li>
+
+        <li class="nav-item"><hr></li>
+        <li class="nav-item" id="grade-filter">
+          <a class="nav-link" href="{% get_url 'GRADE_FILTER' %}" target="_blank">
+          <i class="bi bi-funnel-fill icons-nav"></i> <span>Student Grade Filter</span>
+          </a>
+        </li>
+
+        <li class="nav-item" id="mass-mail">
+          <a class="nav-link" href="{% get_url 'MASS_MAIL_PAGE' %}" target="_blank">
+          <i class="bi bi-funnel-fill icons-nav"></i> <span>Send Mass Mail</span>
+          </a>
+        </li>
+
+        <li class="nav-item" id="job-app-status">
+          <a class="nav-link" href="{% url 'job-app-status' %}">
+          <i class="bi bi-list-check icons-nav"></i> <span>Job Application Status</span>
+          </a>
+        </li>
+
+        <li class="nav-item"><hr></li>
+        <li class="nav-item" id="image-gallery">
+          <a class="nav-link" href="{% url 'add_image' %}">
+          <i class="far fa-image icons-nav"></i> <span>Image Gallery</span>
+          </a>
+        </li>
+        <li class="nav-item" id="testimonial">
+          <a class="nav-link" href="{% url 'add_testimonial' %}">
+          <i class="far fa-sticky-note icons-nav"></i> <span>Testimonials</span>
+          </a>
+        </li>
+        <li class="nav-item"><hr></li>
+        
+      </ul>
       {% endif %}
+
       {% if request.user|has_group:"STUDENT" %}
             <ul class="nav flex-column mt-5">
               <li class="nav-item">
@@ -264,8 +280,9 @@
                 <span>My Jobs</span></a>
               </li>
             </ul>
-            {% endif %}
-            {% if request.user|has_group:"EMPLOYER" %}
+        {% endif %}
+
+        {% if request.user|has_group:"EMPLOYER" %}
             <ul class="nav flex-column mt-5">
               <li class="nav-item">
                 <a class="nav-link" href='/'>
@@ -274,20 +291,20 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="employer_profile">
-      <i class="fas fa-user-tie"></i>
-          <span>Create Profile</span></a>
-              </li>
-              <li class="nav-item">
-          <span>Post jobs</span>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="payment">
-      <i class="fas fa-user-tie"></i>
-          <span>Payment</span></a>
-              </li>
-              
+          <i class="fas fa-user-tie"></i>
+              <span>Create Profile</span></a>
+                  </li>
+                  <li class="nav-item">
+              <span>Post jobs</span>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="payment">
+          <i class="fas fa-user-tie"></i>
+              <span>Payment</span></a>
+                  </li>
+                  
             </ul>
-            {% endif %}
+        {% endif %}
       </div>
     </nav>
 
