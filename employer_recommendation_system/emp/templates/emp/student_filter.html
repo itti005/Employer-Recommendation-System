@@ -22,74 +22,155 @@
                 {{ message|safe }}
     </div>
 {% endfor %}
-<form method="post">
-	{% csrf_token %}
-	<div id="m_o">
-		<span class="">Mandatory/Optional</span>
-		<div class="mb-3">
-		<button type="button" class="btn btn-outline-primary" id="add_btn">Add</button>
-	</div>
-	<div class="wrapper-criteria" id="wrapper-criteria">
-		<div class="foss-criteria" id="filter_1">
-			<div style="width: 800px;">
-</div>
-			<select name="criteria-type" id="criteria-type" class="criteria-type">
-			  <option value="{{MANDATORY_FOSS}}">Mandatory</option>
-			  <option value="{{OPTIONAL_FOSS}}" >Optional</option>
-			</select>
-			<select name="foss" class="foss">
-				{% for item in foss %}
-				<option value="{{item.0}}">{{item.1}}</option>
-				{% endfor %}
-			</select>
-			<input type="text" name="grade" value="0">
-			<button type="button" class="btn btn-outline-primary remove_btn" id="remove_btn_1">Remove</button>
+{% if no_data %}
+<div class="alert alert-warning" role="alert">
+	No data available for selected criteria.
+  </div>
+{% endif %}
+<div class="border border-secondary px-2 rounded pb-3">
+	<form method="post">
+		{% csrf_token %}
+		<div id="m_o" style="border-bottom: 1px solid green;;" class="pb-3">
+			
+	
+			<div class="my-3 py-2" >
+				<span><button type="button" class="btn btn-success btn-sm" id="add_btn"><i class="fas fa-plus-circle mr-2"></i> Add Mandatory Foss</button></span>
+				<span class="fs-6 fw-bold mr-5 text-center">Mandatory/Optional Foss Criteria</span> 
+		</div>
+	
+		<div class="wrapper-criteria" id="wrapper-criteria">
+			<div class="foss-criteria" id="filter_1">
+				<select name="criteria-type" id="criteria-type">
+				  <option value="{{MANDATORY_FOSS}}">Mandatory</option>
+				  <option value="{{OPTIONAL_FOSS}}" >Optional</option>
+				</select>
+				<select name="foss" class="foss">
+					<option value="0" >Select Foss</option>
+					{% for item in foss %}
+					<option value="{{item.0}}">{{item.1}}</option>
+					{% endfor %}
+				</select>
+				<input type="text" name="grade" value="0" class="foss">
+				<button type="button" class="btn btn-outline-danger btn-sm remove_btn" id="remove_btn_1">Remove</button>
+				
+			</div>
 			
 		</div>
-		
-	</div>
-	</div>
-	<div id="multi">
-		<span>Atleast one</span>
-		<div class="mb-3">
-		<button type="button" class="btn btn-outline-primary" id="add_multiple_btn">Add</button>
-	</div>
-	<div class="wrapper-criteria-multiple" id="wrapper-criteria-multiple">
-		<div class="foss-criteria-multiple" id="multiple_filter_1">
-			<select name="fosses_1" class="fosses"  multiple="multiple">
-				{% for item in foss %}
-				<option value="{{item.0}}">{{item.1}}</option>
-				{% endfor %}
-			</select>
-			<input type="text" name="multiple_grade" value="0">
-			<button type="button" class="btn btn-outline-primary remove_btn" id="multiple_remove_btn_1">Remove</button>
+		</div>
+		<div id="multi" style="border-bottom: 1px solid green;;" class="py-3">
+			<div class="my-3 pb-2" >
+				<span><button type="button" class="btn btn-success btn-sm" id="add_multiple_btn"><i class="fas fa-plus-circle mr-2"></i> Add Multiple Fosses</button></span>
+				<span class="fs-6 fw-bold mr-5">Multiple Foss Criteria</span> 
+		</div>
+		<div class="wrapper-criteria-multiple" id="wrapper-criteria-multiple">
+			<div class="foss-criteria-multiple" id="multiple_filter_1">
+				<select name="fosses_1" class="fosses"  multiple="multiple">
+					{% for item in foss %}
+					<option value="{{item.0}}">{{item.1}}</option>
+					{% endfor %}
+				</select>
+				<input type="text" name="multiple_grade" value="0">
+				<button type="button" class="btn btn-outline-danger btn-sm remove_btn" id="multiple_remove_btn_1">Remove</button>
+			</div>
+			
+		</div>
+		</div>
+		<div style="border-bottom: 2px solid green;;" class="py-3">
+			<div class="my-3 pb-2" >
+				<span><i class="fas fa-calendar-alt text-success mr-3"></i> </span> <span class="fs-6 fw-bold mr-5">Date Criteria</span>
+		</div>
+			<div class="row" >
+				<div class="col-6">
+				<label for="start_date">Start Date</label>
+				<input type="date" id="start_date" name="start_date">
+			</div>
+				<div class="col-6">
+				<label for="end_date">End Date</label>
+				<input type="date" id="end_date" name="end_date">
+			</div>
+				
+			</div>
 		</div>
 		
-	</div>
-	</div>
-	<div class="row">
-		<div class="col-6">
-		<label for="start_date">Start Date</label>
-		<input type="date" id="start_date" name="start_date">
-	</div>
-		<div class="col-6">
-		<label for="end_date">End Date</label>
-		<input type="date" id="end_date" name="end_date">
-	</div>
 		
+		<input type="text" name="num" id="num">
+		<input type="submit" name="filter" class="mt-3 btn btn-success" id="btn-filter">
+		<input type="hidden" name="user" id="user" value="{{request.user.username}}">
+	</form>
+</div>
+<div class="row mt-3">
+	<div class="col-md-6">
+		<table class="table table-success table-striped table-bordered">
+			<caption>Filtered Criteria</caption>
+			<tbody>
+				{% if start_date %}
+				<tr>
+					<th>start date : </th>
+					<td>{{start_date}}</td>
+				</tr>
+				{% endif %}
+				{% if end_date %}
+				<tr>
+					<th>end date : </th>
+					<td>{{end_date}}</td>
+				</tr>
+				{% endif %}
+				{% if foss_grade %}
+				<tr>
+					<th>Mandatory Foss</th>
+					<th>Grade</th>
+				</tr>
+				{% endif %}
+				
+				{% for key in foss_grade%}
+				<tr>
+					<td>{{key}}</td>
+					<td>> {{foss_grade | get_value:key}}</td>
+				</tr>
+				{% endfor %}
+				{% if l %}
+				<tr>
+					<th>Multiple Foss</th>
+					<th>Grade</th>
+				</tr>
+				{% endif %}
+				
+				{% for item in l%}
+
+				<tr>
+					<td>
+						{% for foss in item.2 %}
+						{% if not forloop.last %} <span>{{fd | get_value:foss}} | </span> 
+						{% else %}
+						<span>{{fd | get_value:foss}} </span>
+						{% endif %}
+						
+						{% endfor %}
+					</td>
+
+					<td>{{item.1}}</td>
+					
+				</tr>
+				{% endfor %}
+
+			</tbody>
+		</table>
 	</div>
-	
-	<input type="text" name="num" id="num">
-	<input type="submit" name="filter" class="mt-3">
-	<input type="hidden" name="user" id="user" value="{{request.user.username}}">
-</form>
+	<div class="col-md-6">
+	</div>
+</div>
 <div>
-	<a data-bs-toggle="modal" href="#exampleModalToggle" role="button" href="http://127.0.0.1:8081/cron/mail_list_create/" class="btn btn-primary" target="_blank" id="btn_mail">Send 1st Mail</a>
+
+<div class="my-5">
+	<div>
+		<a data-bs-toggle="modal" href="#exampleModalToggle" role="button" href="http://127.0.0.1:8081/cron/mail_list_create/" class="btn btn-primary" target="_blank" id="btn_mail">
+			Send First Mail to Students  <i class="far fa-paper-plane"></i></a>
+	</div>
 	<div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalToggleLabel">Modal 1</h5>
+        <h5 class="modal-title" id="exampleModalToggleLabel">Mail Content</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -131,69 +212,36 @@
   </div>
 </div>
 </div>
-<div>
-	<table class="table table-bordered" id="tb_emails">
-		<thead>
-			<tr>
-				<td>Sr#</td>
-				<td>Email</td>
-			</tr>
-			
-		</thead>
-		<tbody>
-			{% for item in emails %}
-			<tr>
-				<td>{{forloop.counter}}</td>
-				<td>{{item.0}}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-</div>
-<div>
-	<hr>
-	<!-- <div style="border: 2px solid blue;">
-		<table>
-			{% for item in users_id %}
-			<tr>
-				<td>{{item.0}}</td>
-			</tr>
-			{% endfor %}
-		</table>
-	</div> -->
-	<!-- {{mdl_user_data}} -->
-	
-	<!-- <div>
-		<table style="width:100%">
-  <tr>
-    <th>Name</th>
-    <th>Email</th>
-    <th>Foss</th>
-    <th>grade_key</th>
-	<th>Student Id</th>
-	<th>mdluser_id</th>
-  </tr>
-  {% for item in ta %}
-  <tr>
-  	<td>{{item.mdluser_firstname}} {{item.mdluser_lastname}}</td>
-  	<td>{{item.student_email | default_if_none:'-'}}</td>
-  	<td>{{item.foss_name}}</td>
-  	{% comment %}
-  	<td>{{d1 | get_item:item.grade_key}}</td>
-  	{% endcomment %}
-  	
-  	<td>{{item.student_id}}</td>
-  	<td>{{item.mdluser_id}}</td>  	
-  </tr>
-  {% endfor %}
+
+{% if n_users_id %}
+<table id="tb_emails" class="mt-5">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>Email</th>
+			<th>Moodle User Id</th>
+			<th>Name</th>
+			<th>Quiz</th>
+			<th>Foss</th>	
+			<th>Grade</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for item in n_users_id %}
+	<tr>
+		<td>{{forloop.counter}}</td>
+		<td>{{item.3}}</td>
+		<td>{{item.0}}</td>
+		<td>{{item.1}}  {{item.2}}</td>
+		<td>{{item.4}}</td>
+		<td>{{ fosses | get_value:item.4 }}</td>
+		<td>{{item.5}}</td>
+	</tr>
+	{% endfor %}
+	</tbody>
 </table>
-	</div>
-	{{len}}
-	<hr><hr>
-	{{mdl_user_lst}}
-	<hr><hr>
-	{{ta}} -->
-	
+{% endif %}
+
 </div>
 
 {% endblock %}
@@ -204,12 +252,14 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
 	$(document).ready(function (){
+		$('#student_data').DataTable();
+		var multiple_remove_btn_1 = document.getElementById('multiple_remove_btn_1')
+		multiple_remove_btn_1.style.display='none';
+		var first_remove_btn = document.getElementById("remove_btn_1");
+		first_remove_btn.style.display='none';
 		var num = 1;
 		var multi_foss = 1;
-
-		var first_remove_btn = document.getElementById("remove_btn_1");
 		function remove_btn_func(){
-			
 			btn_prefix = event.srcElement.id.split("_")[0];
 			console.log(btn_prefix);
 			if(btn_prefix=='remove'){
@@ -223,11 +273,7 @@
 				console.log(elem_id);
 				document.getElementById(elem_id).remove();
 			}
-			
 		}
-
-		first_remove_btn.addEventListener('click',remove_btn_func);
-		
 		$( "#add_btn" ).click(function() {
 		var item = document.getElementById("filter_1");
 		var clone = item.cloneNode(true);
@@ -235,9 +281,8 @@
 		clone.id = 'filter_'+ count ;
 		var remove_btn = clone.lastElementChild;
 		remove_btn.id = 'remove_btn_'+ count;
-
+		remove_btn.style.display='inline';
 		num = num + 1;
-		// console.log(clone)
 		document.getElementById("wrapper-criteria").appendChild(clone);
 		// remove_btn.id = 'remove_btn_'+ 'a';
 		remove_btn.addEventListener('click',remove_btn_func);
@@ -252,6 +297,7 @@
 		clone.getElementsByClassName("fosses")[0].setAttribute('name', 'fosses_' + multi_foss);
 		var remove_btn = clone.lastElementChild;
 		remove_btn.id = 'multiple_remove_btn_'+ count;
+		remove_btn.style.display='inline';
 		remove_btn.addEventListener('click',remove_btn_func);
 		num = num + 1;
 		document.getElementById("wrapper-criteria-multiple").appendChild(clone);
@@ -278,8 +324,13 @@
          
         emails = table.column(1).data();
         data = []
-        for (i = 0; i < emails.length; i++) {
-              data.push([emails[i]])
+		let emails_set = new Set();
+		for (i = 0; i < emails.length; i++) {
+			emails_set.add(emails[i])
+            }
+		let unique_emails = [...emails_set];
+        for (i = 0; i < unique_emails.length; i++) {
+				data.push([unique_emails[i]])
             }
         var username = $('#f_username').val();
         var pwd = $('#f_pwd').val();
@@ -302,6 +353,14 @@
 },
           })
     });
+
+	
+	$("#btn-filter").on("click", function(event){
+		multi_filter = document.getElementById('wrapper-criteria-multiple')
+		let num = multi_filter.childElementCount
+		$('#num').val = num
+		
+	});
 </script>
 <script type="text/javascript" src="{% static '/ckeditor/ckeditor-init.js' %}"></script>
 <script type="text/javascript" src="{% static '/ckeditor/ckeditor/ckeditor.js' %}"></script>
