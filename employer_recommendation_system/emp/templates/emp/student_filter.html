@@ -120,29 +120,28 @@
 					<th>Mandatory Foss</th>
 					<th>Grade</th>
 				</tr>
-				{% endif %}
-				
 				{% for key in foss_grade%}
 				<tr>
 					<td>{{key}}</td>
-					<td>> {{foss_grade | get_value:key}}</td>
+					<td>> {{foss_grade | get_item:key}}</td>
 				</tr>
 				{% endfor %}
+				{% endif %}
+				
+				
 				{% if l %}
 				<tr>
 					<th>Multiple Foss</th>
 					<th>Grade</th>
 				</tr>
-				{% endif %}
-				
 				{% for item in l%}
 
 				<tr>
 					<td>
 						{% for foss in item.2 %}
-						{% if not forloop.last %} <span>{{fd | get_value:foss}} | </span> 
+						{% if not forloop.last %} <span>{{fd | get_item:foss}} | </span> 
 						{% else %}
-						<span>{{fd | get_value:foss}} </span>
+						<span>{{fd | get_item:foss}} </span>
 						{% endif %}
 						
 						{% endfor %}
@@ -152,6 +151,9 @@
 					
 				</tr>
 				{% endfor %}
+				{% endif %}
+				
+				
 
 			</tbody>
 		</table>
@@ -227,6 +229,7 @@
 		</tr>
 	</thead>
 	<tbody>
+		{% if n_users_id %}
 		{% for item in n_users_id %}
 	<tr>
 		<td>{{forloop.counter}}</td>
@@ -234,10 +237,11 @@
 		<td>{{item.0}}</td>
 		<td>{{item.1}}  {{item.2}}</td>
 		<td>{{item.4}}</td>
-		<td>{{ fosses | get_value:item.4 }}</td>
+		<td>{{ fosses | get_item:item.4 }}</td>
 		<td>{{item.5}}</td>
 	</tr>
 	{% endfor %}
+		{% endif %}
 	</tbody>
 </table>
 {% endif %}
