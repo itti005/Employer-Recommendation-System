@@ -68,6 +68,9 @@ class EventListView(ListView):
         context = super().get_context_data(**kwargs)
         # context['now'] = timezone.now()
         return context
+    def get_queryset(self):
+        queryset = Event.objects.filter(status=True)
+        return queryset
 
 class EventPageView(TemplateView):
     template_name = "events/event.html"

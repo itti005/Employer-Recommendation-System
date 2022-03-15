@@ -138,9 +138,8 @@
       {% if request.user|has_group:"MANAGER" %}
       <ul class="nav flex-column">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/">
-          <i class="bi bi-speedometer2"></i>
-          Manager Dashboard
+          <a class="nav-link " aria-current="page" href="#">
+          <i class="bi bi-speedometer2 icons-nav"></i>  <span style="border-bottom: 2px solid orange;">Manager Dashboard</span>
           </a>
         </li>
 
@@ -201,7 +200,7 @@
 
         <li class="nav-item" id="nav-add-company">
           <a class="nav-link" href="{% url 'event-create' %}">
-          <i class="bi bi-bank2 icons-nav"></i> <span>Add Event</span>
+            <i class="bi bi-calendar-check icons-nav"></i> <span>Add Event</span>
           </a>
         </li>
 
@@ -210,17 +209,23 @@
         </li>
 
         <li class="nav-item"><hr></li>
+        <li class="nav-item" id="student-list">
+          <a class="nav-link" href="{% url 'student-list' %}">
+            <i class="bi bi-person-lines-fill icons-nav"></i> <span>Student List</span>
+          </a>
+        </li>
         <li class="nav-item" id="grade-filter">
           <a class="nav-link" href="{% get_url 'GRADE_FILTER' %}" target="_blank">
           <i class="bi bi-funnel-fill icons-nav"></i> <span>Student Grade Filter</span>
           </a>
         </li>
-
+        {% if request.user.is_superuser %}
         <li class="nav-item" id="mass-mail">
           <a class="nav-link" href="{% get_url 'MASS_MAIL_PAGE' %}" target="_blank">
           <i class="bi bi-funnel-fill icons-nav"></i> <span>Send Mass Mail</span>
           </a>
         </li>
+        {% endif %}
 
         <li class="nav-item" id="job-app-status">
           <a class="nav-link" href="{% url 'job-app-status' %}">

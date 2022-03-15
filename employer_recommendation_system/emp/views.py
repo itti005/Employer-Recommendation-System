@@ -1,4 +1,5 @@
 # from sys import set_coroutine_origin_tracking_depth
+from email import message
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 
@@ -293,12 +294,13 @@ def handlelogout(request):
 
 def index(request):
     context={}
-    context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=True)[:6]
-    context['gallery'] = GalleryImage.objects.filter(display_on_homepage=True,active=True)[:6]
+    context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=True)[:8]
+    l = GalleryImage.objects.filter(display_on_homepage=True,active=True)[:8]
+    context['gallery'] = GalleryImage.objects.filter(display_on_homepage=True,active=True)[:8]
 
-    testimo_list=Testimonial.objects.filter(display_on_homepage=True,active=True)[:3]
-
-    context['testimonials'] = random.choices(testimo_list, k=4)
+    testimo_list=Testimonial.objects.filter(display_on_homepage=True,active=True)[:4]
+    # context['testimonials'] = random.choices(testimo_list, k=4)
+    context['testimonials'] = testimo_list
     context['events'] = Event.objects.filter(show_on_homepage=True,status=True)[:6]
     form = ContactForm()
     context['contact_form'] = form
@@ -746,6 +748,7 @@ def student_profile_confirm(request,pk,job):
 def student_profile(request,pk):
     context = {}
     student = Student.objects.get(user=request.user)
+
     context['student']=student
     # context['skills']=Skill.objects.all()
     if request.method=='POST':
@@ -1010,13 +1013,32 @@ def ajax_contact_form(request):
     return JsonResponse(data)
 
 # @user_passes_test(is_manager)
+def getFieldsInfo(student):
+    total_fields = 9
+    all_fields = [a for a in dir(student) if not a.startswith('__')]
+    empty_fields = []
+    if not student.phone : empty_fields.append('Phone')
+    if not student.address : empty_fields.append('Address')
+    if not Education.objects.filter(student=student): empty_fields.append('education')
+    if not student.skills : empty_fields.append('Skills')
+    if not student.about : empty_fields.append('About')
+    if not student.projects : empty_fields.append('Projects')
+    if not student.cover_letter : empty_fields.append('Cover Letter')
+    if not student.resume : empty_fields.append('Resume')
+    if not student.alternate_email : empty_fields.append('Alternate_email')
+    
+    complete = round((total_fields-len(empty_fields))/total_fields*100)
+    return complete,empty_fields
+
+
 @access_profile
 def student_profile_details(request,id,job):
     context = {}
     context['spk_student_id']=id
-    context['job_id']=job
-    job_obj = Job.objects.get(id=job)
-    context['job']=job_obj
+    if job:
+        context['job_id']=job
+        job_obj = Job.objects.get(id=job)
+        context['job']=job_obj
     # student = Student.objects.get(spk_student_id=id)
     student = Student.objects.get(spk_usr_id=id)
     context['student']=student
@@ -1024,7 +1046,10 @@ def student_profile_details(request,id,job):
     context['scores']=fetch_student_scores(student)
     context['current_education'] = student.education.filter(order=CURRENT_EDUCATION)
     context['past_education'] = student.education.filter(order=PAST_EDUCATION).first()
-
+    complete,empty_fields = getFieldsInfo(student)
+    
+    context['complete']=complete
+    context['empty_fields']=', '.join(empty_fields)
     return render(request,'emp/student_profile.html',context)
 
 @user_passes_test(is_student)
@@ -1407,6 +1432,16 @@ class GalleryImageUpdate(UpdateView):
         messages.error(self.request, 'Error in updating image.')
         return self.render_to_response(self.get_context_data(form=form))
 
+class GalleryImageList(ListView):
+    model = GalleryImage
+    
+    def get_queryset(self):
+        queryset = GalleryImage.objects.filter(active=True)
+        return queryset
+
+
+    
+
 @method_decorator(user_passes_test(is_manager), name='dispatch')
 class TestimonialCreate(CreateView):
     model = Testimonial
@@ -1479,3 +1514,28 @@ class TestimonialsList(ListView):
         return context
         
 
+class StudentListView(PermissionRequiredMixin,ListView):
+    model = Student
+    permission_required = 'emp.view_student'
+
+@csrf_exempt
+def notify_student(request):
+    to_mail = request.POST.get('email','')
+    # to_mail = 'ankitamk@gmail.com'
+    empty_fields = request.POST.get('empty_fields','')
+    subject = 'Notification to complete the profile in Job Recommendation System'
+    message = f"Please add below details to complete your profile in Job Recommendation System :\n\n{empty_fields}\n.\nLogin here to update profile : {settings.LOGIN_URL}"
+    
+    try:
+        send_mail(subject=subject,message=message,recipient_list=[to_mail],from_email=settings.EMAIL_HOST_USER,fail_silently=False,)
+        f = open(settings.PROFILE_EMAIL_LOG_FILE, "a")
+        f.write(f"1,{to_mail},{datetime.datetime.now()},[{empty_fields}]\n")
+        f.close()
+    except Exception as e:
+        f = open(settings.PROFILE_EMAIL_LOG_FILE, "a")
+        f.write(f"0,{to_mail},{datetime.datetime.now()},[{empty_fields}],[{e}]\n")
+        f.close()
+        response = JsonResponse({"error": "there was an error"})
+        response.status_code = 403
+        return response
+    return HttpResponse("Success!")

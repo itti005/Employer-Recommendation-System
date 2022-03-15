@@ -9,6 +9,10 @@ urlpatterns = [
     path('<pk>/profile',views.student_profile,name='student_profile'),
     path('add_student_job_status',views.add_student_job_status,name='add_student_job_status'),
     path('student_profile/<int:id>/<int:job>',views.student_profile_details,name='student_profile_details'),
+    path('student-list',StudentListView.as_view(),name='student-list'),
+    path('notify-student-profile/',views.notify_student,name='notify-student-profile'),
+
+    
     path('manager',views.manager_homepage,name="manager"),
     path('shortlist_student',views.shortlist_student,name='shortlist_student'),
     ################### company urls : currently only accessible to MANAGER Role : Set conditions via admin
@@ -55,6 +59,7 @@ urlpatterns = [
 
     #landing page
     path('add_image', GalleryImageCreate.as_view(),name='add_image' ),
+    path('image-gallery', GalleryImageList.as_view(),name='image_gallery' ),
     # path('image_details/<int:pk>', GalleryImageDetail.as_view(),name='gallery_image_detail' ),
     path('update_image/<int:pk>', GalleryImageUpdate.as_view(),name='update_image' ),
     path('add_testimonial', TestimonialCreate.as_view(),name='add_testimonial' ),

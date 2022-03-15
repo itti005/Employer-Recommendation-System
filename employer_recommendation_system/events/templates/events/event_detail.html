@@ -3,7 +3,7 @@
 {% load helper %}
 {% block content-header %}{{object.name}}{% endblock %}
 {% block content %}
-{% include "emp/page_header.html" with title="Event Details" icon="<i class='bi bi-bank'></i>" %}
+{% include "emp/page_header.html" with title="Event Details" icon="<i class='bi bi-calendar-check'></i>" %}
 {% for message in messages %}
     <div class="text-center alert {{ message.tags }}">
                 {{ message|safe }}

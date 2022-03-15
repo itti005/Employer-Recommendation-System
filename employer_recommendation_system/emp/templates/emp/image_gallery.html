@@ -48,8 +48,8 @@
   <div class="tab-pane fade py-3" id="nav-edit" role="tabpanel" aria-labelledby="nav-edit-tab">
   	<div class="row">
   		{% for image in images %}
-  		<div class="col-sm-6 col-lg-4">
-  			<div class="card" style="width: 100%;">
+  		<div class="col-sm-6 col-lg-4 py-3">
+  			<div class="card" style="width: 100%;height: 100%;">
 			  <img src="media/{{image.location}}" class="card-img-top" alt="...">
 			  <div class="card-body">
 			  	<div class="d-flex justify-content-between">
@@ -67,7 +67,10 @@
 			    	{% endif %}
 			    </span>
 			  	</div><hr>
-			    <p class="card-text">{{image.desc | truncatechars:255}}</p>
+			    <div class="card-text">
+					<p><b>Event : {{image.event.name}}</b></p>
+					<p>{{image.desc | truncatechars:255}}</p>
+				</div>
 			    <a href="{% url 'update_image' pk=image.id%}" class="btn btn-outline-secondary float-end">Edit</a>
 			  </div>
 			</div>

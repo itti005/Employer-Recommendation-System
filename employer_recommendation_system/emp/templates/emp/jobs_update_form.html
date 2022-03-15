@@ -4,6 +4,8 @@
 {% load crispy_forms_tags %}
 {% block css %}
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.0.0.min.js"></script> -->
 <!-- <script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script> -->
 <!-- <link rel="stylesheet" href="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}"> -->
@@ -87,7 +89,7 @@
          </div>
 
           <div class="col-12 mb-3">
-            {{ form.description | as_crispy_field }}
+            {{ form.description | safe }}
           </div>
           <div class="col-12 mb-3">
             {{ form.key_job_responsibilities | as_crispy_field }}
@@ -242,12 +244,18 @@
   var states = $('#state-select').val() ? $('#state-select').val().toString() : ''; //filter states
   var cities = $('#city-select').val() ? $('#city-select').val().toString() : ''; //filter cities
   
-  $('#id_foss').val(foss.toString());
-  if (insti_type) {
-      $('#id_institute_type').val(insti_type);
+  // $('#id_foss').val(foss.toString());
+  if(foss){
+    $('#id_foss').val(foss.toString());
+  }else{
+    $('#id_foss').val('');
   }
-  if (states) {$('#id_state').val(states);}
-  if (cities) {$('#id_city').val(cities);}
+  $('#id_institute_type').val(insti_type);
+  // if (insti_type) {$('#id_institute_type').val(insti_type);}
+  $('#id_state').val(states);
+  $('#id_city').val(cities);
+  // if (states) {$('#id_state').val(states);}
+  // if (cities) {$('#id_city').val(cities);}
 
   state = $('#select-state').val();
   city = $('#select-city').val();
