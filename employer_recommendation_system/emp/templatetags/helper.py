@@ -266,7 +266,7 @@ def format_date(value,arg):
 
 @register.filter()
 def get_event_testimonials(eventid):
-    return Testimonial.objects.filter(event_id=eventid)
+    return Testimonial.objects.filter(event_id=eventid,active=True)
 
 
 @register.filter()

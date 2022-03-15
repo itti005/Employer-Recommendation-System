@@ -31,11 +31,15 @@
       <div class="row">
           {% for object in testi %}
           <div class="col-sm-6 col-lg-4">
-            <div class="card" style="width: 100%;">
-            <video width="100%" height="auto" controls oncontextmenu="return false;">
-              <source src="/media/{{object.location}}" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
+            <div class="card p-3 mb-3" style="width: 100%;">
+              <div class="card-text">
+                <video width="100%" height="auto" controls oncontextmenu="return false;">
+                  <source src="/media/{{object.location}}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+                  <p>{{object.desc}}</p>
+              </div>
+            
             </div>        
           </div>
           {% endfor %}

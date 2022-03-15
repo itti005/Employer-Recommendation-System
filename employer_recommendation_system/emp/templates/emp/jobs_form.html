@@ -9,6 +9,8 @@
 <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.0.0.min.js"></script> -->
 <!-- <script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
 <link rel="stylesheet" href="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}"> -->
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 <style type="text/css">
   .filter-header{
     border-bottom: 2px solid blue;
@@ -98,6 +100,7 @@
          </div>
 
           <div class="col-12 mb-3">
+            
             {{ form.description | as_crispy_field }}
           </div>
           <div class="col-12 mb-3">

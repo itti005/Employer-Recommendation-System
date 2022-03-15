@@ -8,7 +8,7 @@ from spoken.models import AcademicCenter
 import os
 from spoken.models import SpokenUser, SpokenState, SpokenCity
 from django.core.validators import RegexValidator
-
+from ckeditor.fields import RichTextField
 
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('a','No Criteria'),('f','F-Female Candidates'),('m','M-Male Candidates'),]
@@ -200,7 +200,7 @@ class Student(models.Model):
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
 
-    
+
     def get_absolute_url(self):
         url = str(self.id)+'/'+'profile'
         return reverse('student_profile',kwargs={'pk':self.id}) 
@@ -256,7 +256,7 @@ class Job(models.Model):
     city_job = models.IntegerField(null=False,blank=False)  #spk #filter
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     skills = models.CharField(max_length=400,null=True,blank=True) 
-    description = models.TextField(null=True,blank=True,verbose_name="Job Description") 
+    description = RichTextField(null=True,blank=True,verbose_name="Job Description")
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE,verbose_name='Job Sector') #Domain od work Eg. Consultancy, Development, Software etc
     salary_range_min = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Minimum)')
     salary_range_max = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Maximum)')
@@ -269,9 +269,9 @@ class Job(models.Model):
     # 3: Job Application is in process with HR & Company
     # 4: Student selected & job closed.
     status = models.IntegerField(default=1,blank=True)
-    requirements = models.TextField(null=True,blank=True,verbose_name="Qualifications/Skills Required") #Educational qualifications, other criteria
+    requirements = RichTextField(null=True,blank=True,verbose_name="Qualifications/Skills Required") #Educational qualifications, other criteria
     shift_time = models.CharField(max_length=200,blank=True)
-    key_job_responsibilities = models.TextField(null=True,blank=True,verbose_name="Key Job Responsibilities")
+    key_job_responsibilities = RichTextField(null=True,blank=True,verbose_name="Key Job Responsibilities")
     gender = models.CharField(max_length=10,choices=GENDER,default='a')
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
     slug = models.SlugField(max_length = 250, null = True, blank = True)

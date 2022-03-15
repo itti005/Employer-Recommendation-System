@@ -71,7 +71,10 @@
   .c-icon{
     color: #0066A0;
   }
-  
+div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
+  border:1px solid rgba(0,102,160,0.5)!important;
+  padding: 6px;
+}
 </style>
 {% endblock %}
 {% block content %}
@@ -316,11 +319,23 @@
               <div class="row">
                 <div class="col">
                   <p><b>Description</b></p>
-              <p>{{job.description}}</p>
+                  <p>
+                    <div id="cke">
+                      {% autoescape off %} {{job.description}} {% endautoescape %}
+                    </div>
+                    </p>
               <p><b>Requirements</b></p>
-              <p>{{job.requirements}}</p>
+              <p>
+                <div id="cke">
+                  {% autoescape off %} {{job.requirements}} {% endautoescape %}
+                </div>
+              </p>
               <p><b>Key Job Responsibilities</b></p>
-              <p>{{job.key_job_responsibilities}}</p>
+              <p>
+                <div id="cke">
+                  {% autoescape off %} {{job.key_job_responsibilities}} {% endautoescape %}
+                </div>
+              </p>
                 </div>
                 
               </div>

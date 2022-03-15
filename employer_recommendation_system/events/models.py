@@ -62,11 +62,11 @@ class GalleryImage(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     slug = models.SlugField(blank=True, unique=True)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True) #If true; image will be displayed publicly (either in homepage or image gallery page)
     event = models.ForeignKey(Event,blank=True,null=True,on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.desc
+        return str(self.id)
     
     def get_absolute_url(self):
         # return reverse('gallery-image-detail', kwargs={'pk': self.pk})
