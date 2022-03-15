@@ -1,6 +1,9 @@
 {% extends 'emp/base.html' %}
+{% load static %}
 {% load helper %}
 {% block css %}
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 <style type="text/css">
   body{
     background: #EAEAEA;
@@ -49,6 +52,14 @@
     color: inherit;
     box-shadow: 0 0 11px rgba(33,33,33,.2); 
   }
+  div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
+  border:1px solid rgba(0,102,160,0.5)!important;
+  padding: 6px;
+}
+div#cke table{
+  width: 100%!important;
+}
+
 </style>
 {% endblock %}
 {% block content %}
@@ -162,8 +173,8 @@
   {% if awaiting_jobs %}
     {% for job in awaiting_jobs %}
     <div class="col-12 col-md-4 py-3"> 
-    <a href="{% url 'job-list' %}?id={{job.id}}" class="c-href">
-      <div class="card" style="width: 100%;height: 100%;">
+    <a href="{% url 'job-list' %}?id={{job.id}}" class="c-href" style="width: 100%;">
+      <div class="card" style="width: 100%;height: 500px;overflow: scroll;">
         <div class="card-body">
           <div class="d-flex justify-content-between">
             {% if job.company.logo %}
@@ -175,7 +186,10 @@
           </small>
             </div>
           </div>
-          <p class="card-text mb-5">{{job.description | slice:":255"}}...</p>
+          <div id="cke" class="card-text mb-5" style="width: 100%;">
+            {% autoescape off %} {{job.description}} {% endautoescape %}
+          </div>
+          <!-- <p class="card-text mb-5"></p> -->
           
           
         </div>

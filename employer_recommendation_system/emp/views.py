@@ -1014,7 +1014,7 @@ def ajax_contact_form(request):
 
 # @user_passes_test(is_manager)
 def getFieldsInfo(student):
-    total_fields = 10
+    total_fields = 9
     all_fields = [a for a in dir(student) if not a.startswith('__')]
     empty_fields = []
     if not student.phone : empty_fields.append('Phone')
@@ -1025,10 +1025,9 @@ def getFieldsInfo(student):
     if not student.projects : empty_fields.append('Projects')
     if not student.cover_letter : empty_fields.append('Cover Letter')
     if not student.resume : empty_fields.append('Resume')
-    if not student.location : empty_fields.append('Location')
     if not student.alternate_email : empty_fields.append('Alternate_email')
     
-    complete = (total_fields-len(empty_fields))/total_fields*100
+    complete = round((total_fields-len(empty_fields))/total_fields*100)
     return complete,empty_fields
 
 
@@ -1521,20 +1520,17 @@ class StudentListView(PermissionRequiredMixin,ListView):
 
 @csrf_exempt
 def notify_student(request):
-    # to_mail = request.POST.get('email','')
-    to_mail = 'ankitamk@gmail.com'
+    to_mail = request.POST.get('email','')
+    # to_mail = 'ankitamk@gmail.com'
     empty_fields = request.POST.get('empty_fields','')
-    spk_user_id = request.POST.get('spk_user_id','')
     subject = 'Notification to complete the profile in Job Recommendation System'
-    message = f"Please add below details to complete your profile in Job Recommendation System :\n\n{empty_fields}.\nYou can update profile here : {settings.SITE_URL}{reverse('student_profile_details', kwargs={'id': spk_user_id,'job':0})}"
+    message = f"Please add below details to complete your profile in Job Recommendation System :\n\n{empty_fields}\n.\nLogin here to update profile : {settings.LOGIN_URL}"
     
     try:
         send_mail(subject=subject,message=message,recipient_list=[to_mail],from_email=settings.EMAIL_HOST_USER,fail_silently=False,)
         f = open(settings.PROFILE_EMAIL_LOG_FILE, "a")
         f.write(f"1,{to_mail},{datetime.datetime.now()},[{empty_fields}]\n")
         f.close()
-        # time.sleep(2)
-        # print(2/0)
     except Exception as e:
         f = open(settings.PROFILE_EMAIL_LOG_FILE, "a")
         f.write(f"0,{to_mail},{datetime.datetime.now()},[{empty_fields}],[{e}]\n")

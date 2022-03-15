@@ -146,9 +146,10 @@
           <div class="progress-bar bg-success" role="progressbar" style="width: {{complete}}%" aria-valuenow="{{complete}}" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
         <hr>
-        <p><b>Please add following information to complete the profile:</b></p>
-        <p>{{empty_fields}}</p>
-        {% if request.user|has_group:"MANAGER" %}
+        {% if empty_fields %}
+          <p><b>Please add following information to complete the profile:</b></p>
+          <p>{{empty_fields}}</p>
+          {% if request.user|has_group:"MANAGER" %}
         <button type="button" class="btn btn-outline-info btn-sm" id="notify">Notify student</button>
         <button class="btn btn-outline-primary btn-sm" type="button" id="in-progress" style="display:none;" disabled>
           <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
@@ -157,6 +158,10 @@
         <button type="button" class="btn btn-outline-success btn-sm" id="sent-success-status" style="display:none;" disabled><i class="bi bi-check"></i> Mail sent to {{student.user.email}}</button>
         <button type="button" class="btn btn-outline-danger btn-sm" id="sent-error-status" style="display:none;" disabled><i class="bi bi-exclamation-circle"></i> Error occurred, Please try later. </button>
         {% endif %}
+        {% else %}
+          <p>Student Profile is complete.</p>
+        {% endif %}
+        
       </div>
       <div>
         {% if student.resume %}
@@ -194,8 +199,7 @@
       url: "/notify-student-profile/",
       data:{
         'email': "{{student.user.email}}",
-        'empty_fields' : "{{empty_fields}}",
-        'spk_user_id' : "{{student.spk_usr_id}}"
+        'empty_fields' : "{{empty_fields}}"
       },
       success: function(result){
         $('#in-progress').hide();
