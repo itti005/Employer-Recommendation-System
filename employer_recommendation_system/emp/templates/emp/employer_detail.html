@@ -17,7 +17,9 @@
     </tr>
     <tr>
       <th scope="row">Sector / Domain</th>
-      <td>{{object.domain}}</td>
+      <td>{% for item in object.domain.all %}
+        {{item}} {% if not forloop.last %} ,{% endif %}
+      {% endfor %}</td>
     </tr>
     <tr>
       <th scope="row">State</th>

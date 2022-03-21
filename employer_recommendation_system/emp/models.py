@@ -217,7 +217,8 @@ class Company(models.Model):
     email = models.EmailField(null=True,blank=True) #Email for correspondence
     logo = models.ImageField(upload_to='logo/',null=True,blank=True)
     description = models.TextField(null=True,blank=True,verbose_name="Description about the company")
-    domain = models.ForeignKey(Domain,on_delete=models.CASCADE) #Domain od work Eg. Consultancy, Development, Software etc
+    # domain = models.ForeignKey(Domain,on_delete=models.CASCADE) 
+    domain = models.ManyToManyField(Domain,blank=True,related_name='domains') #Domain of work Eg. Consultancy, Development, Software etc
     company_size = models.CharField(max_length=25,choices=NUM_OF_EMPS,default=DEFAULT_NUM_EMP) #Number of employees in company
     website = models.URLField(null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
