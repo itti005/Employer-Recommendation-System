@@ -197,6 +197,7 @@ class Student(models.Model):
     city = models.CharField(max_length=200, null=True)  #spk
     alternate_email = models.EmailField(null=True,blank=True)
     certifications = models.TextField(null=True,blank=True)
+    notified_date = models.DateTimeField(null=True,blank=True)
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
 

@@ -30,7 +30,7 @@
         <div class="py-3 divider">
           <h1 class="display-6 " style="font-size: 2rem;;">{{event.name | capfirst}}</h1>
           <p><i class="far fa-calendar-alt e-icon"></i> {{ event.start_date | format_date:event.end_date}}</p>
-        <p class="">{{event.description | default:""}}</p>
+        <p class="">{{event.description | default:"" | safe}}</p>
         </div>
         
     

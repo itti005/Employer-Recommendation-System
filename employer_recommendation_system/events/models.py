@@ -3,11 +3,15 @@ from django.db import models
 from django.urls import reverse
 from django.conf import settings
 from django.template.defaultfilters import slugify
+from ckeditor.fields import RichTextField
 # Create your models here.
 
 EVENT_TYPE = [
     ('JOB','JobFair'),
-    ('INTERN','Internship')
+    ('INTERN','Internship'),
+    ('HACKATHON','Hackathon'),
+    ('MAPATHON','Mapathon'),
+    ('PILOT_WORKSHOP','Pilot Workshop')
 ]
 
 def brochure_directory_path(instance, filename):
@@ -15,13 +19,13 @@ def brochure_directory_path(instance, filename):
 
 class Event(models.Model):
     name = models.CharField(max_length=250)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(help_text="YYYY-MM-DD")
+    end_date = models.DateField(help_text="YYYY-MM-DD")
     logo = models.FileField(upload_to='brochures')
     type = models.CharField(max_length=200,choices=EVENT_TYPE,default="JOB")
     status = models.BooleanField(default=True) # if inactive , it will not be made public
     show_on_homepage = models.BooleanField(default=True)
-    description = models.TextField(blank=True,null=True)
+    description = RichTextField(null=True,blank=True,verbose_name="Event Description")
 
     def get_absolute_url(self):
         print(" ****************** GETIING ABSOLUTE URL ****************** ")

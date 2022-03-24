@@ -1525,9 +1525,16 @@ def notify_student(request):
     empty_fields = request.POST.get('empty_fields','')
     subject = 'Notification to complete the profile in Job Recommendation System'
     message = f"Please add below details to complete your profile in Job Recommendation System :\n\n{empty_fields}\n.\nLogin here to update profile : {settings.LOGIN_URL}"
-    
+
     try:
         send_mail(subject=subject,message=message,recipient_list=[to_mail],from_email=settings.EMAIL_HOST_USER,fail_silently=False,)
+        try:
+            student = Student.objects.get(user__email=to_mail)
+            student.notified_date = datetime.datetime.now()
+            student.save()
+        except Exception as e:
+            print(e)
+        
         f = open(settings.PROFILE_EMAIL_LOG_FILE, "a")
         f.write(f"1,{to_mail},{datetime.datetime.now()},[{empty_fields}]\n")
         f.close()
