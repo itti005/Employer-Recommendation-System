@@ -1,4 +1,3 @@
-from ast import Try
 from django.db import models
 from django.conf import settings
 import datetime
