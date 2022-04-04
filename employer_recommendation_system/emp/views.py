@@ -1524,8 +1524,14 @@ def notify_student(request):
     # to_mail = 'ankitamk@gmail.com'
     empty_fields = request.POST.get('empty_fields','')
     subject = 'Notification to complete the profile in Job Recommendation System'
-    message = f"Please add below details to complete your profile in Job Recommendation System :\n\n{empty_fields}\n.\nLogin here to update profile : {settings.LOGIN_URL}"
-
+    # message = f"Please add below details to complete your profile in Job Recommendation System :\n\n{empty_fields}\n.\nLogin here to update profile : {settings.LOGIN_URL}"
+    message = f"""
+                Dear Learner,\n
+                Your profile  in Job Recommendation System is incomplete and hence you are not eligible for automatic job matches.
+                We request you to please add the below details to complete your profile in the Job Recommendation System at the earliest:
+                Phone, Address, Education details, Skills, Project work, About, Cover Letter, Resume, Location, Alternate_email,  Phone Number, Photo.
+                Login here to update your complete profile : https://jrs.spoken-tutorial.org/login/\n
+                """
     try:
         send_mail(subject=subject,message=message,recipient_list=[to_mail],from_email=settings.EMAIL_HOST_USER,fail_silently=False,)
         try:
