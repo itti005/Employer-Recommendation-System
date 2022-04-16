@@ -57,6 +57,7 @@ import datetime
 from django.core.mail import send_mail
 from smtplib import SMTPException
 from collections import defaultdict
+from smtplib import SMTPException
 
 import random, os
 
@@ -1520,6 +1521,7 @@ class StudentListView(PermissionRequiredMixin,ListView):
 
 @csrf_exempt
 def notify_student(request):
+    mail_sent = False
     to_mail = request.POST.get('email','')
     # to_mail = 'ankitamk@gmail.com'
     empty_fields = request.POST.get('empty_fields','')
@@ -1534,21 +1536,34 @@ def notify_student(request):
                 """
     try:
         send_mail(subject=subject,message=message,recipient_list=[to_mail],from_email=settings.EMAIL_HOST_USER,fail_silently=False,)
+        mail_sent = True
         try:
             student = Student.objects.get(user__email=to_mail)
             student.notified_date = datetime.datetime.now()
             student.save()
         except Exception as e:
             print(e)
-        
-        f = open(settings.PROFILE_EMAIL_LOG_FILE, "a")
-        f.write(f"1,{to_mail},{datetime.datetime.now()},[{empty_fields}]\n")
-        f.close()
     except Exception as e:
-        f = open(settings.PROFILE_EMAIL_LOG_FILE, "a")
-        f.write(f"0,{to_mail},{datetime.datetime.now()},[{empty_fields}],[{e}]\n")
-        f.close()
-        response = JsonResponse({"error": "there was an error"})
-        response.status_code = 403
-        return response
+        pass
+    if mail_sent:
+        try:
+            f = open(settings.PROFILE_EMAIL_LOG_FILE, "a")
+            f.write(f"1,{to_mail},{datetime.datetime.now()},[{empty_fields}]\n")
+            f.close()
+        except Exception as e:
+            response = JsonResponse({"error": "Mail was sent successfully. But an error occurred while logging the data."})
+            response.status_code = 403
+            return response
+    else:
+        try:
+            f = open(settings.PROFILE_EMAIL_LOG_FILE, "a")
+            f.write(f"0,{to_mail},{datetime.datetime.now()},[{empty_fields}]\n")
+            f.close()
+            response = JsonResponse({"error": "An error occurred while sending mail."})
+            response.status_code = 403
+            return response
+        except Exception as e:
+            response = JsonResponse({"error": "An error occurred while sending mail & logging data."})
+            response.status_code = 403
+            return response
     return HttpResponse("Success!")
