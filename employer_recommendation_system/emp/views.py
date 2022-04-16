@@ -57,7 +57,6 @@ import datetime
 from django.core.mail import send_mail
 from smtplib import SMTPException
 from collections import defaultdict
-from smtplib import SMTPException
 
 import random, os
 
