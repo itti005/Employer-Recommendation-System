@@ -714,6 +714,7 @@ def save_student_profile(request,student):
         for file in redundant_cover + redundant_resume:
             os.remove(os.path.join(location,file))
         # code for saving cover letter & resume ends
+        student.profile_update_date = datetime.datetime.now()
         student.save()
         save_education(c_education_form,student)
         save_prev_education(request,student)

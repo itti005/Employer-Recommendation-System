@@ -198,6 +198,7 @@ class Student(models.Model):
     alternate_email = models.EmailField(null=True,blank=True)
     certifications = models.TextField(null=True,blank=True)
     notified_date = models.DateTimeField(null=True,blank=True)
+    profile_update_date = models.DateTimeField(null=True,blank=True)
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
 
