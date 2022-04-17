@@ -159,8 +159,11 @@
           <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
           Sending mail.... Please wait
         </button>
-        <button type="button" class="btn btn-outline-success btn-sm" id="sent-success-status" style="display:none;" disabled><i class="bi bi-check"></i> Mail sent to {{student.user.email}}</button>
-        <button type="button" class="btn btn-outline-danger btn-sm" id="sent-error-status" style="display:none;" disabled><i class="bi bi-exclamation-circle"></i> Error occurred, Please try later. </button>
+        <button type="button" class="btn btn-outline-success btn-sm" id="sent-success-status" style="display:none;" disabled><i class="bi bi-check"></i> 
+          Mail sent to {{student.user.email}}.</button>
+        <button type="button" class="btn btn-outline-primary btn-sm" id="sent-error-status" style="display:none;" disabled><i class="bi bi-exclamation-circle"></i>
+        <span id="error_text"></span>
+        </button>
         {% endif %}
         {% else %}
           <p>Student Profile is complete.</p>
@@ -209,9 +212,10 @@
         $('#in-progress').hide();
         $('#sent-success-status').show();
       },
-      error: function(){
+      error: function(result){
         $('#in-progress').hide();
         $('#sent-error-status').show();
+        $('#error_text').text(result.responseJSON['error'])
       }
     });
   }

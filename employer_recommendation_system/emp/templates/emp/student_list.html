@@ -59,7 +59,7 @@
     <td>{{student.spk_usr_id}}</td>
     <td><a href="{% url 'student_profile_details' student.spk_usr_id 0 %}">{{student.user.get_full_name | title}}</a></td>
     <td>{{ student.user.email }}</td>
-    <td>{{ student.date_updated }}</td>
+    <td>{{ student.profile_update_date }}</td>
     <td>
       {% if student.notified_date %}
         {{student.notified_date}}
