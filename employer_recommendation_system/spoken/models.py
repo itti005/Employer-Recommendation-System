@@ -47,8 +47,8 @@ class SpokenStudent(models.Model):
     gender = models.CharField(max_length=15)
     verified = models.PositiveSmallIntegerField()
     error = models.IntegerField()
-    created = models.DateTimeField()
-    updated = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
     user = models.OneToOneField(SpokenUser, models.DO_NOTHING, db_column='user_id')
 
     class Meta:
