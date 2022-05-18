@@ -19,8 +19,8 @@ def brochure_directory_path(instance, filename):
 
 class Event(models.Model):
     name = models.CharField(max_length=250)
-    start_date = models.DateField(help_text="YYYY-MM-DD")
-    end_date = models.DateField(help_text="YYYY-MM-DD")
+    start_date = models.DateField()
+    end_date = models.DateField()
     logo = models.FileField(upload_to='brochures')
     type = models.CharField(max_length=200,choices=EVENT_TYPE,default="JOB")
     status = models.BooleanField(default=True) # if inactive , it will not be made public

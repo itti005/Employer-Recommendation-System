@@ -8,13 +8,14 @@
 </div>
 {% include 'accounts/messages.html' %} 
 	<h1 class="text-left pb-2" style="font-size: 1.5rem;color: #0D47A1;width: 100%;border-bottom: 2px solid #0D47A1;">Login</h1>
-	<form action="{% url 'login' %}" method="post" style="width: 100%;">
+	<form  method="post" style="width: 100%;">
 	  {% csrf_token %}
 	  {{ form|crispy  }}
 	  <button type="submit" id="submit" class="btn " style="background: #0D47A1;color: #fff; font-weight: bold;width: 100%;">Login</button>
 	</form>
 	<hr>
 	<div>
+		<p>Forgot Password ? <a href="{% url 'reset_password' %}">Click here to reset password. </a> </p>
 		<p>Need help ? <a target="_blank" href="https://process.spoken-tutorial.org/index.php/Software-Training#Contacts_For_Training">Please contact your training manager. </a> </p>
 	</div>
 	{% comment %} <!-- will be used in later versions for registering spoken team & employers -->
