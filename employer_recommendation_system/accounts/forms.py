@@ -23,16 +23,14 @@ class PasswordResetForm(forms.Form):
 		try:
 			user = SpokenUser.objects.filter(email=email).first()
 			if user:
-				#check if mdl user or belongs to 'Student' group or entry in 'Student' table
-				spk_student_role = False
-				spk_student_record = False
-				is_mdl_user = False
+				#check if mdl user or belongs to 'Student' or 'HR-Manager' group or entry in 'Student' table
 				spk_student_role = 	'Student' in [role.group.name for role in user.spokenusergroup_set.all()]
 				spk_student_record = SpokenStudent.objects.filter(user_id=user.id).first()
 				is_mdl_user = MdlUser.objects.filter(email=email).first()
-				if not (spk_student_role or spk_student_record or is_mdl_user):
+				is_hr = 'HR-Manager' in [role.group.name for role in user.spokenusergroup_set.all()]
+				if not (spk_student_role or spk_student_record or is_mdl_user or is_hr):
 					error = 1
-					err_msg = "Your email does not belong to student group. Please follow https://spoken-tutorial.org/accounts/forgot-password/ to change the password."
+					err_msg = "Only Student or HR can register on JRS. Please follow https://spoken-tutorial.org/accounts/forgot-password/ to change the password."
 				else:
 					if user.is_active:
 						error = 0
@@ -45,11 +43,8 @@ class PasswordResetForm(forms.Form):
 					error = 0
 				else:
 					#create spoken user with email
-					pass
 					error = 1
-					err_msg = f"{email} does not exist"
-			# get spk auth_user
-			# get mdl_user
+					err_msg = f"{email} does not exist in Spoken Tutorial & Online Test Portal."
 		except Exception as e:
 			print(e)
 		if error:

@@ -159,10 +159,7 @@ def reset_password(request):
 			password = ''.join( random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
 			
 			# check if the user exists in SpokenUser
-			spoken_user = SpokenUser.objects.filter(email=email).first()
-			if not spoken_user:
-				spoken_user = SpokenUser.objects.filter(username=email).first()
-			
+			spoken_user = SpokenUser.objects.filter(Q(email=email) | Q(username=email)).first()
 			# check if the user exists in MdlUser
 			mdl_user = MdlUser.objects.filter(email=email).first()
 			if mdl_user:
@@ -177,6 +174,9 @@ def reset_password(request):
 						SpokenUserGroup.objects.create(user=spoken_user,group=group)
 					except:
 						print("User has Student role")
+			else:
+				print("Student is not mdluser")
+
 			spoken_user.password = make_password(password)
 			spoken_user.save()
 			
@@ -184,9 +184,6 @@ def reset_password(request):
 			if not spoken_user.profile_set.first():
 				profile = create_profile(spoken_user,None)
 			changePassUrl = SITE_URL+"accounts/change-password"
-			# changePassUrl = reverse('change_password')
-			# if request.GET and request.GET['next']:
-			# 	changePassUrl = changePassUrl + "?auto=%s&username=%s&next=%s" % (spoken_user.profile_set.first().confirmation_code, spoken_user.username, request.GET['next'])
 			
 			subject  = "Spoken Tutorial password reset"
 			to = [spoken_user.email]
