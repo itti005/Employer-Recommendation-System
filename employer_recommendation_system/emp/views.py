@@ -439,6 +439,9 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     success_message ="%(title)s job was created successfully"
     def get_success_url(self):
         obj = Job.objects.get(title=self.object.title,date_created=self.object.date_created)
+        ld = obj.last_app_date.date()
+        obj.last_app_date = datetime.datetime.combine(ld,datetime.time(23,59,59))
+        obj.save()
         return reverse('job-detail', kwargs={'slug': obj.slug})
     
     def form_invalid(self, form):
@@ -447,7 +450,7 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
     def form_valid(self, form):
         self.object = form.save(commit=False)
         # form.save()
-        self.object.save()
+        job=self.object.save()
         # self.save_degree(form)
         form.save_m2m()
         messages.success(self.request, 'Job information added successfully.')
@@ -579,6 +582,9 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
+        ld = form.cleaned_data['last_app_date']
+        form.cleaned_data['last_app_date'] = datetime.datetime.combine(ld.date(),datetime.time(23,59,59))
+        form.instance.last_app_date = datetime.datetime.combine(ld.date(),datetime.time(23,59,59))
         form.save()
         # self.object = form.save(commit=False)
         # self.object.save()
@@ -590,6 +596,7 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         form = update_form_widgets(self,form)
         return form
 
+ 
 def add_education(student,degree,discipline,institute,start_year,end_year,gpa,order):
     def add_values(education,degree,discipline,institute,start_year,end_year,gpa,order):
         education.degree = degree if degree else None
