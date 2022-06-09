@@ -62,13 +62,22 @@
             /* media queries */
             @media (min-width: 768px) {
                 .user-block{
-                    width: 35%;
+                    /* width: 35%; */
                 }
                 .tech-asp{
                     width: 50%;
                 }
+                #student-img{
+                    height: 180px;
+                    max-height: 200px;
+                }
+                #emp-img{
+                    height: 180px;
+                    max-height: 200px;
+                }
             }
             @media (max-width: 768px) {
+
                 .projects{
                     margin-top: 60px;
                 }
@@ -78,11 +87,17 @@
                     padding-left: 1px; */
                     /* user-block */
                 }
+                #mobile-heading{
+                    font-size: 20px;
+                }
+                #mobile-tag{
+                    font-size: 16px;
+                }
                 
             }
             @media (max-width: 991.98px) {
                 .user-block{
-                    width: 100%;
+                    /* width: 100%; */
                 }
                 #mobile-view-banner{
                     display: block!important;
@@ -99,13 +114,19 @@
                 #desktop-view-banner{
                     display: flex!important;
                 }   
-                
+                .user-block{
+                    width: 35%;
+                }
             }
+            
             @media (min-width: 768px) and (max-width: 1199.98px) { 
                 .img-asp{
                     width: 100%;
                 }
              }
+            
+
+             
              
              
 </style>
@@ -140,7 +161,7 @@
             <img  style="height: 50px;width: auto;"src="../../../static/images/logo/fossee-logo.png">
         </div>
         <p class="text-center my-3" style="font-size:18px;font-style: italic;">Presents</p>
-        <h1 class="mb-5 display-5 mx-5" style="color: #054C77; border-bottom: 2px solid rgba(0,0,0,0.2);">{{jobfair.event.name}}</h1>
+        <h1 class="mb-5 display-5 mx-5"  id="mobile-heading" style="color: #054C77; border-bottom: 2px solid rgba(0,0,0,0.2);">{{jobfair.event.name}}</h1>
     </div>
     <div class="d-flex justify-content-between" id="desktop-view-banner">
         <div class="d-flex mx-3">
@@ -152,10 +173,10 @@
     </div>
     
     <!-- <p class="mb-5 h5" style="font-family: verdana; ">Spoken Tutorial & FOSSEE Team presents a unique opportunity for students to connect with suitable Employers</p> -->
-    <p class="mb-5 h5 px-3" style="font-family: verdana; ">A unique opportunity for students to connect with potential employers</p>
+    <p class="mb-5 h5 px-3 text-center" style="font-family: verdana; " id="mobile-tag">A unique opportunity for students to connect with potential employers</p>
     <div class="d-flex">
-        <span class="d-block mx-5 h4"><i class="far fa-calendar-alt mb-5 fa-icon"></i>  June - July</span>
-        <span class="d-block mx-5 h4"><i class="fas fa-map-marker-alt fa-icon"></i> {{jobfair.venue}}</span>
+        <span class="d-block mx-md-5 h4-md " style="margin-right: 12px!important;"><i class="far fa-calendar-alt mb-5 fa-icon"></i>  June - July</span>
+        <span class="d-block mx-md-5 h4-md "><i class="fas fa-map-marker-alt fa-icon"></i> {{jobfair.venue}}</span>
     </div>
     <div class="d-md-flex justify-content-center">
         <div class="card user-block">
@@ -163,7 +184,8 @@
                 <h5 class="card-title text-center display-6 pt-2 serif">For Students</h5>
               </div>
               <div>
-                <img src="../../../static/images/student1.png" class="card-img-top d-block mx-auto" alt="..." style="height: 180px; width: 80%;max-height: 200px;">
+                <!-- <img id="student-img" src="../../../static/images/student1.png" class="card-img-top d-block mx-auto" alt="..." style="height: 180px; width: 80%;max-height: 200px;"> -->
+                <img id="student-img" src="../../../static/images/student1.png" class="card-img-top d-block mx-auto" alt="..." >
               </div>
             
             <div class="card-body d-flex flex-column card-points">
@@ -178,7 +200,8 @@
                 <h5 class="card-title text-center display-6 pt-2 serif">For Employers</h5>
               </div>
               <div>
-                <img src="../../../static/images/employer1.png" class="card-img-top d-block mx-auto" alt="..." style="height: 180px; width: 80%;max-height: 200px;">
+                <!-- <img id="emp-img" src="../../../static/images/employer1.png" class="card-img-top d-block mx-auto" alt="..." style="height: 180px; width: 80%;max-height: 200px;"> -->
+                <img id="emp-img" src="../../../static/images/employer1.png" class="card-img-top d-block mx-auto" alt="..." >
               </div>
             
             <div class="card-body d-flex flex-column ">
@@ -191,19 +214,19 @@
           </div>
     </div>
 </div>
-<div class="container px-5">
+<div class="container px-lg-5">
     <div class="d-md-flex">
-        <div class="px-md-5">
-            <img src="../../../static/images/aspirant.png" style="width: 500px;height: auto;" class="img-asp">
+        <div class="px-lg-5">
+            <img src="../../../static/images/aspirant.png" style="width: 400px;height: auto;" class="img-asp">
         </div>
-        <div class="px-md-5 py-5 d-flex flex-column justify-content-md-center tech-asp">
+        <div class="px-lg-5 py-5 d-flex flex-column justify-content-md-center tech-asp">
             <h4>Are you a Technical Job Aspirant?</h4><br>
             <p>To participate in the Virtual Job Fair you should have undergone Spoken Tutorial software training & scored above 60% in the corresponding software test.</p>
-            <p>To take <a href="" style="color:#054C77!important ;" target="_blank">Spoken Tutorial Software Training & Test</a> and get a chance to participate in our Virtual Job Fair, <a href="https://process.spoken-tutorial.org/index.php/Software-Training#Contacts_For_Training">click here.</a></p>
+            <p>To take Spoken Tutorial Software Training & Test and get a chance to participate in our Virtual Job Fair, <a href="https://process.spoken-tutorial.org/index.php/Software-Training#Contacts_For_Training" style="color:#054C77!important ;" target="_blank">click here.</a></p>
         </div>
     </div>
 </div>
-<div class="container d-flex flex-column align-items-center recruiter-block" >
+<div class="container-lg d-flex flex-column align-items-center recruiter-block" >
     <h4>Our Past Recruiters</h4><br>
     <div class="d-flex  pr" >
         <div class="pr-wrapper d-flex flex-column align-items-center border-r-b"><img class="past-recruiter1 d-block" src="../../../static/images/logo/convergence.jpeg"/></div>
@@ -220,7 +243,7 @@
 </div>
 <div class="container-fluid d-flex flex-column align-items-center py-4" style="background-color: antiquewhite;">
     <h6>Contact for Job Fair related queries</h6>
-    <div class="d-flex">
+    <div class="d-md-flex">
         <div  class="p-2 mr-2"><i class="far fa-envelope" style="color: #054C77;"></i> hrspokentutorial@gmail.com</div>
         <div  class="p-2"><i class="fas fa-phone-square-alt" style="color: #054C77;"></i> 022 2576 4229</div>
     </div>
@@ -228,14 +251,16 @@
 <div class="d-flex flex-column align-items-center social-media-wrapper py-3">
     <div class="mx-2 my-2">Follow us on social media for more updates!</div>
     <div class="row px-3" style="width: 100%;">
-        <div class="col-6 d-flex flex-column ">
-            <div class="d-flex justify-content-center">
+        <div class="col-md-6 d-md-flex flex-column">
+            <div class="d-flex justify-content-sm-around justify-content-md-center ">
                 <span>@SpokenTutorials</span>
             <div class="mx-2 social-icons"><a href="https://twitter.com/spokentutorials?lang=en" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
             <div class="mx-2 social-icons"><a href="https://www.facebook.com/SpokenTutorial.org/" style="margin-right: 12px;;" target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
             </div>
         </div>
-        <div class="col-6 d-flex justify-content-center">
+        <!-- <div class="col-md-6 d-flex justify-content-center"> -->
+        <div class="col-md-6 d-flex justify-content-sm-around justify-content-md-center">
+            
             <span>@FOSSEE</span>
             <div class="mx-2 social-icons"><a href="https://twitter.com/FOSSEE/status/1534449568162942976" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
             <div class="mx-2 social-icons"><a href="https://www.facebook.com/FOSSEENMEICT/posts/5221007834631220" target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
