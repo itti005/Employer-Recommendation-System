@@ -1,13 +1,11 @@
-from asyncio import events
 from datetime import date
-from pyexpat import model
 from django.db import models
 from django.forms import DateField
 from django.urls import reverse
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from ckeditor.fields import RichTextField
-from numpy import empty
+
 
 from emp.models import Company, Job
 # Create your models here.
