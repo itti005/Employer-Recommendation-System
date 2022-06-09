@@ -172,6 +172,8 @@
       </div>
       <div>
         {% if student.resume %}
+        <p>If you are unable to view resume below , <a target="_blank" href="{{ MEDIA_URL }}students/{{student.user.id}}/resume{{student.user.id}}.pdf">please click here to view resume</a> </p>
+        <p>If you are unable to view cover letter below , <a target="_blank" href="{{ MEDIA_URL }}students/{{student.user.id}}/cover_letter{{student.user.id}}.pdf">please click here to view cover letter</a> </p>
         <embed src="{{ MEDIA_URL }}students/{{student.user.id}}/resume{{student.user.id}}.pdf" width="800px" height="2100px" /> 
         {% else %}
         <div class="alert alert-dark" role="alert">No Resume Available. It is recommended to upload resume.</div>

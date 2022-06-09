@@ -80,21 +80,34 @@ div#navbarSupportedContent>ul>li>a{
 .event .e-icon{
   color : rgba(0,0,0,0.6);
 }
+@media (max-width: 768px) {
+                .img-announce{
+                  display: block!important;
+                    width: 80%!important;
+                    margin-right: auto!important;
+                    margin-left: auto!important;
+                }
+            }
 </style>
 {% endblock %}
 {% block main %}
 {% include "emp/header.html" %}
 <div class="container mt-5" >
  <div class="row p-4 p-lg-5">
- 	<div class="col-lg-9">
+ 	<div class="col-md-9">
  		<h1 class="display-6 fw-bold"><span style="color: #002648;">Spoken Tutorial</span></h1>
  		<h2 class="display-6 fs-3 fw-bold"><span style="color: rgba(255,165,0,0.8);">Job Recommendation System</span></h2>
  		<hr>
  		<p class="lead">A platform to connect potential employers with students across India, having the right skills set.</p><br>
  		<a class="btn c-btn mb-3" href="{% url 'login' %}" role="button" style="width: 100px;" target="_blank">Login</a>
  	</div>
- 	<div class="col-lg-4 offset-lg-1">
- 		
+ 	<div class="col-md-3">
+     <img src="../../../static/images/announce-1-8.png" style="width: 100%;height: auto;" class="img-announce mx-auto text-center">
+ 		<p class="my-2 text-center"><b>Announcing Virtual Job Fair 2022</b></p>
+     <a class="btn c-btn mb-3" href="{% url 'jobfair' 1 %}" role="button" target="_blank" style="background-color: #E48600!important; width: 100%;">Click For Details</a>
+     
+     
+
  	</div>
  </div>
  <div class="row p-5 bg-light border" id="about">
