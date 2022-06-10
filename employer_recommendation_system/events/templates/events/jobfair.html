@@ -124,11 +124,11 @@
                     width: 100%;
                 }
              }
-            
-
-             
-             
-             
+             @media (max-width: 576px) {
+                .w-social{
+                    width: 50%!important;
+                }
+            }
 </style>
 {% endblock %}
 
@@ -253,31 +253,22 @@
     <div class="row px-3" style="width: 100%;">
         <div class="col-md-6 d-md-flex flex-column">
             <div class="d-flex justify-content-sm-around justify-content-md-center ">
-                <span>@SpokenTutorials</span>
+                <span class="w-social">@SpokenTutorials</span>
             <div class="mx-2 social-icons"><a href="https://twitter.com/spokentutorials?lang=en" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
-            <div class="mx-2 social-icons"><a href="https://www.facebook.com/SpokenTutorial.org/" style="margin-right: 12px;;" target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
+            <div class="mx-2 social-icons"><a href="https://www.facebook.com/SpokenTutorial.org/"  target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
+            <div class="mx-2 social-icons"><a href="https://in.linkedin.com/company/spokentutorial" style="margin-right: 12px;;" target="_blank"><i class="fab fa-linkedin social-icons"></i></a></div>
             </div>
         </div>
-        <!-- <div class="col-md-6 d-flex justify-content-center"> -->
         <div class="col-md-6 d-flex justify-content-sm-around justify-content-md-center">
             
-            <span>@FOSSEE</span>
+            <span class="w-social">@FOSSEE</span>
             <div class="mx-2 social-icons"><a href="https://twitter.com/FOSSEE/status/1534449568162942976" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
             <div class="mx-2 social-icons"><a href="https://www.facebook.com/FOSSEENMEICT/posts/5221007834631220" target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
             <div class="mx-2 social-icons"><a href="https://www.instagram.com/p/CeiZMWbOmHg/?igshid=YmMyMTA2M2Y=" target="_blank"><i class="fab fa-instagram social-icons"></i></a></div>
         </div>
     </div>
 </div>
-<!-- <div class="d-flex justify-content-around py-3 px-2" style="width: 100%;border-top: 1px solid #fff; background-color: #fff;" >
-    <div class="d-flex">
-        <img style="height: 25px;margin-right: 12px;"src="../../../static/images/logo/st-logo.png">
-        <a href="http://spoken-tutorial.org/" style="color: rgba(0,0,0,0.5);" target="_blank"><span style="font-size: 12px;">http://spoken-tutorial.org/</span></a>
-    </div>
-    <div class="d-flex">
-        <img style="height: 25px;margin-right: 12px;"src="../../../static/images/logo/fossee-logo.png">
-        <a href="https://fossee.in/" style="color: rgba(0,0,0,0.5);" target="_blank"><span style="font-size: 12px;">https://fossee.in/</span></a>
-    </div>
-</div> -->
+
 <div class="px-5 py-3">
     <span class="d-block text-center" style="font-size: 12px;">Spoken Tutorial and FOSSEE projects developed at IIT Bombay are the initiatives of Ministry of Education, Government of India.</span>
 </div>
