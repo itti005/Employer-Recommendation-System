@@ -469,24 +469,30 @@ class JobListView(FormMixin,ListView):
         context = super().get_context_data(**kwargs)
         context['base_url']=settings.BASE_URL
         # if self.request.user.groups.filter(name='STUDENT'):
-        if has_student_role(self.request.user.student):
-        # if student_rol  self.request.user.groups.filter(name='STUDENT'):
-            jobShortlist = JobShortlist.objects.filter(spk_user=self.request.user.student.spk_usr_id)
-            job_short_list = get_applied_joblist(self.request.user.student)
-            print(f"job_short_list ******* {job_short_list}")
-            all_jobs = Job.objects.all()
-            applied_jobs = [x.job for x in job_short_list]
-            in_process_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['RECEIVED_APP']]
-            rejected_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['REJECTED']]
-            reccomended_jobs = get_recommended_jobs(self.request.user.student)
-            context['applied_jobs'] = applied_jobs
-            context['in_process_jobs'] = in_process_jobs
-            context['rejected_jobs'] = rejected_jobs
-            context['reccomended_jobs'] = reccomended_jobs
-            eligible_jobs = reccomended_jobs+applied_jobs
-            context['non_eligible_jobs'] = list(set(all_jobs).difference(set(eligible_jobs)))
-        elif self.request.user.groups.filter(name='MANAGER'):
+        # if has_student_role(self.request.user.student):
+        if self.request.user.groups.filter(name='MANAGER'):
             context['grade_filter_url'] = settings.GRADE_FILTER
+        else:
+            try:
+                if has_student_role(self.request.user.student):
+            # context['grade_filter_url'] = settings.GRADE_FILTER
+            # if student_rol  self.request.user.groups.filter(name='STUDENT'):
+                    jobShortlist = JobShortlist.objects.filter(spk_user=self.request.user.student.spk_usr_id)
+                    job_short_list = get_applied_joblist(self.request.user.student)
+                    print(f"job_short_list ******* {job_short_list}")
+                    all_jobs = Job.objects.all()
+                    applied_jobs = [x.job for x in job_short_list]
+                    in_process_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['RECEIVED_APP']]
+                    rejected_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['REJECTED']]
+                    reccomended_jobs = get_recommended_jobs(self.request.user.student)
+                    context['applied_jobs'] = applied_jobs
+                    context['in_process_jobs'] = in_process_jobs
+                    context['rejected_jobs'] = rejected_jobs
+                    context['reccomended_jobs'] = reccomended_jobs
+                    eligible_jobs = reccomended_jobs+applied_jobs
+                    context['non_eligible_jobs'] = list(set(all_jobs).difference(set(eligible_jobs)))
+            except:
+                print("No student role assigend to user")
         return context
     def get_queryset(self):
         queryset = super().get_queryset()
