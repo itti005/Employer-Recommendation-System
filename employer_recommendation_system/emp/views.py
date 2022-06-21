@@ -57,37 +57,15 @@ import datetime
 from django.core.mail import send_mail
 from smtplib import SMTPException
 from collections import defaultdict
+from .utility import *
+from .helper import *
 
 import random, os
 
-# STATUS = {'ACTIVE' :1,'INACTIVE' :0}
-
-APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
-APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
-
-RATING = {
-    'ONLY_VISIBLE_TO_ADMIN_HR':0,
-    'DISPLAY_ON_HOMEPAGE':1,
-    'VISIBLE_TO_ALL_USERS':2
-}
-
-JOB_RATING=[(RATING['VISIBLE_TO_ALL_USERS'],'Visible to all users'),(RATING['ONLY_VISIBLE_TO_ADMIN_HR'],'Only visible to Admin/HR'),(RATING['DISPLAY_ON_HOMEPAGE'],'Display on homepage')]
-JOB_STATUS=[(1,'Active'),(0,'Inactive')]
-COMPANY_RATING = [(RATING['VISIBLE_TO_ALL_USERS'],'Visible to all users'),(RATING['ONLY_VISIBLE_TO_ADMIN_HR'],'Only visible to Admin/HR'),(RATING['DISPLAY_ON_HOMEPAGE'],'Display on homepage')]
-
-CURRENT_EDUCATION = 1
-PAST_EDUCATION = 2
-JOB_APP_STATUS = {'RECEIVED_APP':0,'FIRST_SHORTLIST':1,'REJECTED':2}
-DEFAULT_JOB_TYPE=1
-SECOND_SHORTLIST_EMAIL = 2
-MANDATORY_FOSS = 1
-OPTIONAL_FOSS = 2
-
-
 # test functions to limit access to pages start
 def is_student(user):
-    b = settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
-    return settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
+    b = list(set(['STUDENT','STUDENT_ILW']).intersection([x.name for x in user.groups.all()]))
+    return b
 
 def is_manager(user):
     b = settings.ROLES['MANAGER'][1] in [x.name for x in user.groups.all()]
@@ -152,57 +130,57 @@ def get_job_app_status(job):
 
 
 
-def get_recommended_jobs(student):
-    #get jobs having status 0 & last app submission date greater than equal to today
-    jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=STATUS['ACTIVE'])
-    applied_jobs = [x.job for x in get_applied_joblist(student.spk_usr_id)]
-    jobs = [x for x in jobs if x not in applied_jobs ]
-    scores = fetch_student_scores(student)
-    if scores:
-        mdl_user_id = scores[0]['mdl'].userid
-    student_foss = [d['foss'] for d in scores]  #fosses for which student grade is available
-    rec_jobs = []
-    spk_student = SpokenStudent.objects.get(user_id=student.spk_usr_id)
-    count = 1
-    for job in jobs:
-        fosses = list(map(int,job.foss.split(',')))
-        if job.state and job.state!='0':
-            states = list(map(int,job.state.split(',')))
-        else:
-            states = ''
-        if job.city and job.city!='0':
-            cities = list(map(int,job.city.split(',')))
-        else:
-            cities = ''
-        # cities = '' if job.city=='0' else list(map(int,job.city.split(',')))
-        # insti_type = '' if job.institute_type=='0' else list(map(int,job.institute_type.split(',')))
-        if job.institute_type and job.institute_type!='0':
-            insti_type = list(map(int,job.institute_type.split(',')))
-        else:
-            insti_type = ''
-        valid_fosses = [   d['foss'] for d in scores if str(d['foss']) in job.foss and int(d['grade'])>=job.grade]
-        if valid_fosses:
-            mdl_quiz_ids = [x.mdlquiz_id for x in FossMdlCourses.objects.filter(foss_id__in=valid_fosses)] #Student passes 1st foss & grade criteria
-            mdluser_id = TestAttendance.objects.filter(student=spk_student).first().mdluser_id
-            # test_attendance = TestAttendance.objects.filter(student=spk_student, 
-            test_attendance = TestAttendance.objects.filter(mdluser_id=mdluser_id, 
-                                                mdlquiz_id__in=mdl_quiz_ids,
-                                                test__academic__state__in=states if states!='' else SpokenState.objects.all(),
-                                                test__academic__city__in=cities if cities!='' else SpokenCity.objects.all(),
-                                                status__gte=3,
-                                                test__academic__institution_type__in=insti_type if insti_type!='' else InstituteType.objects.all(),
-                                                test__academic__status__in=[job.activation_status] if job.activation_status else [1,3],
-                                                )
-            if job.from_date and job.to_date:
-                test_attendance = test_attendance.filter(test__tdate__range=[job.from_date, job.to_date])
-            elif job.from_date:
-                test_attendance = test_attendance.filter(test__tdate__gte=job.from_date)
-            if test_attendance:
-                rec_jobs.append(job)
-        else:
-            pass
-        count+=1
-    return rec_jobs
+# def get_recommended_jobs(student):
+#     #get jobs having status 0 & last app submission date greater than equal to today
+#     jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=STATUS['ACTIVE'])# All active jobs
+#     applied_jobs = [x.job for x in get_applied_joblist(student)]
+#     jobs = [x for x in jobs if x not in applied_jobs ]
+#     scores = fetch_student_scores(student)
+#     if scores:
+#         mdl_user_id = scores[0]['mdl'].userid
+#     student_foss = [d['foss'] for d in scores]  #fosses for which student grade is available
+#     rec_jobs = []
+#     spk_student = SpokenStudent.objects.get(user_id=student.spk_usr_id)
+#     count = 1
+#     for job in jobs:
+#         fosses = list(map(int,job.foss.split(',')))
+#         if job.state and job.state!='0':
+#             states = list(map(int,job.state.split(',')))
+#         else:
+#             states = ''
+#         if job.city and job.city!='0':
+#             cities = list(map(int,job.city.split(',')))
+#         else:
+#             cities = ''
+#         # cities = '' if job.city=='0' else list(map(int,job.city.split(',')))
+#         # insti_type = '' if job.institute_type=='0' else list(map(int,job.institute_type.split(',')))
+#         if job.institute_type and job.institute_type!='0':
+#             insti_type = list(map(int,job.institute_type.split(',')))
+#         else:
+#             insti_type = ''
+#         valid_fosses = [   d['foss'] for d in scores if str(d['foss']) in job.foss and int(d['grade'])>=job.grade]
+#         if valid_fosses:
+#             mdl_quiz_ids = [x.mdlquiz_id for x in FossMdlCourses.objects.filter(foss_id__in=valid_fosses)] #Student passes 1st foss & grade criteria
+#             mdluser_id = TestAttendance.objects.filter(student=spk_student).first().mdluser_id
+#             # test_attendance = TestAttendance.objects.filter(student=spk_student, 
+#             test_attendance = TestAttendance.objects.filter(mdluser_id=mdluser_id, 
+#                                                 mdlquiz_id__in=mdl_quiz_ids,
+#                                                 test__academic__state__in=states if states!='' else SpokenState.objects.all(),
+#                                                 test__academic__city__in=cities if cities!='' else SpokenCity.objects.all(),
+#                                                 status__gte=3,
+#                                                 test__academic__institution_type__in=insti_type if insti_type!='' else InstituteType.objects.all(),
+#                                                 test__academic__status__in=[job.activation_status] if job.activation_status else [1,3],
+#                                                 )
+#             if job.from_date and job.to_date:
+#                 test_attendance = test_attendance.filter(test__tdate__range=[job.from_date, job.to_date])
+#             elif job.from_date:
+#                 test_attendance = test_attendance.filter(test__tdate__gte=job.from_date)
+#             if test_attendance:
+#                 rec_jobs.append(job)
+#         else:
+#             pass
+#         count+=1
+#     return rec_jobs
 
 #function to get student spoken test scores; returns list of dictionary of foss & scores
 def fetch_student_scores(student):  #parameter : recommendation student obj
@@ -233,47 +211,48 @@ def fetch_student_scores(student):  #parameter : recommendation student obj
     return scores
 
 
-def get_applied_joblist(spk_user_id):
-    return JobShortlist.objects.filter(spk_user=spk_user_id,status__in=[APPLIED,APPLIED_SHORTLISTED])
 
-def get_awaiting_jobs(spk_user_id):  #Jobs for which the student has not yet applied
-    all_jobs = Job.objects.all().filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=STATUS['ACTIVE'])
+#checked_spk
+def get_jobs_to_display(rec_student):  
+    all_jobs = Job.objects.all().filter(rating=DISPLAY_ON_HOMEPAGE,status=ACTIVE)
     if not all_jobs:
-        all_jobs = Job.objects.all().filter(status=STATUS['ACTIVE'])
-    applied_jobs = [x.job for x in get_applied_joblist(spk_user_id)]
-    return list(set(all_jobs)-set(applied_jobs))
-
+        all_jobs = Job.objects.all().filter(status=ACTIVE)
+    return list(set(all_jobs)-set(get_applied_jobs(rec_student)))
+#checked_spk
 @user_passes_test(is_student)
 def student_homepage(request):
     context={}
-    # Top 5 jobs & company to display on student homepage
-    company_display = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=STATUS['ACTIVE']).values('name','logo').order_by('date_updated')[:6]
+    # Top 6 jobs & company to display on student homepage
+    company_display = Company.objects.filter(rating=DISPLAY_ON_HOMEPAGE,status=ACTIVE).values('name','logo').order_by('date_updated')[:6]
     context['company_display']=company_display
     rec_student = Student.objects.get(user=request.user)
-    applied_jobs = get_applied_joblist(rec_student.spk_usr_id)
-    awaiting_jobs = get_awaiting_jobs(rec_student.spk_usr_id)
-    rec_jobs = get_recommended_jobs(rec_student)
+    # applied_jobs = get_applied_joblist(rec_student.spk_usr_id)
+    applied_jobs = get_applied_jobs(rec_student)
     context['applied_jobs'] = applied_jobs if len(applied_jobs)<4 else applied_jobs[:4]
-    context['awaiting_jobs'] = awaiting_jobs if len(awaiting_jobs)<6 else awaiting_jobs[:6]
-    l = awaiting_jobs if len(awaiting_jobs)<6 else awaiting_jobs[:6]
-    context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
+    jobs_to_display = get_jobs_to_display(rec_student) # WHat is the use of this ??
+    context['jobs_to_display'] = jobs_to_display if len(jobs_to_display)<6 else jobs_to_display[:6]
+    rec_jobs = get_recommended_jobs(rec_student)
     context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
     
-    try:
-         spk_student = SpokenStudent.objects.using('spk').filter(user_id=rec_student.spk_usr_id).get()
-         id = spk_student.id
-         test_attendance_entries = TestAttendance.objects.using('spk').filter( student_id = spk_student.id)
-         for ta in test_attendance_entries :
-             mdl_user_id = ta.mdluser_id
-             mdl_course_id = ta.mdlcourse_id
-             mdl_quiz_id = ta.mdlquiz_id
-             quiz_grade = MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id , quiz=mdl_quiz_id)
-             spk_mdl_course_map = FossMdlCourses.objects.using('spk').get(mdlcourse_id=mdl_course_id)
-             spk_foss = FossCategory.objects.using('spk').get(id=spk_mdl_course_map.foss_id)
-    except Exception as e:
-        print(e)
-    scores = fetch_student_scores(rec_student)
-    context['scores']=scores
+    # l = awaiting_jobs if len(awaiting_jobs)<6 else awaiting_jobs[:6]
+    # context['APPLIED_SHORTLISTED']=APPLIED_SHORTLISTED
+    
+    
+    # try:
+    #      spk_student = SpokenStudent.objects.using('spk').filter(user_id=rec_student.spk_usr_id).get()
+    #      id = spk_student.id
+    #      test_attendance_entries = TestAttendance.objects.using('spk').filter( student_id = spk_student.id)
+    #      for ta in test_attendance_entries :
+    #          mdl_user_id = ta.mdluser_id
+    #          mdl_course_id = ta.mdlcourse_id
+    #          mdl_quiz_id = ta.mdlquiz_id
+    #          quiz_grade = MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id , quiz=mdl_quiz_id)
+    #          spk_mdl_course_map = FossMdlCourses.objects.using('spk').get(mdlcourse_id=mdl_course_id)
+    #          spk_foss = FossCategory.objects.using('spk').get(id=spk_mdl_course_map.foss_id)
+    # except Exception as e:
+    #     print(e)
+    # scores = fetch_student_scores(rec_student)
+    # context['scores']=scores
 
     return render(request,'emp/student_homepage.html',context)
 
@@ -489,9 +468,12 @@ class JobListView(FormMixin,ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['base_url']=settings.BASE_URL
-        if self.request.user.groups.filter(name='STUDENT'):
+        # if self.request.user.groups.filter(name='STUDENT'):
+        if has_student_role(self.request.user.student):
+        # if student_rol  self.request.user.groups.filter(name='STUDENT'):
             jobShortlist = JobShortlist.objects.filter(spk_user=self.request.user.student.spk_usr_id)
-            job_short_list = get_applied_joblist(self.request.user.student.spk_usr_id)
+            job_short_list = get_applied_joblist(self.request.user.student)
+            print(f"job_short_list ******* {job_short_list}")
             all_jobs = Job.objects.all()
             applied_jobs = [x.job for x in job_short_list]
             in_process_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['RECEIVED_APP']]
@@ -749,6 +731,7 @@ def student_profile_confirm(request,pk,job):
     context['education_form']=education_form
     context['jobApplicationForm']=jobApplicationForm
     context['scores'] = fetch_student_scores(student)
+    context['ilw_scores']=fetch_ilw_scores(student)
     context['projects'] = student.projects.all()
     return render(request,'emp/student_form.html',context)
 
@@ -785,6 +768,8 @@ def student_profile(request,pk):
     context['education_form'] = c_education_form
     context['institutes'] = AcademicCenter.objects.values('id','institution_name').order_by('institution_name')
     context['scores'] = fetch_student_scores(student)
+    if has_ilw_role(student):
+        context['ilw_scores']=fetch_ilw_scores(student)
     context['projects'] = student.projects.all()
     context['degrees'] = Degree.objects.order_by('name')
     context['acad_disciplines'] = Discipline.objects.order_by('name')
@@ -1052,6 +1037,7 @@ def student_profile_details(request,id,job):
     context['student']=student
     context['MEDIA_URL']=settings.MEDIA_URL
     context['scores']=fetch_student_scores(student)
+    context['ilw_scores']=fetch_ilw_scores(student)
     context['current_education'] = student.education.filter(order=CURRENT_EDUCATION)
     context['past_education'] = student.education.filter(order=PAST_EDUCATION).first()
     complete,empty_fields = getFieldsInfo(student)
@@ -1065,7 +1051,7 @@ def student_jobs(request):
     context = {}
     #get applied jobs
     rec_student = Student.objects.get(user=request.user)
-    applied_jobs = get_applied_joblist(rec_student.spk_usr_id)
+    applied_jobs = get_applied_joblist(rec_student)
     rec_jobs = get_recommended_jobs(rec_student)
     #get recommended jobs
     context['applied_jobs']=applied_jobs

@@ -1,5 +1,7 @@
+from django.contrib.auth.models import User
 from django import template
 from django.conf import settings
+from emp.helper import has_fossee_role, has_ilw_role, has_spk_student_role
 from moodle.models import *
 from spoken.models import *
 from emp.models import JobShortlist,NUM_OF_EMPS
@@ -273,3 +275,15 @@ def get_event_testimonials(eventid):
 def get_value(dictionary,key):
     value = dictionary.get(key) 
     return value
+
+@register.filter()
+def is_student(student_id):
+    try:
+        user = User.objects.get(id=student_id.id)
+        groups = [x.name for x in user.groups.all()]
+        if has_spk_student_role(user.student) or has_ilw_role(user.student) or has_fossee_role(user.student):
+            return True
+        else:
+            return False
+    except Exception as e:
+        return False

@@ -36,9 +36,9 @@ class LoginViewCustom(LoginView):
 		settings.ROLES['MANAGER'][1]:'/manager',
 		settings.ROLES['STUDENT'][1]:'/student',
 		settings.ROLES['EMPLOYER'][1]:'/employer',
+		"STUDENT_ILW" : '/student',
 		}
 		url = role_url[self.request.user.groups.all()[0].name]
-		
 		r = self.request.POST.get('next')
 		r2 = self.request.get_full_path()
 		r1 = self.redirect_field_name
