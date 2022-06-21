@@ -30,7 +30,8 @@
             </div>
 {% endfor %}
 <section>
-  {% if request.user|has_group:"STUDENT" %}
+  {# if request.user|has_group:"STUDENT" #}
+  {% if request.user|is_student %}
     {% if current_education %}
       <div>
         <div class="d-none">
@@ -92,11 +93,12 @@
   <thead>
   </thead>
   <tbody>
+    {% if scores %}
     <tr>
      <td><b>Foss</b></td>
      <td><b>Grade</b></td>
    </tr>
-    {% if scores %}
+   
       {% for item in scores %}
    <tr>
      <td>{{item.name}}</td>
@@ -104,12 +106,41 @@
    </tr>
    {% endfor %}
    {% else %}
-   <th>No Data Available. Please check shortlisted tab.</th>
+    <tr>
+      <th>No Data Available.</th>
+      <th></th>
+    </tr>
+   
     {% endif %}
   </tbody>
 </table>
    </li>
   </li>
+  {% if ilw_scores %}
+  <li class="list-group-item list-group-item-info"><span>ILW Test Scores</span>
+    <li class="list-group-item">
+      <table class="table table-bordered ">
+   <thead>
+   </thead>
+   <tbody>
+     <tr>
+      <td><b>Foss</b></td>
+      <td><b>Grade</b></td>
+      <td><b>Test Date</b></td>
+    </tr> 
+       {% for item in ilw_scores %}
+    <tr>
+      <td>{{item.name}}</td>
+      <td>{{item.grade}}</td>
+      <td>{{item.mdl.updated}}</td>
+    </tr>
+    {% endfor %}
+   </tbody>
+ </table>
+    </li>
+   </li>
+  {% endif %}
+  
   <li class="list-group-item list-group-item-info"><span>Profile</span></li>
   <li class="list-group-item">
   	<b>About</b>

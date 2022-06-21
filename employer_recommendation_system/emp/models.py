@@ -254,9 +254,9 @@ class Foss(models.Model):
 class Job(models.Model):
     title = models.CharField(max_length=250,verbose_name="Title of the job page") #filter
     designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
-    state_job = models.IntegerField(null=False,blank=False)  #spk #filter
+    state_job = models.IntegerField(null=False,blank=False)  
     #state_job = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    city_job = models.IntegerField(null=False,blank=False)  #spk #filter
+    city_job = models.IntegerField(null=False,blank=False)  
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     skills = models.CharField(max_length=400,null=True,blank=True) 
     description = RichTextField(null=True,blank=True,verbose_name="Job Description")
@@ -284,9 +284,9 @@ class Job(models.Model):
     # institute_type = models.CharField(max_length=200,null=True,blank=True)
     institute_type = models.CharField(max_length=200,blank=True)
     # state = models.CharField(max_length=200,null=True,blank=True)
-    state = models.CharField(max_length=200,blank=True)
+    state = models.CharField(max_length=200,blank=True)#spk #filter
     # city = models.CharField(max_length=200,null=True,blank=True)
-    city = models.CharField(max_length=200,blank=True)
+    city = models.CharField(max_length=200,blank=True)#spk #filter
     grade = models.IntegerField()
     activation_status = models.IntegerField(max_length=10,choices=ACTIVATION_STATUS,blank=True,null=True)
     from_date = models.DateField(null=True,blank=True,verbose_name='Test Date From')
@@ -312,15 +312,15 @@ class Job(models.Model):
         ordering = [('-date_updated')]
 
 
-class JobShortlist(models.Model):
+class JobShortlist(models.Model): #Record is created when a student applies for a job, with status 0.The status changes to 1 when HR further shortlists it.
     # user=models.ForeignKey(User,on_delete=models.CASCADE)
     spk_user=models.IntegerField(null=True)  #spk
     student=models.ForeignKey(Student,on_delete=models.CASCADE)  #rec
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, null=True,blank=True)
     date_updated = models.DateTimeField(auto_now=True)
-    #0 : awaiting for further shortlist
-    #1 : shortlisted for 2nd round
+    #0 : student has applied but not yet shortlisted by HR Manager
+    #1 : student has applied & shortlisted by HR Manager
     status = models.IntegerField(null=True,blank=True)
 
     def __str__(self):

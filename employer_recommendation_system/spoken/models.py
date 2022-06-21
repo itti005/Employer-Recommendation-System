@@ -305,6 +305,7 @@ class TestAttendance(models.Model):
     created = models.DateTimeField()
     updated = models.DateTimeField()
     student = models.ForeignKey(SpokenStudent, models.DO_NOTHING, blank=True, null=True, db_column='student_id')
+    mdlgrade = models.DecimalField(max_digits=12, decimal_places=5, default=0.00)
 
     class Meta:
         managed = False
@@ -336,4 +337,63 @@ class Profile(models.Model):
         managed = False
         db_table = 'cms_profile'
 
+class Language(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    # user = models.ForeignKey(SpokenUser, on_delete=models.PROTECT )
+    code = models.CharField(max_length=10, default='en')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'creation_language'
+
+
+class Participant(models.Model):
+    GENDER_CHOICES = (
+		('', '--- Gender ---'),
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', "Don't wish to disclose")
+    )
+    REGISTRATION_TYPE_CHOICES =(
+    ('', '-----'),  (1, 'Subscribed College'),(2, 'Manual Registration')
+    )
+    name = models.CharField(max_length=255,null=True)
+    email = models.EmailField(max_length=255,null=True)
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=6,null=True)
+    amount = models.DecimalField(max_digits=10,decimal_places=2,null=True)	
+    # event = models.ForeignKey(TrainingEvents, on_delete=models.PROTECT)
+    user = models.ForeignKey(SpokenUser, on_delete=models.PROTECT)
+    state = models.ForeignKey(SpokenState, on_delete=models.PROTECT )
+    college = models.ForeignKey(AcademicCenter, on_delete=models.PROTECT)
+    department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
+    registartion_type = models.PositiveSmallIntegerField(choices= REGISTRATION_TYPE_CHOICES, default=1)
+    created = models.DateTimeField(auto_now_add = True)
+    foss_language = models.ForeignKey(Language, on_delete=models.PROTECT, null=True )
+    # payment_status = models.ForeignKey(Payee, on_delete=models.PROTECT, null=True)
+    reg_approval_status = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        managed = False
+        db_table = 'training_participant'
+    
+
+class EventTestStatus(models.Model):
+    participant = models.ForeignKey(Participant, on_delete=models.PROTECT)
+    # event = models.ForeignKey(TrainingEvents, on_delete=models.PROTECT)
+    mdlemail = models.EmailField(max_length=255,null=True)
+    fossid = models.ForeignKey(FossCategory, on_delete=models.PROTECT )
+    mdlcourse_id = models.PositiveIntegerField(default=0)
+    mdlquiz_id = models.PositiveIntegerField(default=0)
+    mdlattempt_id = models.PositiveIntegerField(default=0)
+    part_status = models.PositiveSmallIntegerField(default=0)
+    mdlgrade= models.DecimalField(max_digits = 10, decimal_places = 5, default=0.00)
+    cert_code= models.CharField(max_length = 100, null=True)
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+    
+    class Meta:
+        managed = False
+        db_table = 'training_eventteststatus'
 
