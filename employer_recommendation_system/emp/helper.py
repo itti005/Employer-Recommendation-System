@@ -72,44 +72,28 @@ def fetch_ta_scores(student):
     df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id'])
     scores = []
     ta = TestAttendance.objects.filter(student_id = student.spk_student_id,status__gte=3)
-    print(f"length ta ********* {len(ta)}")
-    for item in ta:
-        print(f"***********************************\n")
-        print(f"mdlcourse_id : {item.mdlcourse_id}\nmdlquiz_id : {item.mdlquiz_id}")
-        print(f"***********************************\n")
+    for item in ta :
         if item.mdlcourse_id and item.mdlquiz_id:
-            print(f"value :{df_fmc.loc[(item.mdlcourse_id,item.mdlquiz_id)].values[0][0]}")
-        
-        # scores[df_fmc.loc[(item.mdlcourse_id,item.mdlquiz_id)].values[0][0]] = item.mdlgrade
             foss_id = df_fmc.loc[(item.mdlcourse_id,item.mdlquiz_id)].values[0][0]
             fs = FossCategory.objects.get(id=foss_id)
             scores.append({'foss': foss_id,
                         'name':fs.foss,'grade':item.mdlgrade,'quiz':item.mdlquiz_id,'mdl':item})
-    print(f"scores : {scores}")
     return scores
 
 def fetch_ilw_scores(student):
-    fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
-    df_fmc = pd.DataFrame(fmc)
-    df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id'])
-    print(f"df_fmc **********************\n**********************\n{df_fmc}**********************\n")
+    # fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
+    # df_fmc = pd.DataFrame(fmc)
+    # df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id'])
     scores = []
     try:
         participant = Participant.objects.get(user=student.spk_usr_id)
         ets = EventTestStatus.objects.filter(participant=participant,part_status__gte=2)
         for item in ets:
-            print("\n***********************************")
-            print(f"item.mdlcourse_id ---- {item.mdlcourse_id} ; item.mdlquiz_id ----- {item.mdlquiz_id}")
-            print("\n***********************************")
-            # scores[df_fmc.loc[(item.mdlcourse_id,item.mdlquiz_id)].values[0][0]] = item.mdlgrade
             foss_obj = FossCategory.objects.get(id=item.fossid_id)
             scores.append({'foss':foss_obj.id,'name':foss_obj.foss,'grade':item.mdlgrade,'quiz':item.mdlquiz_id,'mdl':item})
 
     except Participant.DoesNotExist:
         print(f"{student} : Not an ILW student")
-
-        # scores[item.fossid_id] = item.mdlgrade
-        print(f"scores ************************** \n{scores}")
     return scores
 
 def fetch_fossee_scores(student):
@@ -120,9 +104,7 @@ def fetch_student_scores(student):  #parameter : recommendation student obj
     scores = {}
     # fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
     # df_fmc = pd.DataFrame(fmc)
-    # df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id'])
-
-
+    # df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id']
     groups = [x.name for x in student.user.groups.all()]
     if 'STUDENT' in groups:
         s = fetch_ta_scores(student)
