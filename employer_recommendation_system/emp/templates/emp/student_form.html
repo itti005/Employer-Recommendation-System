@@ -134,12 +134,14 @@
     <tr>
      <td><b>Foss</b></td>
      <td><b>Grade</b></td>
+     <td><b>Test Date</b></td>
    </tr>
     
       {% for item in scores %}
    <tr>
      <td>{{item.name}}</td>
      <td>{{item.grade}}</td>
+     <td>{{item.updated}}</td>
    </tr>
    {% endfor %}
    {% else %}

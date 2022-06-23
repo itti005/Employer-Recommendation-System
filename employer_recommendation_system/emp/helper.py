@@ -1,5 +1,4 @@
-
-from spoken.models import EventTestStatus, Participant, SpokenUser, TestAttendance
+from spoken.models import EventTestStatus, Participant, SpokenUser, TestAttendance, Test
 from .models import JobShortlist, Job,STATUS
 from spoken.models import FossMdlCourses, SpokenCity, SpokenState, InstituteType,FossCategory
 import pandas as pd
@@ -65,6 +64,22 @@ def merge_scores(d1,d2):
             if d2[key] > d1[key]:
                 d1[key] = d2[key]
 
+
+def unique_foss_scores(scores):
+    unique_foss = {}
+    unique_scores = []
+
+    for item in scores:
+        if item['foss'] in list(unique_foss.keys()):
+            if item['grade'] > unique_foss[item['foss']]:
+                unique_foss[item['foss']] = item['grade']
+                unique_scores.append(item)
+        else:
+            unique_foss[item['foss']] = item['grade']
+            unique_scores.append(item)
+    print(unique_scores)
+    return unique_scores
+    
 # def fetch_ta_scores(student,df_fmc):
 def fetch_ta_scores(student):
     fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
@@ -73,11 +88,18 @@ def fetch_ta_scores(student):
     scores = []
     ta = TestAttendance.objects.filter(student_id = student.spk_student_id,status__gte=3)
     for item in ta :
-        if item.mdlcourse_id and item.mdlquiz_id:
-            foss_id = df_fmc.loc[(item.mdlcourse_id,item.mdlquiz_id)].values[0][0]
-            fs = FossCategory.objects.get(id=foss_id)
-            scores.append({'foss': foss_id,
-                        'name':fs.foss,'grade':item.mdlgrade,'quiz':item.mdlquiz_id,'mdl':item})
+        try:
+            if item.mdlcourse_id and item.mdlquiz_id:
+                # foss_id = df_fmc.loc[(item.mdlcourse_id,item.mdlquiz_id)].values[0][0]
+                test = Test.objects.get(id=item.test_id)
+                foss = test.foss
+                # foss_id = item.test.foss_id
+                # fs = FossCategory.objects.get(id=foss_id)
+                scores.append({'foss': foss.id,
+                            'name':foss.foss,'grade':item.mdlgrade,'quiz':item.mdlquiz_id,'mdl':item,'updated':item.created})
+        except:
+            print("Test does not exist")
+    scores = unique_foss_scores(scores)
     return scores
 
 def fetch_ilw_scores(student):
@@ -94,6 +116,7 @@ def fetch_ilw_scores(student):
 
     except Participant.DoesNotExist:
         print(f"{student} : Not an ILW student")
+    scores = unique_foss_scores(scores)
     return scores
 
 def fetch_fossee_scores(student):
@@ -101,35 +124,38 @@ def fetch_fossee_scores(student):
 
 #function to get student spoken test scores; returns list of dictionary of foss & scores
 def fetch_student_scores(student):  #parameter : recommendation student obj
-    scores = {}
+    scores = []
     # fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
     # df_fmc = pd.DataFrame(fmc)
     # df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id']
     groups = [x.name for x in student.user.groups.all()]
     if 'STUDENT' in groups:
         s = fetch_ta_scores(student)
-        scores = merge_scores(scores,s)
+        # scores = merge_scores(scores,s)
+        scores = scores + s
         
     if 'STUDENT_ILW' in groups:
         s = fetch_ilw_scores(student)
-        scores = merge_scores(scores,s)
+        # scores = merge_scores(scores,s)
+        scores = scores + s
 
     if 'STUDENT_FOSSEE' in groups:
         #scores = scores + fetch_fossee_scores(student,df_fmc)
         pass #ToDO #FOSSEE
 
+    # scores = unique_foss_scores(scores)
     return scores
 
 
-def is_job_recommended_ta(job,student):
-    scores = fetch_ta_scores(student)
+def is_job_recommended_ta(job,student,scores):
+    # scores = fetch_ta_scores(student)
     states = get_query_state_list(job)
     cities = get_query_city_list(job)
     insti_type = get_query_insti_type_list(job)
     valid_fosses = get_valid_fosses(job,scores)
     mdl_quiz_ids = [x.mdlquiz_id for x in FossMdlCourses.objects.filter(foss_id__in=valid_fosses)]
     test_attendance = TestAttendance.objects.filter(student_id=student.spk_student_id, 
-                                                    mdlquiz_id__in=mdl_quiz_ids,
+                                                    test__foss_id__in=valid_fosses,
                                                     test__academic__state__in=states if states!='' else SpokenState.objects.all(),
                                                     test__academic__city__in=cities if cities!='' else SpokenCity.objects.all(),
                                                     status__gte=3,
@@ -193,10 +219,10 @@ def get_recommended_jobs(student):
     jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=STATUS['ACTIVE'])# All active jobs
     applied_jobs = get_applied_jobs(student)
     jobs = [x for x in jobs if x not in applied_jobs ]
-
+    scores = fetch_ta_scores(student)
     if has_spk_student_role(student):
         for job in jobs:
-            if is_job_recommended_ta(job,student):
+            if is_job_recommended_ta(job,student,scores):
                 rec_jobs.append(job)
     
     
