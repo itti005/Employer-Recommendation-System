@@ -4,6 +4,9 @@ from spoken.models import FossMdlCourses, SpokenCity, SpokenState, InstituteType
 import pandas as pd
 import datetime
 from spoken.helper import is_spk_student_role, is_ILW
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.utils.functional import wraps
 
 RATING = {
     'ONLY_VISIBLE_TO_ADMIN_HR':0,
@@ -27,6 +30,12 @@ ACTIVE = 1
 APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
 APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
 
+def is_student(user): # check for any student role
+    return list(set(['STUDENT','STUDENT_ILW']).intersection([x.name for x in user.groups.all()]))
+
+def is_manager(user):
+    return settings.ROLES['MANAGER'][1] in [x.name for x in user.groups.all()]
+
 def has_spk_student_role(student):
     return 'STUDENT' in [x.name for x in student.user.groups.all()]
 
@@ -35,6 +44,49 @@ def has_ilw_role(student):
 
 def has_fossee_role(student):
     return 'STUDENT_FOSSEE' in [x.name for x in student.user.groups.all()]
+
+def check_student(view_func):
+    @wraps(view_func)
+    def inner(request,pk, *args, **kwargs):
+        if request.user.student.id!=int(pk):
+            raise PermissionDenied()
+        return view_func(request,pk, *args, **kwargs)
+    return inner
+
+def check_student_job(view_func):
+    @wraps(view_func)
+    def inner(request,pk,job, *args, **kwargs):
+        student = request.user.student
+        job_obj = Job.objects.get(id=job)
+        jobs = get_recommended_jobs(student)
+        if student.id!=int(pk) or not job_obj in jobs:
+            raise PermissionDenied()
+        return view_func(request,pk,job, *args, **kwargs)
+    return inner
+
+def check_user(view_func):
+    @wraps(view_func)
+    def inner(request,pk, *args, **kwargs):
+        if request.user.id!=int(pk):
+            raise PermissionDenied()
+        return view_func(request,pk, *args, **kwargs)
+    return inner
+
+def access_profile(view_func):
+    @wraps(view_func)
+    def inner(request,id,job, *args, **kwargs):
+        if is_manager(request.user):
+            return view_func(request,id,job, *args, **kwargs)
+        if is_student(request.user):
+            rec_jobs = get_recommended_jobs(request.user.student)
+            try:
+                job_obj = Job.objects.get(id=job)
+                if job_obj in rec_jobs and request.user.student.spk_usr_id==int(id):
+                    return view_func(request,id,job, *args, **kwargs)
+            except:
+                raise PermissionDenied()
+        raise PermissionDenied()
+    return inner
 
 #called
 def get_applied_joblist(rec_student): #Jobs where student has applied
@@ -48,7 +100,6 @@ def get_applied_jobs(rec_student):
     js = JobShortlist.objects.filter(student=rec_student)
     return [x.job for x in js]
 
-# ????????????
 def get_eligible_jobs(spk_user_id):  #Jobs for which the student has not yet applied
     all_jobs = Job.objects.all().filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=STATUS['ACTIVE'])
     if not all_jobs:
@@ -124,23 +175,17 @@ def fetch_fossee_scores(student):
 
 #function to get student spoken test scores; returns list of dictionary of foss & scores
 def fetch_student_scores(student):  #parameter : recommendation student obj
-    scores = []
-    # fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
-    # df_fmc = pd.DataFrame(fmc)
-    # df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id']
+    scores = []    
     groups = [x.name for x in student.user.groups.all()]
     if 'STUDENT' in groups:
         s = fetch_ta_scores(student)
-        # scores = merge_scores(scores,s)
         scores = scores + s
         
     if 'STUDENT_ILW' in groups:
         s = fetch_ilw_scores(student)
-        # scores = merge_scores(scores,s)
         scores = scores + s
 
     if 'STUDENT_FOSSEE' in groups:
-        #scores = scores + fetch_fossee_scores(student,df_fmc)
         pass #ToDO #FOSSEE
 
     # scores = unique_foss_scores(scores)
@@ -148,7 +193,6 @@ def fetch_student_scores(student):  #parameter : recommendation student obj
 
 
 def is_job_recommended_ta(job,student,scores):
-    # scores = fetch_ta_scores(student)
     states = get_query_state_list(job)
     cities = get_query_city_list(job)
     insti_type = get_query_insti_type_list(job)
@@ -193,13 +237,11 @@ def get_query_insti_type_list(job):
 
 def get_valid_fosses(job,scores):
     fosses = list(map(int,job.foss.split(',')))
-    # valid_fosses = [ item for item in scores if item in fosses and scores[item] >= job.grade]
     valid_fosses = []
     for item in scores:
         if item['foss'] in fosses:
             if item['grade'] >= job.grade:
                 valid_fosses.append(item['foss'])
-    # valid_fosses = [ item['foss'] for item in scores if item['foss'] in fosses and item['grade'] >= job.grade]
     return valid_fosses
 
 
@@ -238,5 +280,13 @@ def get_recommended_jobs(student):
 
     return rec_jobs  
 
+def get_jobs_to_display(rec_student):  
+    all_jobs = Job.objects.all().filter(rating=DISPLAY_ON_HOMEPAGE,status=ACTIVE)
+    if not all_jobs:
+        all_jobs = Job.objects.all().filter(status=ACTIVE)
+    return list(set(all_jobs)-set(get_applied_jobs(rec_student)))
 
-
+def get_state_city_lst():
+    states = SpokenState.objects.all()
+    cities = SpokenCity.objects.all()
+    return states, cities
