@@ -183,32 +183,32 @@ def get_job_app_status(job):
 #     return rec_jobs
 
 #function to get student spoken test scores; returns list of dictionary of foss & scores
-def fetch_student_scores(student):  #parameter : recommendation student obj
-    scores = []
-    #student = Student.objects.get(id=2) #TEMPORARY
-    spk_user = student.spk_usr_id
-    try:
-        spk_student = SpokenStudent.objects.get(user=spk_user)
-        testattendance = TestAttendance.objects.values('mdluser_id').filter(student=spk_student)
-        mdl_grades = MdlQuizGrades.objects.using('moodle').filter(userid=testattendance[0]['mdluser_id']) #fetch all rows with mdl_course & grade
-        count = 1
-        for item in mdl_grades: #map above mdl_course with foss from fossmdlcourse
-            try:
-                foss_mdl_courses = FossMdlCourses.objects.get(mdlquiz_id=item.quiz)
-                foss = foss_mdl_courses.foss
-                scores.append({'foss':foss.id,'name':foss.foss,'grade':item.grade,'quiz':item.quiz,'mdl':item})
-            except FossMdlCourses.DoesNotExist as e:
-                print(e)
-            except MultipleObjectsReturned:
-                for foss_mdl_courses in FossMdlCourses.objects.filter(mdlquiz_id=item.quiz):
-                    foss = foss_mdl_courses.foss
-                    scores.append({'foss':foss.id,'name':foss.foss,'grade':item.grade,'quiz':item.quiz,'mdl':item})
-            count+=1
-    except SpokenStudent.DoesNotExist as e:
-        print(e)
-    except IndexError as e:
-        print(e)
-    return scores
+# def fetch_student_scores(student):  #parameter : recommendation student obj
+#     scores = []
+#     #student = Student.objects.get(id=2) #TEMPORARY
+#     spk_user = student.spk_usr_id
+#     try:
+#         spk_student = SpokenStudent.objects.get(user=spk_user)
+#         testattendance = TestAttendance.objects.values('mdluser_id').filter(student=spk_student)
+#         mdl_grades = MdlQuizGrades.objects.using('moodle').filter(userid=testattendance[0]['mdluser_id']) #fetch all rows with mdl_course & grade
+#         count = 1
+#         for item in mdl_grades: #map above mdl_course with foss from fossmdlcourse
+#             try:
+#                 foss_mdl_courses = FossMdlCourses.objects.get(mdlquiz_id=item.quiz)
+#                 foss = foss_mdl_courses.foss
+#                 scores.append({'foss':foss.id,'name':foss.foss,'grade':item.grade,'quiz':item.quiz,'mdl':item})
+#             except FossMdlCourses.DoesNotExist as e:
+#                 print(e)
+#             except MultipleObjectsReturned:
+#                 for foss_mdl_courses in FossMdlCourses.objects.filter(mdlquiz_id=item.quiz):
+#                     foss = foss_mdl_courses.foss
+#                     scores.append({'foss':foss.id,'name':foss.foss,'grade':item.grade,'quiz':item.quiz,'mdl':item})
+#             count+=1
+#     except SpokenStudent.DoesNotExist as e:
+#         print(e)
+#     except IndexError as e:
+#         print(e)
+#     return scores
 
 
 
@@ -773,7 +773,8 @@ def student_profile(request,pk):
     context['form']=student_form
     context['education_form'] = c_education_form
     context['institutes'] = AcademicCenter.objects.values('id','institution_name').order_by('institution_name')
-    context['scores'] = fetch_student_scores(student)
+    # context['scores'] = fetch_student_scores(student)
+    context['scores'] = fetch_ta_scores(student)
     if has_ilw_role(student):
         context['ilw_scores']=fetch_ilw_scores(student)
     context['projects'] = student.projects.all()
