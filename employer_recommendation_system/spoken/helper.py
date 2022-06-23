@@ -7,7 +7,8 @@ from django.contrib.auth.hashers import make_password
 def is_jrs_user(email):
     try:
         return User.objects.get(email=email)
-    except:
+    except Exception as e:
+        print(f"Exception : {e}")
         return None
 
 def pwd_exists(email):

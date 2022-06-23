@@ -313,6 +313,7 @@ class JobCreate(PermissionRequiredMixin,SuccessMessageMixin,CreateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
+        job=self.object.save()
         form.save_m2m()
         messages.success(self.request, 'Job information added successfully.')
         return super(ModelFormMixin, self).form_valid(form)
