@@ -7,7 +7,6 @@ from spoken.models import *
 from emp.models import JobShortlist,NUM_OF_EMPS
 from spoken.models import *
 from events.models import Testimonial
-from emp.views import JOB_RATING
 
 register = template.Library()
 
@@ -287,3 +286,4 @@ def is_student(student_id):
             return False
     except Exception as e:
         return False
+
