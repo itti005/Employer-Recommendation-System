@@ -24,6 +24,7 @@ from spoken.backends import *
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from datetime import datetime
 SITE_URL = getattr(settings, "SITE_URL", "https://jrs.spoken-tutorial.org/")
 PASSWORD_MAIL_SENDER = getattr(settings, "NO_REPLY_SPOKEN_MAIL", "no-reply@spoken-tutorial.org")
 
@@ -211,7 +212,7 @@ Spoken Tutorials
 IIT Bombay.
 '''.format(spoken_user.username, spoken_user.username, password,changePassUrl)
 
-			print(f"username ***************** {spoken_user.username}\npassword ******************** {password}\nchangePassUrl ************** {changePassUrl}")
+			print(f"username ***************** {spoken_user.email}\npassword ******************** {password}\nchangePassUrl ************** {changePassUrl}")
 			email = EmailMultiAlternatives(
                 subject, message, PASSWORD_MAIL_SENDER,
                 to = to, bcc = [], cc = [],
@@ -262,9 +263,14 @@ def change_password(request):
 	
 	context['form'] = form
 	# get code from profile
-	s = request.user.student
-	spk_user_id = s.spk_usr_id
-	context['userid'] = spk_user_id
+	# s = request.user.student
+	# spk_user_id = s.spk_usr_id
+	try:
+		spk_user = SpokenUser.objects.filter(email=request.user.email)[0]
+		spk_user_id = spk_user.id
+	except:
+		print("Not a spoken user") #fossee user
+	context['userid'] = spk_user.id
 	profile = Profile.objects.filter(user_id=spk_user_id).first()
 	if profile:
 		context['code'] = profile.confirmation_code

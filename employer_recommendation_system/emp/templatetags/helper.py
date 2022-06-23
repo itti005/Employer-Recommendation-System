@@ -7,6 +7,12 @@ from spoken.models import *
 from emp.models import JobShortlist,NUM_OF_EMPS
 from spoken.models import *
 from events.models import Testimonial
+RATING = {
+    'ONLY_VISIBLE_TO_ADMIN_HR':0,
+    'DISPLAY_ON_HOMEPAGE':1,
+    'VISIBLE_TO_ALL_USERS':2
+}
+JOB_RATING=[(RATING['VISIBLE_TO_ALL_USERS'],'Visible to all users'),(RATING['ONLY_VISIBLE_TO_ADMIN_HR'],'Only visible to Admin/HR'),(RATING['DISPLAY_ON_HOMEPAGE'],'Display on homepage')]
 
 register = template.Library()
 
