@@ -27,6 +27,7 @@ urlpatterns = [
     path('my_jobs/', views.student_jobs, name='student_jobs'),
     path('job/<slug:slug>/', JobDetailView.as_view(), name='job-detail'),
     path('job_listings/', JobListingView.as_view(), name='job-listing'),
+    path('api/jobs/<req_user>/',views.jobs,name='jobs'),
     ################### jobshortlist
     path('job_application_status/', JobAppStatusListView.as_view(), name='job-app-status'),
     path('job_application_status/<int:id>/', views.job_app_details, name='job-app-detail'),
