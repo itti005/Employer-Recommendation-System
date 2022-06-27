@@ -133,9 +133,9 @@ def unique_foss_scores(scores):
     
 # def fetch_ta_scores(student,df_fmc):
 def fetch_ta_scores(student):
-    fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
-    df_fmc = pd.DataFrame(fmc)
-    df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id'])
+    # fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
+    # df_fmc = pd.DataFrame(fmc)
+    # df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id'])
     scores = []
     ta = TestAttendance.objects.filter(student_id = student.spk_student_id,status__gte=3)
     for item in ta :
@@ -197,7 +197,7 @@ def is_job_recommended_ta(job,student,scores):
     cities = get_query_city_list(job)
     insti_type = get_query_insti_type_list(job)
     valid_fosses = get_valid_fosses(job,scores)
-    mdl_quiz_ids = [x.mdlquiz_id for x in FossMdlCourses.objects.filter(foss_id__in=valid_fosses)]
+    # mdl_quiz_ids = [x.mdlquiz_id for x in FossMdlCourses.objects.filter(foss_id__in=valid_fosses)]
     test_attendance = TestAttendance.objects.filter(student_id=student.spk_student_id, 
                                                     test__foss_id__in=valid_fosses,
                                                     test__academic__state__in=states if states!='' else SpokenState.objects.all(),
@@ -261,8 +261,9 @@ def get_recommended_jobs(student):
     jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=STATUS['ACTIVE'])# All active jobs
     applied_jobs = get_applied_jobs(student)
     jobs = [x for x in jobs if x not in applied_jobs ]
-    scores = fetch_ta_scores(student)
+    
     if has_spk_student_role(student):
+        scores = fetch_ta_scores(student)
         for job in jobs:
             if is_job_recommended_ta(job,student,scores):
                 rec_jobs.append(job)
