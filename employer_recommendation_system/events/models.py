@@ -1,19 +1,28 @@
 from datetime import date
 from django.db import models
+from django.forms import DateField
 from django.urls import reverse
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from ckeditor.fields import RichTextField
+
+
+from emp.models import Company, Job
 # Create your models here.
 
 EVENT_TYPE = [
-    ('JOB','JobFair'),
+    ('JOB','Job'),
+    ('JOBFAIR','JobFair'),
     ('INTERN','Internship'),
     ('HACKATHON','Hackathon'),
     ('MAPATHON','Mapathon'),
     ('PILOT_WORKSHOP','Pilot Workshop')
 ]
 
+JOBFAIR_VENUE_TYPE = [
+    ('VIRTUAL','virtual'),
+    ('PHYSICAL','physical')
+]
 def brochure_directory_path(instance, filename):
     return 'brochures'
 
@@ -21,7 +30,7 @@ class Event(models.Model):
     name = models.CharField(max_length=250)
     start_date = models.DateField()
     end_date = models.DateField()
-    logo = models.FileField(upload_to='brochures')
+    logo = models.FileField(upload_to='brochures',null=True,blank=True)
     type = models.CharField(max_length=200,choices=EVENT_TYPE,default="JOB")
     status = models.BooleanField(default=True) # if inactive , it will not be made public
     show_on_homepage = models.BooleanField(default=True)
@@ -82,3 +91,17 @@ class GalleryImage(models.Model):
             obj = GalleryImage.objects.get(location=self.location,date_created=self.date_created,desc=self.desc)
             obj.slug = slugify(obj.id) 
             obj.save()
+
+class JobFair(models.Model):
+    students_enrolled = models.IntegerField(null=True,blank=True)
+    students_placed = models.IntegerField(null=True,blank=True)
+    companies = models.ManyToManyField(Company,null=True,blank=True)
+    jobs = models.ManyToManyField(Job,null=True,blank=True)
+    venue = models.CharField(max_length=255)
+    type = models.CharField(choices=JOBFAIR_VENUE_TYPE,max_length=100)
+    student_last_registration = models.DateField(null=True,blank=True)
+    emp_last_registration = models.DateField(null=True,blank=True)
+    event = models.ForeignKey(Event,on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return self.event.name

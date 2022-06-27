@@ -2,8 +2,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django import forms
-from spoken.models import SpokenStudent
-from spoken.models import Profile
+from spoken.models import SpokenStudent, Participant, Profile
 from moodle.models import MdlUser
 
 from spoken.models import SpokenUser
@@ -28,7 +27,8 @@ class PasswordResetForm(forms.Form):
 				spk_student_record = SpokenStudent.objects.filter(user_id=user.id).first()
 				is_mdl_user = MdlUser.objects.filter(email=email).first()
 				is_hr = 'HR-Manager' in [role.group.name for role in user.spokenusergroup_set.all()]
-				if not (spk_student_role or spk_student_record or is_mdl_user or is_hr):
+				is_ilw = Participant.objects.filter(user=user)
+				if not (spk_student_role or spk_student_record or is_mdl_user or is_hr or is_ilw):
 					error = 1
 					err_msg = "Only Student or HR can register on JRS. Please follow https://spoken-tutorial.org/accounts/forgot-password/ to change the password."
 				else:

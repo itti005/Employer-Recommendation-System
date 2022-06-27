@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.contrib.auth.views import LoginView
 from django.views import generic
 from django.urls import reverse_lazy, reverse
-
 from django.contrib.auth.decorators import login_required
 from spoken.models import SpokenGroup
 from moodle.models import MdlUser
@@ -25,6 +24,7 @@ from spoken.backends import *
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from datetime import datetime
 SITE_URL = getattr(settings, "SITE_URL", "https://jrs.spoken-tutorial.org/")
 PASSWORD_MAIL_SENDER = getattr(settings, "NO_REPLY_SPOKEN_MAIL", "no-reply@spoken-tutorial.org")
 
@@ -36,9 +36,9 @@ class LoginViewCustom(LoginView):
 		settings.ROLES['MANAGER'][1]:'/manager',
 		settings.ROLES['STUDENT'][1]:'/student',
 		settings.ROLES['EMPLOYER'][1]:'/employer',
+		"STUDENT_ILW" : '/student',
 		}
 		url = role_url[self.request.user.groups.all()[0].name]
-		
 		r = self.request.POST.get('next')
 		r2 = self.request.get_full_path()
 		r1 = self.redirect_field_name
@@ -46,64 +46,64 @@ class LoginViewCustom(LoginView):
 			return reverse('change_password')
 		return url
 
-class RegisterView(generic.CreateView):
-	form_class = RegisterForm
-	template_name = 'accounts/register.html'
+# class RegisterView(generic.CreateView):
+# 	form_class = RegisterForm
+# 	template_name = 'accounts/register.html'
 	
-	def get_success_url(self):
-		messages.add_message(self.request, messages.INFO, 'Successfully Registered !')
-		return reverse('login')
+# 	def get_success_url(self):
+# 		messages.add_message(self.request, messages.INFO, 'Successfully Registered !')
+# 		return reverse('login')
 
-	def form_valid(self, form):
-		response = super().form_valid(form)
-		user = UserModel.objects.get(Q(username__iexact=form.data['username']) | Q(email__iexact=form.data['email']))
-		group_type = form.data['group']
-		if group_type=='students':
-			pass
+# 	def form_valid(self, form):
+# 		response = super().form_valid(form)
+# 		user = UserModel.objects.get(Q(username__iexact=form.data['username']) | Q(email__iexact=form.data['email']))
+# 		group_type = form.data['group']
+# 		if group_type=='students':
+# 			pass
 		
-		g = Group.objects.get(name=group_type)
-		user.groups.add(g)
-		user.save()
-		return response
+# 		g = Group.objects.get(name=group_type)
+# 		user.groups.add(g)
+# 		user.save()
+# 		return response
 def update_msg(request):
 	django_messages = []
 	for message in messages.get_messages(request):
 			django_messages.append({'message':message.message,'tag':message.tags})	
 			return django_messages
 
-def validate_student(request):
-#def validate_student():
-	email = request.GET.get('email', None)
-	#email = 'ankita7@gmail.com' 
+# def validate_student(request):
+# #def validate_student():
+# 	email = request.GET.get('email', None)
+# 	#email = 'ankita7@gmail.com' 
 
-	if User.objects.filter(email__iexact=email).exists():
-		data = {'is_rec_student':True}
-		messages.success(request,'Email Id already registered with recommendation system')
-		data['messages'] = update_msg(request)
-		return JsonResponse(data)
+# 	if User.objects.filter(email__iexact=email).exists():
+# 		data = {'is_rec_student':True}
+# 		messages.success(request,'Email Id already registered with recommendation system')
+# 		data['messages'] = update_msg(request)
+# 		return JsonResponse(data)
 
-	is_spoken_student = User.objects.using('spk').filter(email__iexact=email).exists()
-	data = {'is_spoken_student':is_spoken_student}
-	if is_spoken_student:
-		user = User.objects.using('spk').filter(email__iexact=email)[0]
-		try:
-			student = SpkStudent.objects.using('spk').filter(user_id=user.id)[0]
-			attendance_exists = TestAttendance.objects.using('spk').filter(student_id=student.id).exists()
-			if attendance_exists:
-				data['is_spk_test_user']=True
-				data['email']=email
-				messages.success(request,'Email registered with spoken tutorial')
-				data['messages'] = update_msg(request)
-				return JsonResponse(data)
-		except Exception as e:
-			messages.error(request,'Email is not registered with spoken tutorial test')
-			data['messages']=update_msg(request)
-			return JsonResponse(data)
-	else:
-		messages.error(request,'Email is not registered with spoken tutorial')
-		data['messages']=update_msg(request)
-		return JsonResponse(data)	
-	return JsonResponse(data)
+# 	is_spoken_student = User.objects.using('spk').filter(email__iexact=email).exists()
+# 	data = {'is_spoken_student':is_spoken_student}
+# 	if is_spoken_student:
+# 		user = User.objects.using('spk').filter(email__iexact=email)[0]
+# 		try:
+# 			student = SpkStudent.objects.using('spk').filter(user_id=user.id)[0]
+# 			attendance_exists = TestAttendance.objects.using('spk').filter(student_id=student.id).exists()
+# 			if attendance_exists:
+# 				data['is_spk_test_user']=True
+# 				data['email']=email
+# 				messages.success(request,'Email registered with spoken tutorial')
+# 				data['messages'] = update_msg(request)
+# 				return JsonResponse(data)
+# 		except Exception as e:
+# 			messages.error(request,'Email is not registered with spoken tutorial test')
+# 			data['messages']=update_msg(request)
+# 			return JsonResponse(data)
+# 	else:
+# 		messages.error(request,'Email is not registered with spoken tutorial')
+# 		data['messages']=update_msg(request)
+# 		return JsonResponse(data)	
+# 	return JsonResponse(data)
 
 def register_student(request):
 	if request.method == 'POST':
@@ -212,7 +212,7 @@ Spoken Tutorials
 IIT Bombay.
 '''.format(spoken_user.username, spoken_user.username, password,changePassUrl)
 
-			print(f"username ***************** {spoken_user.username}\npassword ******************** {password}\nchangePassUrl ************** {changePassUrl}")
+			print(f"username ***************** {spoken_user.email}\npassword ******************** {password}\nchangePassUrl ************** {changePassUrl}")
 			email = EmailMultiAlternatives(
                 subject, message, PASSWORD_MAIL_SENDER,
                 to = to, bcc = [], cc = [],
@@ -263,9 +263,14 @@ def change_password(request):
 	
 	context['form'] = form
 	# get code from profile
-	s = request.user.student
-	spk_user_id = s.spk_usr_id
-	context['userid'] = spk_user_id
+	# s = request.user.student
+	# spk_user_id = s.spk_usr_id
+	try:
+		spk_user = SpokenUser.objects.filter(email=request.user.email)[0]
+		spk_user_id = spk_user.id
+	except:
+		print("Not a spoken user") #fossee user
+	context['userid'] = spk_user.id
 	profile = Profile.objects.filter(user_id=spk_user_id).first()
 	if profile:
 		context['code'] = profile.confirmation_code

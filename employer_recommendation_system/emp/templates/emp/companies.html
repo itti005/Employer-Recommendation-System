@@ -25,7 +25,15 @@
           <tr>
             <td>{{forloop.counter}}</td>
             <td>{{ object.name }}</td>
-            <td>{{ object.domain }}</td>
+            <td>
+              {% for domain in object.domain.all %}
+                {% if forloop.last %}
+                  {{ domain }}
+                {% else %}
+                  {{ domain }} , 
+                {% endif %}
+              {% endfor %}
+            </td>
           </tr>
           {% endfor %}
         </tbody>

@@ -227,7 +227,9 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
           <a class="btn btn-warning" href="{% url 'update-job-detail' slug=job.slug %}"><i class="bi bi-pencil"></i> Edit</a>
           {% endif %}
 
-          {% if request.user|has_group:"STUDENT" %}
+         
+          {% if request.user|is_student %}
+          
           <!-- <span class="badge bg-danger " id="e_{{job.id}}" style="display: none;">Not Eligible</span><br>
                  <small class="text-muted " id="t_{{job.id}}" style="display: none;">Your profile does not meet the job requirements.
                  </small> -->

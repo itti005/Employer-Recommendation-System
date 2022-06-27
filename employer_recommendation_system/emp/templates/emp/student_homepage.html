@@ -134,27 +134,30 @@ div#cke table{
         </div>
     </div>
     {% endfor %}
-    
+    <div class="col-12"><a href="{% url 'student_jobs' %}">View all recommended jobs >> </a></div>
 {% else %}
 <div class="col-lg-4 col-sm-12 py-3">  
 <p>No Recommended Jobs Yet.</p>
 </div> 
 {% endif %}    
 </div>
-<div class="col-12"><a href="{% url 'student_jobs' %}">View all recommended jobs >> </a></div>
+
 </section>
 <section>
 
 <br>
 {% if applied_jobs %}
 <div class="row mb-3">
-  <div class="text-center w-100 fs-5 border-bottom mb-3 col-12">Applied Jobs</div>
+  <div class="text-center w-100 fs-5 border-bottom mb-3 col-12 c-name"><b>Applied Jobs</b></div>
   {% for item in applied_jobs %}
   <div class="col-md-3">
     <div class="card" style="width: 18rem;">
   <div class="card-body">
-    <h5 class="card-title">{{item.job.title}}</h5>
-    <h6 class="card-subtitle mb-2 text-muted">{{item.job.company.name}}</h6>
+    <h6 class="card-title d-flex">
+      <div style="margin-right: 10px;"><i class="fas fa-suitcase"></i></div>
+      <div>{{item.title}}</div>
+    </h6>
+    <p class="card-subtitle mb-2 text-muted"><i class="fas fa-building" style="margin-right: 10px;"></i>{{item.company.name}}</p>
     <p class="card-text"></p>
     <a href="#" class="card-link"><span class="badge bg-{{item.status | format_status}} rounded-pill">
       {{item.status | status_value }}
@@ -170,9 +173,9 @@ div#cke table{
 
 
 <div class="row">
-  <div class="text-center w-100 fs-5 border-bottom mb-3 col-12">Posted Jobs</div>
-  {% if awaiting_jobs %}
-    {% for job in awaiting_jobs %}
+  <div class="text-center w-100 fs-5 border-bottom mb-3 col-12 c-name"><b>Posted Jobs</b></div>
+  {% if jobs_to_display %}
+    {% for job in jobs_to_display %}
     <div class="col-12 col-md-4 py-3"> 
     <a href="{% url 'job-list' %}?id={{job.id}}" class="c-href" style="width: 100%;">
       <div class="card" style="width: 100%;height: 500px;overflow: scroll;">

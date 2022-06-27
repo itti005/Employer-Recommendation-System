@@ -8,7 +8,8 @@ from django.views.generic.detail import DetailView
 from .models import *
 from django.contrib.auth.decorators import user_passes_test
 from django.utils.decorators import method_decorator
-from emp.views import is_manager
+from emp.helper import is_manager
+from django.core.exceptions import PermissionDenied
 
 # Create your views here.
 # CBVs for event
@@ -90,3 +91,13 @@ class EventPageView(TemplateView):
         context['event_images'] = event_images
         print("**************************")
         return context
+
+def display_jobfair(request,pk):
+    context = {}
+    print(f"pk *************** here *************** {pk}")
+    try:
+        jobfair = JobFair.objects.get(id=pk)
+        context['jobfair'] = jobfair
+    except Exception as e:
+        raise PermissionDenied()
+    return render(request,'events/jobfair.html',context)

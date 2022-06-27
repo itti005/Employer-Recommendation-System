@@ -130,22 +130,58 @@
     </tr>
   </thead>
   <tbody>
+    {% if scores %}
     <tr>
      <td><b>Foss</b></td>
      <td><b>Grade</b></td>
+     <td><b>Test Date</b></td>
    </tr>
-    {% if scores %}
+    
       {% for item in scores %}
    <tr>
      <td>{{item.name}}</td>
      <td>{{item.grade}}</td>
+     <td>{{item.updated}}</td>
    </tr>
    {% endfor %}
    {% else %}
-   <th>No Data Available. Please check shortlisted tab.</th>
+   <tr>
+    <th>No Data Available.</th>
+   </tr>
     {% endif %}
   </tbody>
 </table>
+
+{% if request.user|has_group:"STUDENT_ILW" %}
+<table class="table table-bordered ">
+  <thead>
+    <tr>
+      <th scope="col" class="table-warning" colspan="3">ILW Test Scores</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if ilw_scores %}
+    <tr>
+     <td><b>Foss</b></td>
+     <td><b>Grade</b></td>
+     <td><b>Test Date</b></td>
+   </tr>
+    
+      {% for item in ilw_scores %}
+   <tr>
+     <td>{{item.name}}</td>
+     <td>{{item.grade}}</td>
+     <td>{{item.mdl.updated}}</td>
+   </tr>
+   {% endfor %}
+   {% else %}
+   <tr>
+    <th>No Data Available.</th>
+   </tr>
+    {% endif %}
+  </tbody>
+</table>
+{% endif %}
   </div>
 </div>
 <form method="post" id="form-student" enctype="multipart/form-data" action="{% url 'student_profile' request.user.student.id %}">
@@ -211,14 +247,14 @@
       	{{ form.cover_letter | as_crispy_field }}
     	</div>
       <div class="col-sm-2 mb-3">
-        {% if form.cover_letter %} <a class="btn btn-warning" href="{% url 'document_view' pk=request.user.id %}?type=cover_letter" target="_blank">View Cover Letter</a> {% endif %}
+        {% if form.cover_letter.value  %} <a class="btn btn-warning" href="{% url 'document_view' pk=request.user.id %}?type=cover_letter" target="_blank">View Cover Letter</a> {% endif %}
       </div>
       <div class="col-sm-6 mb-3">
         <span>Upload only .pdf file</span>
         {{ form.resume | as_crispy_field }}
       </div>
       <div class="col-sm-2 mb-3">
-        {% if form.resume %} <a class="btn btn-warning" href="{% url 'document_view' pk=request.user.id %}?type=resume" target="_blank">View Resume</a> {% endif %}
+        {% if form.resume.value %} <a class="btn btn-warning" href="{% url 'document_view' pk=request.user.id %}?type=resume" target="_blank">View Resume</a> {% endif %}
       </div>
     	<!-- Add Education 1 -->
     	<div class="col-sm-4 mb-3"></div>

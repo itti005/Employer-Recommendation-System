@@ -30,7 +30,8 @@
             </div>
 {% endfor %}
 <section>
-  {% if request.user|has_group:"STUDENT" %}
+  {# if request.user|has_group:"STUDENT" #}
+  {% if request.user|is_student %}
     {% if current_education %}
       <div>
         <div class="d-none">
@@ -92,24 +93,56 @@
   <thead>
   </thead>
   <tbody>
+    {% if scores %}
     <tr>
      <td><b>Foss</b></td>
      <td><b>Grade</b></td>
+     <td><b>Test Date</b></td>
    </tr>
-    {% if scores %}
+   
       {% for item in scores %}
    <tr>
      <td>{{item.name}}</td>
      <td>{{item.grade}}</td>
+     <td>{{item.updated}}</td>
    </tr>
    {% endfor %}
    {% else %}
-   <th>No Data Available. Please check shortlisted tab.</th>
+    <tr>
+      <th>No Data Available.</th>
+      <th></th>
+    </tr>
+   
     {% endif %}
   </tbody>
 </table>
    </li>
   </li>
+  {% if ilw_scores %}
+  <li class="list-group-item list-group-item-info"><span>ILW Test Scores</span>
+    <li class="list-group-item">
+      <table class="table table-bordered ">
+   <thead>
+   </thead>
+   <tbody>
+     <tr>
+      <td><b>Foss</b></td>
+      <td><b>Grade</b></td>
+      <td><b>Test Date</b></td>
+    </tr> 
+       {% for item in ilw_scores %}
+    <tr>
+      <td>{{item.name}}</td>
+      <td>{{item.grade}}</td>
+      <td>{{item.mdl.updated}}</td>
+    </tr>
+    {% endfor %}
+   </tbody>
+ </table>
+    </li>
+   </li>
+  {% endif %}
+  
   <li class="list-group-item list-group-item-info"><span>Profile</span></li>
   <li class="list-group-item">
   	<b>About</b>
@@ -172,6 +205,8 @@
       </div>
       <div>
         {% if student.resume %}
+        <p>If you are unable to view resume below , <a target="_blank" href="{{ MEDIA_URL }}students/{{student.user.id}}/resume{{student.user.id}}.pdf">please click here to view resume</a> </p>
+        <p>If you are unable to view cover letter below , <a target="_blank" href="{{ MEDIA_URL }}students/{{student.user.id}}/cover_letter{{student.user.id}}.pdf">please click here to view cover letter</a> </p>
         <embed src="{{ MEDIA_URL }}students/{{student.user.id}}/resume{{student.user.id}}.pdf" width="800px" height="2100px" /> 
         {% else %}
         <div class="alert alert-dark" role="alert">No Resume Available. It is recommended to upload resume.</div>

@@ -1,0 +1,293 @@
+{% extends 'emp/base_generic.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load helper %}
+{% block content-header %}Event List{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+
+    #top{
+                background-image: url("../../../static/images/background.png");
+                width: 100%;
+                height: auto;
+                background-color: #cccccc;
+                background-size: cover; 
+                padding: 8% 2% 1% 2%;
+            }
+            .card{margin: 16px;}
+            .recruiter-block{padding: 4% 10% 4% 10%;}
+            .past-recruiter {                
+                width: 100px;
+                height: 100%;
+            }
+            .pr{width: 100%;}
+            .pr-wrapper{
+                width: 25%;
+                padding: 16px;
+            }
+            .past-recruiter1{
+                width: 60%;
+                margin: auto;
+            }
+            .border-r-b{
+                border-right:2px solid #e9e9e9;
+                border-bottom:2px solid #e9e9e9;
+            }
+            .border-b{border-bottom:2px solid #e9e9e9;}
+            .border-r{border-right:2px solid #e9e9e9; }
+            .social-icons{font-size: 32px;}
+            .social-icons a{color: #fff;}
+            .social-media-wrapper{
+                background-color: #054C77;
+                color : #ffff;
+            }
+            .fa-icon{color: #ED7D2B;}
+           .display-6{
+               font-size: 1.5rem;
+               font-weight: bold;
+               color: #054C77;
+           }
+           .display-5{font-size: 2rem;}
+           .points{
+               color: #ED7D2B;
+               font-size: 1.2rem;;
+           }
+           .card-points{height: 100%;;}
+           .call-to-action a{background-color: #054C77;}
+           .call-to-action a:hover{background-color: #054C77;}
+            .serif{font-family: serif;}
+            body{font-family: Verdana, Geneva, Tahoma, sans-serif;}
+            /* media queries */
+            @media (min-width: 768px) {
+                .user-block{
+                    /* width: 35%; */
+                }
+                .tech-asp{
+                    width: 50%;
+                }
+                #student-img{
+                    height: 180px;
+                    max-height: 200px;
+                }
+                #emp-img{
+                    height: 180px;
+                    max-height: 200px;
+                }
+            }
+            @media (max-width: 768px) {
+
+                .projects{
+                    margin-top: 60px;
+                }
+                .img-asp{
+                    width: 100%!important;
+                    /* padding-right: 1px!important;
+                    padding-left: 1px; */
+                    /* user-block */
+                }
+                #mobile-heading{
+                    font-size: 20px;
+                }
+                #mobile-tag{
+                    font-size: 16px;
+                }
+                
+            }
+            @media (max-width: 991.98px) {
+                .user-block{
+                    /* width: 100%; */
+                }
+                #mobile-view-banner{
+                    display: block!important;
+                }
+                #desktop-view-banner{
+                    display: none!important;
+                }   
+                
+            }
+            @media (min-width: 991.98px) {
+                #mobile-view-banner{
+                    display: none!important;
+                }
+                #desktop-view-banner{
+                    display: flex!important;
+                }   
+                .user-block{
+                    width: 35%;
+                }
+            }
+            
+            @media (min-width: 768px) and (max-width: 1199.98px) { 
+                .img-asp{
+                    width: 100%;
+                }
+             }
+             @media (max-width: 576px) {
+                .w-social{
+                    width: 50%!important;
+                }
+            }
+</style>
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+	<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'index' %}">Spoken Tutorial</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Home</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+</div>
+
+<div id="top" class="container-fluid d-flex flex-column justify-content-center align-items-center mb-5">
+    <div id="mobile-view-banner">
+        <div class="d-flex mb-2 justify-content-center projects" style="width: 80%;">
+            <div class="d-flex mx-5">
+                <img style="height: 50px;width: auto;;margin-right: 12px;"src="../../../static/images/logo/st-logo.png">
+                <b>Spoken <br><span style="color: orange;">Tutorial</span></b>
+            </div>
+            <img  style="height: 50px;width: auto;"src="../../../static/images/logo/fossee-logo.png">
+        </div>
+        <p class="text-center my-3" style="font-size:18px;font-style: italic;">Presents</p>
+        <h1 class="mb-5 display-5 mx-5"  id="mobile-heading" style="color: #054C77; border-bottom: 2px solid rgba(0,0,0,0.2);">{{jobfair.event.name}}</h1>
+    </div>
+    <div class="d-flex justify-content-between" id="desktop-view-banner">
+        <div class="d-flex mx-3">
+            <img style="height: 50px;width: auto;;margin-right: 12px;"src="../../../static/images/logo/st-logo.png">
+            <b>Spoken <br><span style="color: orange;">Tutorial</span></b>
+        </div>
+        <h1 class="mb-5 display-5 mx-3" style="color: #054C77; border-bottom: 2px solid rgba(0,0,0,0.2);">{{jobfair.event.name}}</h1>
+        <img  class="mx-3" style="height: 50px;width: auto;"src="../../../static/images/logo/fossee-logo.png">
+    </div>
+    
+    <!-- <p class="mb-5 h5" style="font-family: verdana; ">Spoken Tutorial & FOSSEE Team presents a unique opportunity for students to connect with suitable Employers</p> -->
+    <p class="mb-5 h5 px-3 text-center" style="font-family: verdana; " id="mobile-tag">A unique opportunity for students to connect with potential employers</p>
+    <div class="d-flex">
+        <span class="d-block mx-md-5 h4-md " style="margin-right: 12px!important;"><i class="far fa-calendar-alt mb-5 fa-icon"></i>  June - July</span>
+        <span class="d-block mx-md-5 h4-md "><i class="fas fa-map-marker-alt fa-icon"></i> {{jobfair.venue}}</span>
+    </div>
+    <div class="d-md-flex justify-content-center">
+        <div class="card user-block">
+            <div class="card-header ">
+                <h5 class="card-title text-center display-6 pt-2 serif">For Students</h5>
+              </div>
+              <div>
+                <!-- <img id="student-img" src="../../../static/images/student1.png" class="card-img-top d-block mx-auto" alt="..." style="height: 180px; width: 80%;max-height: 200px;"> -->
+                <img id="student-img" src="../../../static/images/student1.png" class="card-img-top d-block mx-auto" alt="..." >
+              </div>
+            
+            <div class="card-body d-flex flex-column card-points">
+              <p class="card-text"><i class="far fa-handshake points"></i> A great way to connect with companies and discover new career opportunities.</p>
+              <p class="card-text"> <i class="fas fa-wallet points"></i> The Job Fair is entirely free for Spoken Tutorial students.</p>
+              <div class="call-to-action" style="margin-top: auto;"><a href="{% url 'login' %}" class="btn btn-primary d-block" style="margin-top: auto;" target="_blank">Login to Job Recommendation System</a></div>
+              
+            </div>
+          </div>
+          <div class="card user-block" >
+            <div class="card-header">
+                <h5 class="card-title text-center display-6 pt-2 serif">For Employers</h5>
+              </div>
+              <div>
+                <!-- <img id="emp-img" src="../../../static/images/employer1.png" class="card-img-top d-block mx-auto" alt="..." style="height: 180px; width: 80%;max-height: 200px;"> -->
+                <img id="emp-img" src="../../../static/images/employer1.png" class="card-img-top d-block mx-auto" alt="..." >
+              </div>
+            
+            <div class="card-body d-flex flex-column ">
+              <p class="card-text"><i class="fas fa-laptop-code points"></i> All the candidates have been trained to use open source software</p>
+              <p class="card-text"><i class="fas fa-clipboard-check points"></i> Subsequently they have cleared software tests or participated in National level software competitions</p>
+              <p class="card-text"><i class="fas fa-chalkboard-teacher points"></i> Highly motivated students as they have completed the course through self-learning mode</p>
+            </p>
+            <div class="call-to-action" style="margin-top: auto;"><a href="https://forms.gle/E1ysD2reXVYe6DZdA" class="btn btn-primary d-block" style="margin-top: auto;" target="_blank">Register</a></div>
+            </div>
+          </div>
+    </div>
+</div>
+<div class="container px-lg-5">
+    <div class="d-md-flex">
+        <div class="px-lg-5">
+            <img src="../../../static/images/aspirant.png" style="width: 400px;height: auto;" class="img-asp">
+        </div>
+        <div class="px-lg-5 py-5 d-flex flex-column justify-content-md-center tech-asp">
+            <h4>Are you a Technical Job Aspirant?</h4><br>
+            <p>To participate in the Virtual Job Fair you should have undergone Spoken Tutorial software training & scored above 60% in the corresponding software test.</p>
+            <p>To take Spoken Tutorial Software Training & Test and get a chance to participate in our Virtual Job Fair, <a href="https://process.spoken-tutorial.org/index.php/Software-Training#Contacts_For_Training" style="color:#054C77!important ;" target="_blank">click here.</a></p>
+        </div>
+    </div>
+</div>
+<div class="container-lg d-flex flex-column align-items-center recruiter-block" >
+    <h4>Our Past Recruiters</h4><br>
+    <div class="d-flex  pr" >
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b"><img class="past-recruiter1 d-block" src="../../../static/images/logo/convergence.jpeg"/></div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b"><img class="past-recruiter1 d-block" src="../../../static/images/logo/iweb.jpeg"/></div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b"><img class="past-recruiter1 d-block" src="../../../static/images/logo/merce.jpeg"/></div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-b"><img class="past-recruiter1 d-block" src="../../../static/images/logo/rapidqube.png"/></div>
+    </div>
+    <div class="d-flex  pr">
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r"><img class="past-recruiter1 d-block" src="../../../static/images/logo/rave.jpeg"/></div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r" style="background-color: rgba(0,0,0,0.2);"><img class="past-recruiter1 d-block" src="../../../static/images/logo/qualitykiosk.png"/></div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r"><img class="past-recruiter1 d-block" src="../../../static/images/logo/pentation.png"/></div>
+        <div class="pr-wrapper d-flex flex-column align-items-center"><img class="past-recruiter1 d-block" src="../../../static/images/logo/tech-mahindraa.png"/></div>
+    </div>  
+</div>
+<div class="container-fluid d-flex flex-column align-items-center py-4" style="background-color: antiquewhite;">
+    <h6>Contact for Job Fair related queries</h6>
+    <div class="d-md-flex">
+        <div  class="p-2 mr-2"><i class="far fa-envelope" style="color: #054C77;"></i> hrspokentutorial@gmail.com</div>
+        <div  class="p-2"><i class="fas fa-phone-square-alt" style="color: #054C77;"></i> 022 2576 4229</div>
+    </div>
+</div>
+<div class="d-flex flex-column align-items-center social-media-wrapper py-3">
+    <div class="mx-2 my-2">Follow us on social media for more updates!</div>
+    <div class="row px-3" style="width: 100%;">
+        <div class="col-md-6 d-md-flex flex-column">
+            <div class="d-flex justify-content-sm-around justify-content-md-center ">
+                <span class="w-social">@SpokenTutorials</span>
+            <div class="mx-2 social-icons"><a href="https://twitter.com/spokentutorials?lang=en" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
+            <div class="mx-2 social-icons"><a href="https://www.facebook.com/SpokenTutorial.org/"  target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
+            <div class="mx-2 social-icons"><a href="https://in.linkedin.com/company/spokentutorial" style="margin-right: 12px;;" target="_blank"><i class="fab fa-linkedin social-icons"></i></a></div>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex justify-content-sm-around justify-content-md-center">
+            
+            <span class="w-social">@FOSSEE</span>
+            <div class="mx-2 social-icons"><a href="https://twitter.com/FOSSEE/status/1534449568162942976" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
+            <div class="mx-2 social-icons"><a href="https://www.facebook.com/FOSSEENMEICT/posts/5221007834631220" target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
+            <div class="mx-2 social-icons"><a href="https://www.instagram.com/p/CeiZMWbOmHg/?igshid=YmMyMTA2M2Y=" target="_blank"><i class="fab fa-instagram social-icons"></i></a></div>
+        </div>
+    </div>
+</div>
+
+<div class="px-5 py-3">
+    <span class="d-block text-center" style="font-size: 12px;">Spoken Tutorial and FOSSEE projects developed at IIT Bombay are the initiatives of Ministry of Education, Government of India.</span>
+</div>
+
+
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+  $( document ).ready(function() {
+   
+  });
+</script>
+{% endblock %}
+
+
