@@ -1433,3 +1433,44 @@ def notify_student(request):
             response.status_code = 403
             return response
     return HttpResponse("Success!")
+
+def jobs(request, req_user):
+    context={}
+    try:
+        this_user = User.objects.get(username = req_user)
+    except Exception as e:
+        raise e
+    foss_counter = defaultdict(int)
+    if this_user.groups.filter(name='STUDENT'):
+        '''
+        Right now as we have less jobs data, sending all jobs.
+        This will be boosting the motivation in the initial level.
+        Later on we can add the filters which are commented.
+        '''
+        jobShortlist = JobShortlist.objects.filter(spk_user=this_user.student.spk_usr_id)
+        job_short_list = get_applied_joblist(this_user.student.spk_usr_id)
+        all_jobs = Job.objects.all()
+        # applied_jobs = [x.job for x in job_short_list]
+        # in_process_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['RECEIVED_APP']]
+        rejected_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['REJECTED']]
+        # reccomended_jobs = get_recommended_jobs(this_user.student)
+        # eligible_jobs = reccomended_jobs+applied_jobs
+        # non_eligible_jobs = list(set(all_jobs).difference(set(eligible_jobs)))
+        eligible_jobs = list(set(all_jobs).difference(set(rejected_jobs)))
+        for jobs in all_jobs:
+            foss_list = get_foss(jobs.foss)
+            for foss in foss_list:
+                foss_counter[foss] += foss_list.count(foss)
+        # take jobs content and match it with tutorials content
+        context["foss_count"]= foss_counter
+    tutdict = json.dumps(foss_counter)
+    return HttpResponse(tutdict, content_type='application/json')
+
+
+def get_foss(value):
+    if value:
+        foss_ids = list(map(int,value.split(',')))
+        foss = [FossCategory.objects.get(id=x).foss for x in foss_ids]
+        if foss:
+            return foss
+    return []
