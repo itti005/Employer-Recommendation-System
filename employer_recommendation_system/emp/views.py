@@ -47,7 +47,7 @@ from django.core.mail import send_mail
 from smtplib import SMTPException
 from .utility import *
 from .helper import *
-
+from collections import defaultdict
 
 import os
 @check_user
@@ -1437,7 +1437,7 @@ def notify_student(request):
 def jobs(request, req_user):
     context={}
     try:
-        this_user = User.objects.get(username = req_user)
+        this_user = User.objects.get(email = req_user)
     except Exception as e:
         raise e
     foss_counter = defaultdict(int)
