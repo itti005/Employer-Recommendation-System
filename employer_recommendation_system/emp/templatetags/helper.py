@@ -119,7 +119,7 @@ def display_foss(value):
         foss_ids = list(map(int,value.split(',')))
         foss = [FossCategory.objects.get(id=x).foss for x in foss_ids]
         if foss:
-            return ' , '.join(foss)
+            return ', '.join(foss)
     return ''
 
 @register.filter()
@@ -130,7 +130,7 @@ def display_states(value):
         # states = [SpokenState.objects.get(id=x).name for x in state_ids]
         states = [x.name for x in SpokenState.objects.filter(id__in=state_ids)]
         if states:
-            return ' , '.join(states)
+            return ', '.join(states)
     return ''
 
 @register.filter()
@@ -141,7 +141,7 @@ def display_cities(value):
         # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
         cities = [x.name for x in SpokenCity.objects.filter(id__in=city_ids)]
         if cities:
-            return ' , '.join(cities)
+            return ', '.join(cities)
     return ''
 
 @register.filter()
@@ -152,7 +152,7 @@ def display_institute(value):
         # type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
         type_institutes = [x.name for x in InstituteType.objects.filter(id__in=insti_ids)]
         if type_institutes:
-            return ' , '.join(type_institutes)
+            return ', '.join(type_institutes)
     return ''
 
 @register.filter()
@@ -171,7 +171,7 @@ def display_degrees(value):
         # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
         degrees = [x.name for x in Degree.objects.filter(id__in=degree_ids)]
         if degrees:
-            return ' , '.join(degrees)
+            return ', '.join(degrees)
     return ''
 
 @register.filter()
@@ -182,7 +182,7 @@ def display_disciplines(value):
         # cities = [SpokenCity.objects.get(id=x).name for x in city_ids]
         disciplines = [x.name for x in Discipline.objects.filter(id__in=discipline_ids)]
         if disciplines:
-            return ' , '.join(disciplines)
+            return ', '.join(disciplines)
     return ''
 
 

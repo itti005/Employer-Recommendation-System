@@ -154,7 +154,7 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
       <th>Degree <span class="text-muted fw-light">(Qualification of the student)</span></th>
       <td>
         {% for item in object.degree.all %}
-          {{item}} {% if not forloop.last %} ,{% endif %}
+          {{item}}{% if not forloop.last %},{% endif %}
         {% endfor %}
       </td>
     </tr>
@@ -162,7 +162,7 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
       <th>Discipline <span class="text-muted fw-light">(Branch of study)</span></th>
       <td>
         {% for item in object.discipline.all %}
-          {{item}} {% if not forloop.last %} ,{% endif %}
+          {{item}}{% if not forloop.last %},{% endif %}
         {% endfor %}
       </td>
     </tr>

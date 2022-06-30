@@ -18,7 +18,7 @@
             }
             .card{margin: 16px;}
             .recruiter-block{padding: 4% 10% 4% 10%;}
-            .past-recruiter {                
+            .past-recruiter,.current-recruiter {                
                 width: 100px;
                 height: 100%;
             }
@@ -29,6 +29,10 @@
             }
             .past-recruiter1{
                 width: 60%;
+                margin: auto;
+            }
+            .current-recruiter1{
+                width:80%;
                 margin: auto;
             }
             .border-r-b{
@@ -70,10 +74,12 @@
                 #student-img{
                     height: 180px;
                     max-height: 200px;
+                    width: auto!important;
                 }
                 #emp-img{
                     height: 180px;
                     max-height: 200px;
+                    width: auto!important;
                 }
             }
             @media (max-width: 768px) {
@@ -93,6 +99,14 @@
                 #mobile-tag{
                     font-size: 16px;
                 }
+                .past-recruiter1{
+                width: 100%;
+                margin: auto;
+            }
+            .pr-wrapper{
+                /* width: 25%; */
+                padding: 2px;
+            }
                 
             }
             @media (max-width: 991.98px) {
@@ -128,6 +142,23 @@
                 .w-social{
                     width: 50%!important;
                 }
+                .pr-wrapper p{
+                font-size: 0.8rem;
+            }
+            }
+            .current_company{
+                /* background-color: #fff; */
+                /* border: 1px solid green;; */
+            }
+            .com-block{
+                background-color: #fff;
+                height: 100%;
+            }
+            .pr-wrapper p{
+                color: #aab1b7;
+            }
+            .position{
+                color: #aab1b7;
             }
 </style>
 {% endblock %}
@@ -191,6 +222,7 @@
             <div class="card-body d-flex flex-column card-points">
               <p class="card-text"><i class="far fa-handshake points"></i> A great way to connect with companies and discover new career opportunities.</p>
               <p class="card-text"> <i class="fas fa-wallet points"></i> The Job Fair is entirely free for Spoken Tutorial students.</p>
+              <p class="card-text"> <i class="fas fa-wallet points"></i> Use your student dashboard login credentials for JRS login.</p>
               <div class="call-to-action" style="margin-top: auto;"><a href="{% url 'login' %}" class="btn btn-primary d-block" style="margin-top: auto;" target="_blank">Login to Job Recommendation System</a></div>
               
             </div>
@@ -226,6 +258,50 @@
         </div>
     </div>
 </div>
+
+<div class="container-lg d-flex flex-column align-items-center recruiter-block" >
+    <h4>Current Recruiters</h4><br>
+    <div class="d-flex  pr" >
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b">
+            <img class="past-recruiter1 d-block" src="../../../static/images/logo/capgemini.png"/>
+        <p class="d-none  d-md-block">Positions:20</p>
+        </div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b">
+            <img class="past-recruiter1 d-block" src="../../../static/images/logo/Intech.png"/>
+            <p class="d-none  d-md-block">Positions:10</p>
+        </div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b">
+            <img class="past-recruiter1 d-block" src="../../../static/images/logo/raster.jpg"/>
+            <p class="d-none  d-md-block">Positions:5</p>
+        </div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-b">
+            <img class="past-recruiter1 d-block" src="../../../static/images/logo/colorjet.jpeg"/>
+        <p class="d-none  d-md-block">Positions:4</p>
+        </div>
+    </div>
+    <div class="d-flex  pr">
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r">
+            <img class="past-recruiter1 d-block" src="../../../static/images/logo/cybrain.jpg"/>
+            <p class="d-none  d-md-block">Positions:4</p>
+        </div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r" >
+            <img class="past-recruiter1 d-block" src="../../../static/images/logo/ideal-insti.jpeg" style="width: 40%;height: auto;"/>
+            <p class="d-none  d-md-block">Positions:3</p>
+        </div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r">
+            <img class="past-recruiter1 d-block" src="../../../static/images/logo/tropilite.jpeg"/>
+            <p class="d-none  d-md-block">Positions:2</p>
+        </div>
+        <div class="pr-wrapper d-flex flex-column align-items-center border-r">
+            <img class="past-recruiter1 d-block" src="../../../static/images/logo/icare.jpeg" style="width: 40%;height: auto;">
+            <p class="d-none  d-md-block">Positions:2</p>
+        </div>
+        <div class="pr-wrapper d-flex flex-column align-items-center">
+            <img class="past-recruiter1 d-block" src="../../../static/images/logo/cdil.jpeg"/>
+            <p class="d-none  d-md-block">Positions:2</p>
+        </div>
+    </div>  
+</div>
 <div class="container-lg d-flex flex-column align-items-center recruiter-block" >
     <h4>Our Past Recruiters</h4><br>
     <div class="d-flex  pr" >
@@ -245,6 +321,7 @@
     <h6>Contact for Job Fair related queries</h6>
     <div class="d-md-flex">
         <div  class="p-2 mr-2"><i class="far fa-envelope" style="color: #054C77;"></i> hrspokentutorial@gmail.com</div>
+        <div  class="p-2 mr-2"><i class="far fa-envelope" style="color: #054C77;"></i> hr@spoken-tutorial.org</div>
         <div  class="p-2"><i class="fas fa-phone-square-alt" style="color: #054C77;"></i> 022 2576 4229</div>
     </div>
 </div>

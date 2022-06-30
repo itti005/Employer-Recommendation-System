@@ -172,8 +172,8 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
     <img class="d-block align-self-center m-2" src="{{ job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" 
     style=" height: 50px;display: inline;">
     {% endif %}
-          <div><strong class="mb-1">{{job.title}}</strong>
-            <div class="col-10 mb-1 small">{{job.company.name}}<br>{% get_citydetails job.city_job %} , {% get_statedetails job.state_job %}</div>
+          <div class="flex-grow-1"><strong class="mb-1">{{job.title}}</strong>
+            <div class="col-10 mb-1 small">{{job.company.name}}<br>{% get_citydetails job.city_job %}, {% get_statedetails job.state_job %}</div>
           </div>
           <small><i class="bi bi-bookmark"></i></small>
         </div>
@@ -218,7 +218,7 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
                 <div class="flex-grow-1">
                   <p>{{job.company.name}}<br>
              <b>{{job.title}}</b> <br>
-              {% get_statedetails job.state_job %} , {% get_citydetails job.city_job %}</p>
+              {% get_statedetails job.state_job %}, {% get_citydetails job.city_job %}</p>
                 </div>
                 <div class="mt-1">
                   {% if request.user|has_group:"MANAGER" %}
@@ -281,7 +281,7 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
                     <div class="card-body">
                       <p class="card-title"><b>Company</b></p>
                       <ul class="p-0 my-0 small" style="list-style-type: none;">
-                        <li>Domain : {{job.company.domain}}</li>
+                        <li>Domain : {{job.domain}}</li>
                         <li>Employees : {{job.company.company_size | get_employees}}</li>
                         <li>Website : <a class="c-link" href="{{job.company.website}}" target="_blank">{{job.company.website}}</a></li>
                       </ul>
@@ -306,10 +306,10 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
                       {% if job.institute_type %}<span><b>Institution Type : </b>{{job.institute_type | display_institute}}</span><br>{% endif %}
                       {% if job.degree.all %}<span><b>Degree : </b>
                         {% for item in job.degree.all %}
-                        {{item}} {% if not forloop.last %} ,{% endif %}
+                        {{item}}{% if not forloop.last %}, {% endif %}
                         {% endfor %}</span><br>{% endif %}
                       {% if job.discipline.all %}<span><b>Discipline : </b>{% for item in job.discipline.all %}
-                        {{item}} {% if not forloop.last %} ,{% endif %}
+                        {{item}}{% if not forloop.last %},{% endif %}
                       {% endfor %}</span><br>{% endif %}
                       {% if job.from_date or  job.to_date %}<span><b>Test Period : </b>{{job.from_date | default_if_none:''}} - {{job.to_date | default_if_none:''}}</span><br>{% endif %}
                     </li>
