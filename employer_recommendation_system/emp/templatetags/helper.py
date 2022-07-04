@@ -1,4 +1,3 @@
-from signal import valid_signals
 from django.contrib.auth.models import User
 from django import template
 from django.conf import settings
