@@ -153,21 +153,31 @@ def fetch_ta_scores(student):
     scores = unique_foss_scores(scores)
     return scores
 
+def get_participant(student):
+    try:
+        participant = Participant.objects.get(user=student.spk_usr_id)
+    except Participant.DoesNotExist:
+        print(f"{student} : Not an ILW student")
+    except Participant.MultipleObjectsReturned:
+        participants = Participant.objects.filter(user=student.spk_usr_id)
+        for participant in participants:
+            if EventTestStatus.objects.filter(participant=participant):
+                participant=participant
+                break
+    return participant
+
 def fetch_ilw_scores(student):
     # fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
     # df_fmc = pd.DataFrame(fmc)
     # df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id'])
+    participant = get_participant(student)
     scores = []
-    try:
-        participant = Participant.objects.get(user=student.spk_usr_id)
+    if participant:
         ets = EventTestStatus.objects.filter(participant=participant,part_status__gte=2)
         for item in ets:
             foss_obj = FossCategory.objects.get(id=item.fossid_id)
             scores.append({'foss':foss_obj.id,'name':foss_obj.foss,'grade':item.mdlgrade,'quiz':item.mdlquiz_id,'mdl':item})
-
-    except Participant.DoesNotExist:
-        print(f"{student} : Not an ILW student")
-    scores = unique_foss_scores(scores)
+        scores = unique_foss_scores(scores)
     return scores
 
 def fetch_fossee_scores(student):
@@ -248,9 +258,12 @@ def get_valid_fosses(job,scores):
 def is_job_recommended_ilw(job,student):
     scores = fetch_ilw_scores(student)
     valid_fosses = get_valid_fosses(job,scores)
-    participant = Participant.objects.get(user_id=student.spk_usr_id)
-    ets = EventTestStatus.objects.filter(participant=participant,fossid__in=valid_fosses)
-    return ets
+    # participant = Participant.objects.get(user_id=student.spk_usr_id)
+    participant = get_participant(student)
+    if participant:
+        ets = EventTestStatus.objects.filter(participant=participant,fossid__in=valid_fosses)
+        return ets
+    return False
 
 def is_job_recommended_fossee(job,student):
     pass

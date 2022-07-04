@@ -120,7 +120,7 @@ div#cke table{
             </div>
           </div>
           <hr>
-          <p class="card-text mb-5">{{job.description | slice:":255"}}...</p>
+          <p class="card-text mb-5">{{job.description | safe | slice:":255"}}...</p>
           <div class="row">
             <div class="col-6">
             <a href="#" class="btn btn-info post-apply disabled" style="display: none;" id="applied_{{job.id}}"><i class="fas fa-check mr-3"></i>Applied</a>

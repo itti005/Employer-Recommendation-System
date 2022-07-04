@@ -214,7 +214,9 @@ def get_student_fullname(value):
 
 @register.filter()
 def get_institute_name(value):
-    return AcademicCenter.objects.get(id=value).institution_name
+    if value:
+        return AcademicCenter.objects.get(id=value).institution_name
+    return None
 
 @register.filter()
 def get_num_emp(value):
