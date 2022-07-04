@@ -1,3 +1,4 @@
+from signal import valid_signals
 from django.contrib.auth.models import User
 from django import template
 from django.conf import settings
@@ -214,7 +215,9 @@ def get_student_fullname(value):
 
 @register.filter()
 def get_institute_name(value):
-    return AcademicCenter.objects.get(id=value).institution_name
+    if value:
+        return AcademicCenter.objects.get(id=value).institution_name
+    return None
 
 @register.filter()
 def get_num_emp(value):

@@ -74,15 +74,15 @@
   <li class="list-group-item list-group-item-info"><span>Education Details</span></li>
   <li class="list-group-item">
     {% for e in current_education %}
-    <span><i class="bi bi-bank2 c-icon"></i> {{e.institute | get_institute_name}}</span><br>
-    <span><i class="bi bi-book c-icon"></i> {{e.degree}} | {{e.acad_discipline}}</span><br>
+    <span><i class="bi bi-bank2 c-icon"></i> {{e.institute | get_institute_name | default_if_none:'-'}}</span><br>
+    <span><i class="bi bi-book c-icon"></i> {{e.degree | default_if_none:'-'}} | {{e.acad_discipline | default_if_none:'-'}}</span><br>
     <span><i class="far fa-clipboard c-icon"></i> GPA : {{e.gpa | default_if_none:'-'}}</span><br>
     <span><i class="bi bi-calendar c-icon"></i> {{e.start_year | default_if_none:'-'}} - {{e.end_year | default_if_none:'-'}}</span><br>
     {% endfor %}
     <hr>
     {% if past_education %}
-    <span><i class="bi bi-bank2 c-icon"></i> {{past_education.institute | get_institute_name}}</span><br>
-    <span><i class="bi bi-book c-icon"></i> {{past_education.degree}} | {{past_education.acad_discipline}}</span><br>
+    <span><i class="bi bi-bank2 c-icon"></i> {{past_education.institute | get_institute_name | default_if_none:'-'}}</span><br>
+    <span><i class="bi bi-book c-icon"></i> {{past_education.degree | default_if_none:'-'}} | {{past_education.acad_discipline | default_if_none:'-'}}</span><br>
     <span><i class="far fa-clipboard c-icon"></i> GPA : {{past_education.gpa | default_if_none:'-'}}</span><br>
     <span><i class="bi bi-calendar c-icon"></i> {{past_education.start_year | default_if_none:'-'}} - {{past_education.end_year | default_if_none:'-'}}</span><br>
     {% endif %}
