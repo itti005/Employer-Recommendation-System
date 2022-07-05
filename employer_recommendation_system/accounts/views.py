@@ -210,7 +210,7 @@ Best Wishes,
 Admin
 Spoken Tutorials
 IIT Bombay.
-'''.format(spoken_user.username, spoken_user.username, password,changePassUrl)
+'''.format(spoken_user.username, spoken_user.email, password,changePassUrl)
 
 			print(f"username ***************** {spoken_user.email}\npassword ******************** {password}\nchangePassUrl ************** {changePassUrl}")
 			email = EmailMultiAlternatives(
