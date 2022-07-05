@@ -154,6 +154,7 @@ def fetch_ta_scores(student):
     return scores
 
 def get_participant(student):
+    participant = None
     try:
         participant = Participant.objects.get(user=student.spk_usr_id)
     except Participant.DoesNotExist:
