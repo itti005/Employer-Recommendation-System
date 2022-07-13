@@ -660,9 +660,10 @@ def shortlist_student(request):
     try:
         students = request.GET.get('students', None)
         student_ids = [ int(x) for x in students[:-1].split(',') ]
+        status = request.GET.get('status', 0)
         job_id = int(request.GET.get('job_id', None))
         job = Job.objects.get(id=job_id)
-        JobShortlist.objects.filter(job=job,spk_user__in=student_ids).update(status=1)
+        JobShortlist.objects.filter(job=job,spk_user__in=student_ids).update(status=status)
         data['updated']=True
     except:
         data['updated']=False
@@ -771,9 +772,11 @@ def job_app_details(request,id):
     
     # context['df']=df1.to_html()
     students_shortlisted = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==1]
+    students_rejected = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==2]
     context['job'] = job
     context['students_awaiting'] = students_awaiting
     context['students_shortlisted'] = students_shortlisted
+    context['students_rejected'] = students_rejected
     context['mass_mail']=settings.MASS_MAIL
     return render(request,'emp/job_app_status_detail.html',context)
 
@@ -1474,3 +1477,4 @@ def get_foss(value):
         if foss:
             return foss
     return []
+
