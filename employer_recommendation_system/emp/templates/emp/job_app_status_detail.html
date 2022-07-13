@@ -245,23 +245,19 @@
   var tb_a;
   var mass_mail_url;
   function shortlist_student(apply_btn,job_id){
-    apply_btn_id = apply_btn.id;
-    console.log("apply_btn",apply_btn)
+    apply_btn_id = apply_btn.id;    
     var student_ids = [];
     var students = '';
         $('input.select-student:checked').each(function() {
           id = $(this).attr("id");
           students+=id.split('_')[1]+','
      });
-        console.log(students);
         if(students==''){
           alert('Please select student\(s\)')
         }else{
           if(apply_btn_id==='btn-shortlist'){
-            console.log("Acccept")
             status = 1;
           }else{
-            console.log("Reject")
             status = 2;
       }
       $.ajax({
@@ -293,32 +289,24 @@
     $('#select-all').change(function() {
       
         if(this.checked) {
-            $(':checkbox').prop('checked', true);
-            // $('#btn-shortlist').show();
-            // $('.btn-status').show();
-
-            
+            $(':checkbox').prop('checked', true);            
         }else{
           $(':checkbox').prop('checked', false);
-          // $('.btn-status').hide();
         }
         $('#textbox1').val(this.checked);        
     });
     $('input.select-student:checkbox').change(function() {
-        console.log('select checked');
         var allVals = [];
         $('input.select-student:checked').each(function() {
        allVals.push($(this).val());
      });
         if (allVals.length) {
-          // $('.btn-status').show();
           var x = document.getElementsByClassName("select-student");
           if (allVals.length==x.length) {
             $(':checkbox').prop('checked', true);
           };
           
         }else{
-          // $('.btn-status').hide();
           $('#select-all:checkbox').prop('checked', false);
         }
      $('#t').val(allVals);
@@ -338,7 +326,6 @@
 
 $("#form_mass_mail").on("submit", function(event){
         event.preventDefault();
-        console.log('send_mass_mail');
         table = $('#tb-shortlisted').DataTable()
         if (table.data().any() == false){
           alert('Email list is empty. Please filter emails for mass mail.')
@@ -350,7 +337,6 @@ $("#form_mass_mail").on("submit", function(event){
         for (i = 0; i < emails.length; i++) {
               data.push([emails[i]])
             }
-      console.log("data,",data)
       modal = $('#taskModal').modal()
       subject = modal.find('.modal-body input[name="subject"]').val()
       job = modal.find('.modal-body input[name="job_id"]').val()
