@@ -56,7 +56,7 @@
     <th>Job ID</th>
     <th>Job Title</th>
     <!-- <th>Rating</th> -->
-    <th>Sector</th>
+    <th>Company</th>
     <th>Location</th>
     <th>Last Application Date</th>
     <th>Skills</th>
@@ -70,7 +70,7 @@
     <td>{{job.id}}</td>
     <td><a href="{% url 'job-detail' slug=job.slug %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view or edit ">{{ job.title }}</a></td>
     {% comment %}<td>{{ job.rating }}</td>{% endcomment %}
-    <td>{{ job.domain }}</td>
+    <td>{{ job.company.name }}</td>
     <td>{% get_citydetails job.city_job %}, {% get_statedetails job.state_job %}</td>
     <td>{{ job.last_app_date }}</td>
     <td>{{ job.foss | display_foss }}</td>

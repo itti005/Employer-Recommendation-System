@@ -726,7 +726,8 @@ def job_app_details1(request,id):
 def job_app_details(request,id):
     context = {}
     job = Job.objects.get(id=id)
-    students_awaiting = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
+    # students_awaiting = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
+    students_awaiting = [(x.student,x.date_created) for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
     students_awaiting1 = [x.student.spk_student_id for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
     ta = TestAttendance.objects.filter(student_id__in=students_awaiting1)
     ta = ta.values('student_id','mdluser_id','mdlcourse_id','mdlquiz_id')
@@ -749,10 +750,6 @@ def job_app_details(request,id):
         sq = Student.objects.filter(spk_student_id__in=df['student_id'])
         sq = sq.values('spk_usr_id','address','spk_institute','gender','state','city','spk_student_id')
         sq_df=pd.DataFrame(sq)
-        # users = User.objects.filter(student__in=sq).values('first_name','last_name')
-        # users_df = pd.DataFrame(users)
-        # sq_df=sq_df.join(users_df,on='user_id')
-        # sq_df['fullname']=sq_df['first_name'] + sq_df['last_name']
         df=pd.merge(df,sq_df,left_on='student_id',right_on='spk_student_id')
         df1=df.drop_duplicates().pivot(index='student_id',columns='foss',values='grade')
         context['columns']=df1.columns
@@ -778,6 +775,9 @@ def job_app_details(request,id):
     context['students_shortlisted'] = students_shortlisted
     context['students_rejected'] = students_rejected
     context['mass_mail']=settings.MASS_MAIL
+
+    #stats
+    
     return render(request,'emp/job_app_status_detail.html',context)
 
 
