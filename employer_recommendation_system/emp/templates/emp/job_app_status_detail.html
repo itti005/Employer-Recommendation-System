@@ -350,11 +350,11 @@ $("#form_mass_mail").on("submit", function(event){
           return
         }
          
-        emails = table.column(3).data()
+        emails = table.column(4).data()
         data = []
         for (i = 0; i < emails.length; i++) {
               data.push([emails[i]])
-            }
+            }            
       modal = $('#taskModal').modal()
       subject = modal.find('.modal-body input[name="subject"]').val()
       job = modal.find('.modal-body input[name="job_id"]').val()
