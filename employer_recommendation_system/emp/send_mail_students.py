@@ -28,7 +28,8 @@ def send_mail_shortlist(subject,message,emails,job):
 	log_file=open(log_file_location, "w+")
 	for email in students_email:
 		print(email)
-		mail = EmailMultiAlternatives(subject,message,from_host,students_email,headers = {"Content-type" : "text/html"})
+		# mail = EmailMultiAlternatives(subject,message,from_host,students_email,headers = {"Content-type" : "text/html"})
+		mail = EmailMultiAlternatives(subject,message,from_host,[email],headers = {"Content-type" : "text/html"})
 		try:
 			validate_email(email)
 			mail.attach_alternative(message, "text/html")
