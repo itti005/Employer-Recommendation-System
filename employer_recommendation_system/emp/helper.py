@@ -117,6 +117,7 @@ def merge_scores(d1,d2):
 
 
 def unique_foss_scores(scores):
+    
     unique_foss = {}
     unique_scores = []
 
@@ -128,7 +129,7 @@ def unique_foss_scores(scores):
         else:
             unique_foss[item['foss']] = item['grade']
             unique_scores.append(item)
-    print(unique_scores)
+    
     return unique_scores
     
 # def fetch_ta_scores(student,df_fmc):
@@ -214,8 +215,9 @@ def is_job_recommended_ta(job,student,scores):
                                                     test__academic__state__in=states if states!='' else SpokenState.objects.all(),
                                                     test__academic__city__in=cities if cities!='' else SpokenCity.objects.all(),
                                                     status__gte=3,
-                                                    test__academic__institution_type__in=insti_type if insti_type!='' else InstituteType.objects.all(),
-                                                    test__academic__status__in=[job.activation_status] if job.activation_status else [1,3],)
+                                                    test__academic__institution_type__in=insti_type if insti_type!='' else InstituteType.objects.all()
+                                                    )
+    
     if job.from_date and job.to_date:
         test_attendance = test_attendance.filter(test__tdate__range=[job.from_date, job.to_date])
     elif job.from_date:
@@ -248,6 +250,7 @@ def get_query_insti_type_list(job):
 
 def get_valid_fosses(job,scores):
     fosses = list(map(int,job.foss.split(',')))
+    
     valid_fosses = []
     for item in scores:
         if item['foss'] in fosses:
