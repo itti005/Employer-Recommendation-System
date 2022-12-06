@@ -114,6 +114,8 @@ def display_gender(value):
 
 @register.filter()
 def display_foss(value):
+    if value == '0':
+        return 'Any FOSS'
     if value:
     # if value is not None:
         foss_ids = list(map(int,value.split(',')))
