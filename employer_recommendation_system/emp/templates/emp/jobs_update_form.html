@@ -124,6 +124,7 @@
          <div class="custom-multi-select form-group mb-3 foss_select" >
           <label>{{filter_form.foss.label }}</label>
           <select class="form-control" id="foss-select" multiple>
+            <option value="0">All</option>
           {% for foss in filter_form.foss %} 
           {{ foss }}
           {% endfor %}

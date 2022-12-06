@@ -248,6 +248,8 @@ def get_query_insti_type_list(job):
 
 def get_valid_fosses(job,scores):
     fosses = list(map(int,job.foss.split(',')))
+    if 0 in fosses:
+        fosses = [x['id'] for x in FossCategory.objects.all().values('id')] 
     valid_fosses = []
     for item in scores:
         if item['foss'] in fosses:

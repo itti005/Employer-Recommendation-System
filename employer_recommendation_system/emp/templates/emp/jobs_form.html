@@ -134,6 +134,7 @@
       <div class="col-lg-6">
         <label>FOSS*</label>
         <select class="form-control" id="foss-select" multiple="multiple" required>
+          <option value="0">All</option>
         {% for foss in filter_form.foss %} 
         {{ foss }}
         {% endfor %}
