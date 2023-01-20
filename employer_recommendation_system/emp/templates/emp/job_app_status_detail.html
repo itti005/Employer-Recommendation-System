@@ -121,6 +121,7 @@
     <div class="d-flex mb-3" id="mass-mail">
       <div><button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#taskModal">Create Mass Mail</button></div>
       <div class="mx-5"><button type="button" class="btn btn-danger btn-sm btn-status"  onclick="shortlist_student(this,'{{job.id}}');">Reject</button></div>
+      <div class="mx-5"><a class="btn btn-success btn-sm btn-status" href="{% url 'check_mail_status' job.id %}">Check Mail Status</a></div>
     </div>
     {% endif %}
     <table class="table table-striped pt-3" id="tb-shortlisted">
