@@ -48,7 +48,7 @@ from smtplib import SMTPException
 from .utility import *
 from .helper import *
 from collections import defaultdict
-
+import csv
 import os
 @check_user
 def document_view(request,pk):
@@ -1110,7 +1110,9 @@ def ajax_send_mail(request):
         
         total , sent, errors, log_file_name = send_mail_shortlist(subject,message,emails,job)
         file_path = os.path.join(settings.LOG_LOCATION, log_file_name)
-        email_status = ShortlistEmailStatus(date_created=date_created,email_sequence=SECOND_SHORTLIST_EMAIL,total_mails=total,success_mails=sent,job_id=int(job),log_file=file_path)
+        email_status = ShortlistEmailStatus(date_created=date_created,email_sequence=SECOND_SHORTLIST_EMAIL,
+                                            total_mails=total,success_mails=sent,job_id=int(job),log_file=file_path,
+                                            message=message,subject=subject)
         email_status.save()
         data['status']='success'
         data['total']=total
@@ -1478,3 +1480,25 @@ def get_foss(value):
             return foss
     return []
 
+def check_mail_status(request,id):
+    context = {}
+    job = Job.objects.get(id=id)
+    email_status = ShortlistEmailStatus.objects.filter(job_id=job.id)
+    context['job'] = job
+    context['email_status'] = email_status
+    d = dict()
+    for log in email_status:
+        log_file_location=os.path.join(settings.BASE_DIR,log.log_file)
+        try:
+            file = open(log_file_location)
+            csvreader = csv.reader(file)
+            rows = []
+            
+            for row in csvreader:
+                rows.append(row)
+            file.close()
+            d[log] = rows
+        except Exception as e:
+            print(f"{e}")
+        context['log'] = d
+    return render(request,'emp/mail_status.html',context)
