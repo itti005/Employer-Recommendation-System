@@ -335,7 +335,11 @@ class ShortlistEmailStatus(models.Model):
     log_file = models.CharField(max_length=250)
     message = models.TextField(default="Data is not available. Data is available only for mails sent after 21st Jan, 2023")
     subject = models.CharField(max_length=255,default="Data is not available. Data is available only for mails sent after 21st Jan, 2023")
-    
+
+class Notifications(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    mail_order = models.IntegerField(default=1)
+    mail_date = models.DateTimeField(auto_now_add=True)
 
 # landing page models
 # class GalleryImage(models.Model):
