@@ -184,9 +184,18 @@
           <p><b>Please add following information to complete the profile:</b></p>
           <p>{{empty_fields}}</p>
           {% if request.user|has_group:"MANAGER" %}
-          {% if student.notified_date %}
-          <p>Last notified on : {{student.notified_date}}</p>
+          <p><strong>Notification data : </strong></p>
+          <ul>
+            {% if notifications %}
+            {% for data in notifications %}
+            <li>{{data.mail_date}}</li>
+            {% endfor%}    
+            {% else %}
+            <li>No data</li>
           {% endif %}
+          </ul>
+          
+          <hr>
         <button type="button" class="btn btn-outline-info btn-sm" id="notify">Notify student</button>
         <button class="btn btn-outline-primary btn-sm" type="button" id="in-progress" style="display:none;" disabled>
           <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>

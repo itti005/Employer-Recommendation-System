@@ -50,6 +50,8 @@ from .helper import *
 from collections import defaultdict
 import csv
 import os
+
+
 @check_user
 def document_view(request,pk):
     try:
@@ -920,6 +922,7 @@ def student_profile_details(request,id,job):
     
     context['complete']=complete
     context['empty_fields']=', '.join(empty_fields)
+    context['notifications'] = Notifications.objects.filter(user = student.user)
     return render(request,'emp/student_profile.html',context)
 
 @user_passes_test(is_student)
@@ -1408,6 +1411,9 @@ def notify_student(request):
     try:
         send_mail(subject=subject,message=message,recipient_list=[to_mail],from_email=settings.EMAIL_HOST_USER,fail_silently=False,)
         mail_sent = True
+        user = User.objects.filter(email=to_mail)[0]
+        prev = Notifications.objects.filter(user=user).count()
+        Notifications.objects.create(user=user,mail_order=prev+1)
         try:
             student = Student.objects.get(user__email=to_mail)
             student.notified_date = datetime.datetime.now()
