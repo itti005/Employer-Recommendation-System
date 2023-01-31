@@ -1,0 +1,73 @@
+{% extends 'emp/base.html'%}
+
+{% block content %}
+<p>Job Id : {{job.id}}</p>
+<p>Job Title : {{job.title}}</p>
+<p>Company : {{job.company.name}}</p>
+
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Date Created</th>
+        <th scope="col">Total Mails</th>
+        <th scope="col">Success Mails</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for status in email_status %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td>{{status.date_created}}</td>
+                <td>{{status.total_mails}}</td>
+                <td>{{status.success_mails}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+  {% for key, val in log.items %}
+  <div class="card mb-3">
+    <div class="card-header">
+        <p >
+            <span><strong>Mails Sent on : </strong>{{key.date_created}} | </span>
+            <span><strong>Total mails : </strong>{{key.total_mails}} | </span>
+            <span><strong>Success mails : </strong>{{key.success_mails}}</span>
+        </p>
+         </div>
+    <div class="card-body">
+      <div>
+        <p><strong>Subject : </strong><small>{{key.subject}}</small></p>
+        <p><strong>Message : </strong><small>{{key.message}}</small></p>
+      </div>
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in val %}
+              <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td>{{item.0}}</td>
+                <td> {% if item.1 == '1'%}<i class="far fa-check-circle" style="color: green"></i>
+                     {% else %} <i class="far fa-times-circle" style="color: red"></i>
+                     {% endif %}
+                </td>
+                
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+    </div>
+  </div>
+  
+  
+  
+
+  {% endfor %}
+
+{% endblock %}
