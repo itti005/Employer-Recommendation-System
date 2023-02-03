@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+
 {% include "emp/page_header.html" with title="Students registered in JRS" icon="<i class='bi bi-list-check'></i>" %}
 <div class="main-c">
   {% for message in messages %}
@@ -13,31 +14,33 @@
                 {{ message|safe }}
             </div>
         {% endfor %}
+
 <div class="container-fluid">
- <div class="job-pagination mt-5">
-{% if is_paginated %}
-<div class="d-flex justify-content-between">
   <div>
-    {% if page_obj.has_previous %}
-    <a href="?{% param_replace page=1 %}" >First</a>
-    {% if page_obj.previous_page_number != 1 %}
-      <a class="page-item" href="?{% param_replace page=page_obj.previous_page_number %}"><span aria-hidden="true">&laquo;</span></a>
-    {% endif %}
-  {% endif %}
-
-  Page {{ page_obj.number }} of {{ paginator.num_pages }}
-
-  {% if page_obj.has_next %}
-    {% if page_obj.next_page_number != paginator.num_pages %}
-      <a href="?{% param_replace page=page_obj.next_page_number %}"><span aria-hidden="true">&raquo;</span></a>
-    {% endif %}
-    <a href="?{% param_replace page=paginator.num_pages %}">Last</a>
-  {% endif %}
+    <form>
+      <div class="mb-3">
+        <label for="name" class="form-label">Name/Email address</label>
+        <input type="text" class="form-control" id="name" name="name">
+        <div id="emailHelp" class="form-text">Search by student firstname, lastname or email</div>
+      </div>
+      
+      <button type="submit" class="btn btn-primary mb-2">Search</button>
+    </form>
   </div>
-  <div class="job-num"><span>Jobs {{ page_obj.start_index }} — {{ page_obj.end_index }}</span></div>
+  <nav aria-label="Page navigation example">
+    <ul class="pagination">
+      {% for item in page_obj.paginator.page_range %}
+        {% if item == page_obj.number %}
+        <li class="page-item" style="background-color: midnightblue; "><a class="page-link" href="?page={{item}}"><strong>{{item}}</strong></a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="?page={{item}}">{{item}}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </nav>
+  <div>    
 </div>
-{% endif %}
-</div>   
+
 <div class="row">
     <div class="col-12">
         {% if object_list %}
@@ -71,7 +74,7 @@
   
 </table>
 {% else %}
-<div>No companies ti display</div>
+<div>No students to display</div>
 {% endif %}
 
     </div>
@@ -88,11 +91,6 @@
 {% block js %}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
-  $( document ).ready(function() {
-    $('#tb-students').DataTable({
-        "pageLength": 50
-    });
-   
-});
+  $( document ).ready(function() {});
 </script>
 {% endblock %}

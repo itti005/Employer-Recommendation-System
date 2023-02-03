@@ -1392,6 +1392,13 @@ class TestimonialsList(ListView):
 class StudentListView(PermissionRequiredMixin,ListView):
     model = Student
     permission_required = 'emp.view_student'
+    paginate_by = 500
+    
+    def get_queryset(self):
+        search = self.request.GET.get('name')
+        if search:
+            return Student.objects.filter(Q(user__first_name__icontains=search)|Q(user__last_name__icontains=search)|Q(user__email__icontains=search))
+        return Student.objects.all().order_by('user__first_name')
 
 @csrf_exempt
 def notify_student(request):
