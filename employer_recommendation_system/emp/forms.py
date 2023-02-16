@@ -8,8 +8,9 @@ class DateInput(forms.DateInput):
 
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 
+    
 class StudentGradeFilterForm(forms.Form):
-    foss = forms.ModelMultipleChoiceField(queryset=FossCategory.objects.using('spk').all())
+    foss = forms.ModelMultipleChoiceField(queryset=FossCategory.objects.using('spk').filter(id__in=[x.foss.id for x in FossMdlCourses.objects.all()]).order_by('foss'))
     state = forms.ModelMultipleChoiceField(queryset=SpokenState.objects.using('spk').all(), required=False)
     city = forms.ModelMultipleChoiceField(queryset=SpokenCity.objects.using('spk').all().order_by('name'), required=False)
     grade = forms.IntegerField(min_value=0, max_value=100)
@@ -57,9 +58,6 @@ class StudentForm(ModelForm):
         help_texts = {
             'certifications' : 'Please mention your certifications as comma seperated values.'
         }
-
-class DateInput(forms.DateInput):
-    input_type = 'date'
 
 class JobSearchForm(forms.Form):
     keyword = forms.ChoiceField(choices=[]) # give foss names, company names & job titles in dropdown
