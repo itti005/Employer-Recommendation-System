@@ -27,8 +27,7 @@
             </div>
         {% endfor %}
 <br>
-<!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop">Toggle top offcanvas</button>
- -->
+
 <div class="offcanvas offcanvas-top" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
   <div class="offcanvas-header">
     <h5 id="offcanvasTopLabel">
@@ -360,11 +359,6 @@
               status = 4;
               break;
           }
-          {% comment %} if(apply_btn_id==='btn-shortlist'){
-            status = 1;
-          }else{
-            status = 2;
-      } {% endcomment %}
       $.ajax({
         url: "/shortlist_student",
         data: {
