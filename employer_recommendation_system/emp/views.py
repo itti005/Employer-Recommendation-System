@@ -686,45 +686,6 @@ class JobAppStatusListView(UserPassesTestMixin,ListView):
 
 
 @user_passes_test(is_manager)
-def job_app_details1(request,id):
-    context = {}
-    # given : job id
-    # get job 
-    job = Job.objects.get(id=id)
-    # get foss for that job
-    foss = job.foss
-    # get mdlcourse_id for fosses
-    # quiz_ids = [x.mdlquiz_id for x in FossMdlCourses.objects.filter(foss_id__in=list(map(int,foss.split(','))))]
-    fossMdlCourses = FossMdlCourses.objects.filter(foss_id__in=list(map(int,foss.split(',')))).values('foss_id','mdlcourse_id','mdlquiz_id')
-    fossMdlCourses_df = pd.DataFrame(fossMdlCourses)
-    # get students for that job from jobshortlist table
-    students_emp = [x.student for x in JobShortlist.objects.filter(job=job)]
-    students_spk = [x.spk_student_id for x in students_emp]
-    # 1 get mdluser_id from ta table for above students
-    mdluser_ids = set([x.mdluser_id for x in TestAttendance.objects.filter(student_id__in=students_spk)])
-    mdluser_student = TestAttendance.objects.filter(student_id__in=students_spk).values('mdluser_id','student_id')
-    mdluser_student_df = pd.DataFrame(mdluser_student)
-    # now filter mdlquiz_grades on mdluser_ids & mdlquiz_ids above
-    r = MdlQuizGrades.objects.using('moodle').filter(userid__in=mdluser_ids,quiz__in=fossMdlCourses_df['mdlquiz_id']).values('quiz','userid','grade')
-    # change the aabove qs to df
-    df = pd.DataFrame(r)
-    # add student_id column based on mdluser_id see #1
-    r = pd.merge(mdluser_student_df,df,left_on='mdluser_id',right_on='userid')
-    r = pd.merge(r,fossMdlCourses_df,left_on='quiz',right_on='mdlquiz_id').drop_duplicates()
-    r=r.drop(['mdluser_id','quiz','userid','mdlcourse_id','mdlquiz_id'], axis = 1).drop_duplicates()
-    d = {}
-    for index, row in r.iterrows():
-        if row['student_id'] in d:
-            d[row['student_id']][row['foss_id']]=row['grade']
-        else:
-            d[row['student_id']]={'student_id':row['student_id'],row['foss_id']:row['grade']}
-    l = list(d.values())
-    context['data']=l
-
-
-    return render(request,'emp/job_app_status_detail.html',context)
-
-@user_passes_test(is_manager)
 def job_app_details(request,id):
     context = {}
     job = Job.objects.get(id=id)
@@ -772,10 +733,14 @@ def job_app_details(request,id):
     # context['df']=df1.to_html()
     students_shortlisted = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==1]
     students_rejected = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==2]
+    students_shortlisted_comp = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==3] #shortlisted by company
+    students_rejected_comp = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==4] #rejected by company
     context['job'] = job
     context['students_awaiting'] = students_awaiting
     context['students_shortlisted'] = students_shortlisted
     context['students_rejected'] = students_rejected
+    context['students_shortlisted_comp'] = students_shortlisted_comp
+    context['students_rejected_comp'] = students_rejected_comp
     context['mass_mail']=settings.MASS_MAIL
 
     #stats
@@ -1399,6 +1364,10 @@ class StudentListView(PermissionRequiredMixin,ListView):
         if search:
             return Student.objects.filter(Q(user__first_name__icontains=search)|Q(user__last_name__icontains=search)|Q(user__email__icontains=search))
         return Student.objects.all().order_by('user__first_name')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_students'] = Student.objects.count()
+        return context
 
 @csrf_exempt
 def notify_student(request):

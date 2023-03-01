@@ -50,7 +50,14 @@
 <div>
   <span class="me-5"><b>Job Id : </b>{{job.id}}</span><span class="me-5"><b>Job Title : </b>{{job.title}}</span><span><b>Company : </b>{{job.company.name}}</span>
 </div>
-
+<hr>
+<div class="d-flex mb-3">
+  <div scope="col">
+    <button type="button" class="btn btn-success btn-sm btn-status"  id="btn-shortlist" onclick="shortlist_student(this,'{{job.id}}');">Shortlist for mass mail</button></div>
+  <div scope="col" class="mx-5"> <button type="button" class="btn btn-danger btn-sm btn-status"   onclick="shortlist_student(this,'{{job.id}}');" id="btn-reject">Reject</button></div>
+  <div scope="col" class="mx-5"> <button type="button" class="btn btn-success btn-sm btn-status"   onclick="shortlist_student(this,'{{job.id}}');" id="btn-shortlist-comp">Shortlisted by company</button></div>
+  <div scope="col" class="mx-5"> <button type="button" class="btn btn-danger btn-sm btn-status"   onclick="shortlist_student(this,'{{job.id}}');" id="btn-reject-comp">Rejected by company</button></div>
+</div>
 <hr class="hr">
 <div>
   <nav>
@@ -58,6 +65,8 @@
     <button style="color: black;" class="nav-link active" id="nav-awaiting-tab" data-bs-toggle="tab" data-bs-target="#nav-awaiting" type="button" role="tab" aria-selected="true">Awaiting Shortlist</button>
     <button style="color: green;" class="nav-link" id="nav-shortlisted-tab" data-bs-toggle="tab" data-bs-target="#nav-shortlisted" type="button" role="tab"  aria-selected="false">Shortlisted</button>
     <button style="color: red;" class="nav-link" id="nav-rejected-tab" data-bs-toggle="tab" data-bs-target="#nav-rejected" type="button" role="tab"  aria-selected="false">Rejected</button>
+    <button style="color: green;" class="nav-link" id="nav-shortlist-comp-tab" data-bs-toggle="tab" data-bs-target="#nav-shortlisted-comp" type="button" role="tab"  aria-selected="false">Shortlisted by Company</button>
+    <button style="color: red;" class="nav-link" id="nav-rejected-comp-tab" data-bs-toggle="tab" data-bs-target="#nav-rejected-comp" type="button" role="tab"  aria-selected="false">Rejected by Company</button>
   </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
@@ -68,11 +77,7 @@
         <p>List of students awaiting for further shortlist.</p>
       </div>
       <input class="form-check-input" type="checkbox" value="" id="select-all"> Select all students <hr>
-      <div class="d-flex mb-3">
-        <div scope="col">
-          <button type="button" class="btn btn-success btn-sm btn-status"  id="btn-shortlist" onclick="shortlist_student(this,'{{job.id}}');">Shortlist</button></div>
-        <div scope="col" class="mx-5"> <button type="button" class="btn btn-danger btn-sm btn-status"   onclick="shortlist_student(this,'{{job.id}}');">Reject</button></div>
-      </div>
+      
       <table class="table" id="tb-students">
         <thead>
           <tr>
@@ -120,7 +125,7 @@
     {% if students_shortlisted %}
     <div class="d-flex mb-3" id="mass-mail">
       <div><button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#taskModal">Create Mass Mail</button></div>
-      <div class="mx-5"><button type="button" class="btn btn-danger btn-sm btn-status"  onclick="shortlist_student(this,'{{job.id}}');">Reject</button></div>
+      {% comment %} <div class="mx-5"><button type="button" class="btn btn-danger btn-sm btn-status"  onclick="shortlist_student(this,'{{job.id}}');">Reject</button></div> {% endcomment %}
       <div class="mx-5"><a class="btn btn-success btn-sm btn-status" href="{% url 'check_mail_status' job.id %}">Check Mail Status</a></div>
     </div>
     {% endif %}
@@ -156,13 +161,8 @@
       <p>Rejected list of students.</p>
     </div><hr>
     {% if students_rejected %}
-    <div class="d-flex mb-3" id="mass-mail">
-      <!-- <div><button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#taskModal">Create Mass Mail</button></div> -->
-      <button type="button" class="btn btn-success btn-sm btn-status"  id="btn-shortlist" onclick="shortlist_student(this,'{{job.id}}');">Shortlist</button>
-      </div>
+    <div class="d-flex mb-3" id="mass-mail"></div>
     {% endif %}
-    
-  <!-- <div class="mx-5"><button type="button" class="btn btn-outline-danger btn-sm btn-status"  onclick="shortlist_student(this,'{{job.id}}');">Reject</button></div> -->
   <div>
     <table class="table table-striped pt-3" id="tb-rejected">
       <thead>
@@ -193,6 +193,84 @@
   </div>
 </div>
 
+<div class="tab-pane fade" id="nav-shortlisted-comp" role="tabpanel" aria-labelledby="nav-profile-tab">
+  <div>
+    <p>Final list of students shortlisted by company.</p>
+  </div>
+  <hr>
+  {% if students_shortlisted_comp %}
+  <div class="d-flex mb-3" id="mass-mail">
+    <div><button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#taskModal">Create Mass Mail</button></div>
+    {% comment %} <div class="mx-5"><button type="button" class="btn btn-danger btn-sm btn-status"  onclick="shortlist_student(this,'{{job.id}}');">Reject</button></div> {% endcomment %}
+    <div class="mx-5"><a class="btn btn-success btn-sm btn-status" href="{% url 'check_mail_status' job.id %}">Check Mail Status</a></div>
+  </div>
+  {% endif %}
+  <table class="table table-striped pt-3" id="tb-shortlisted">
+<thead>
+  <tr>
+    <th scope="col"></th>
+    <th scope="col">#Sr No.</th>
+    <th scope="col">Student</th>
+    <th scope="col">Spoken User Id</th>
+    <th scope="col">Email</th>
+  </tr>
+</thead>
+<tbody>
+  {% for student in students_shortlisted_comp %}
+  <tr>
+    <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{student.spk_usr_id}}"> 
+    <td>{{forloop.counter}}</td>
+    <!-- <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td> -->
+    <td><a href="{% url 'student_profile_details' student.spk_usr_id 0 %}">{{student.user.get_full_name | title}}</a></td>
+
+    
+    <td>{{student.spk_usr_id}}</td>
+    <td>{{student.user.email}}</td>
+  </tr>
+{% empty %}
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<div class="tab-pane fade" id="nav-rejected-comp" role="tabpanel" aria-labelledby="nav-profile-tab">
+  <div>
+    <p>Final list of students rejected by company.</p>
+  </div>
+  <hr>
+  {% if students_rejected_comp %}
+  <div class="d-flex mb-3" id="mass-mail">
+    {% comment %} <div class="mx-5"><button type="button" class="btn btn-danger btn-sm btn-status"  onclick="shortlist_student(this,'{{job.id}}');">Reject</button></div> {% endcomment %}
+    <div class="mx-5"><a class="btn btn-success btn-sm btn-status" href="{% url 'check_mail_status' job.id %}">Check Mail Status</a></div>
+  </div>
+  {% endif %}
+  <table class="table table-striped pt-3" id="tb-shortlisted">
+<thead>
+  <tr>
+    <th scope="col"></th>
+    <th scope="col">#Sr No.</th>
+    <th scope="col">Student</th>
+    <th scope="col">Spoken User Id</th>
+    <th scope="col">Email</th>
+  </tr>
+</thead>
+<tbody>
+  {% for student in students_rejected_comp %}
+  <tr>
+    <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{student.spk_usr_id}}"> 
+    <td>{{forloop.counter}}</td>
+    <!-- <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td> -->
+    <td><a href="{% url 'student_profile_details' student.spk_usr_id 0 %}">{{student.user.get_full_name | title}}</a></td>
+
+    
+    <td>{{student.spk_usr_id}}</td>
+    <td>{{student.user.email}}</td>
+  </tr>
+{% empty %}
+{% endfor %}
+</tbody>
+</table>
+</div>
     
   </div>
 </div>
@@ -268,11 +346,25 @@
         if(students==''){
           alert('Please select student\(s\)')
         }else{
-          if(apply_btn_id==='btn-shortlist'){
+          switch(apply_btn_id){
+            case 'btn-shortlist':
+              status = 1;
+              break;
+            case 'btn-reject':
+              status = 2;
+              break;
+            case 'btn-shortlist-comp':
+              status = 3;
+              break;
+            case 'btn-reject-comp':
+              status = 4;
+              break;
+          }
+          {% comment %} if(apply_btn_id==='btn-shortlist'){
             status = 1;
           }else{
             status = 2;
-      }
+      } {% endcomment %}
       $.ajax({
         url: "/shortlist_student",
         data: {
