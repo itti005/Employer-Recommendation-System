@@ -22,9 +22,14 @@ class EducationAdmin(admin.ModelAdmin):
     pass
 
 class SkillAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["name", "group", "updated"]
+    list_filter = ["group"]
 class DisciplineAdmin(admin.ModelAdmin):
     pass
+class SkillInline(admin.TabularInline):
+    model = Skill
+class SkillGroupAdmin(admin.ModelAdmin):
+    inlines = [SkillInline]
 
 admin.site.register(Degree,DegreeAdmin)
 admin.site.register(Course,CourseAdmin)
@@ -37,4 +42,5 @@ admin.site.register(JobShortlist,JobShortlistAdmin)
 admin.site.register(Education,EducationAdmin)
 admin.site.register(Skill,SkillAdmin)
 admin.site.register(Discipline,DisciplineAdmin)
+admin.site.register(SkillGroup,SkillGroupAdmin)
 

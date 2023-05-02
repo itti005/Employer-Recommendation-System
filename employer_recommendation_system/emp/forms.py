@@ -48,9 +48,17 @@ class PrevEducationForm(EducationForm):
         fields = '__all__'
 
 class StudentForm(ModelForm):
+    OPTIONS = [(True, 'Yes'),(False, 'No'),]
+    REL_LOC_CHOICES = [('No', 'No'),('Within the state', 'Within the state'),
+                       ('Anywhere in India', 'Anywhere in India'),('Overseas', 'Overseas'),]
+    joining_immediate = forms.ChoiceField(widget=forms.RadioSelect,choices=OPTIONS,label='If offered a job, will you be able to join immediately?')
+    avail_for_intern = forms.ChoiceField(widget=forms.RadioSelect,choices=OPTIONS,label='Are you interested for an internship?')
+    willing_to_relocate = forms.MultipleChoiceField(choices=REL_LOC_CHOICES,widget=forms.CheckboxSelectMultiple,label='Are you willing to relocate based on job requirement?')
     class Meta:
         model = Student
-        fields = ['about','github','linkedin','cover_letter','skills','resume','projects','phone','alternate_email','address','certifications']
+        fields = ['about','github','linkedin','cover_letter','skills','resume','projects',
+                  'phone','alternate_email','address','certifications',
+                  'joining_immediate','avail_for_intern','willing_to_relocate']
 
         widgets = {
             'certifications' : forms.Textarea(attrs={'rows':2, 'cols':15,'maxlength':200}),

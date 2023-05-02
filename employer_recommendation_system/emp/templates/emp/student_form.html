@@ -3,17 +3,8 @@
 {% load helper %}
 {% load crispy_forms_tags %}
 {% block css %}
-<!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
-<!-- <link rel="stylesheet" type="text/css" href="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.css' %}"> -->
+<link rel="stylesheet" type="text/css" href="{% static '/external/dropdown-search-box-amsify-select/css/amsify.select.css' %}" />
 <style type="text/css">
-	.select2-container{
-		width: 100%!important;
-	}
-	.select2-container--default .select2-selection--multiple{
-		border: none!important;
-		border: 1px solid #ced4da!important;
-	}
- 
   label{
     color: #0066A0;
     font-weight: bold;
@@ -32,21 +23,27 @@
     font-size: .875em;
     color: #dc3545;
   }
+  .amsify-selection-label {
+    height:36px!important;
+    border:2px solid #FFCC00!important;
+  }
+  
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row">
-  <div class="col-md-8">
+  <div class="col-md-8" >
     {% include "emp/page_header.html" with title="Student Profile" icon="<i class='bi bi-person-square'></i>" %}
     {% for message in messages %}
-         <div class="text-center alert {{ message.tags }}">
+         <div class="alert {{ message.tags }}">
              {{ message|safe }}
          </div>
 {% endfor %}
   </div>
   
 </div>
+
 <div class="alert alert-warning alert-dismissible fade show col-md-8" role="alert" style="display: none;" id="alert-project">
   <span>Only 5 projects can be added</span>
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -79,7 +76,6 @@
       <span><button type="submit" form="form-job-app" class="btn btn-outline-secondary" type="submit" id="confirm_apply">Confirm & Apply</button></span>
     </div>
     <div class="col-md-4">
-      <!-- <span><button type="button" class="btn btn-outline-secondary" id="modify">Modify</button></span> -->
       <span><a target="_blank" class="btn btn-outline-secondary" href="{% url 'student_profile' pk=request.user.student.id %}">Modify</a></span>
     </div>
     <div class="col-md-8"><hr></div>
@@ -93,15 +89,6 @@
     <input type="number" name="spk_user_id" required="" id="id_spk_user_id" value="{{request.user.student.spk_usr_id}}">
     
     </form> 
-  </div>
-  
-  <div class="row">
-    <!-- <div class="col-md-6" id="confirm"><button id="confirm-btn" type="button" class="btn btn-outline-success" onclick="apply_for_job('{{request.user.student.spk_usr_id}}','{{job_id}}','{{request.user.student.id}}');" >Confirm & Apply</button></div> -->
-    <!-- <div class="col-md-6" id="confirm"><a id="confirm-btn" type="button" class="btn btn-outline-success" 
-      href="{% url 'add_student_job_status' %}" 
-     >Confirm & Apply</a></div> -->
-
-    <!-- <div class="col-md-6" id="modify"><button type="button" class="btn btn-outline-info" >Modify</button></div> -->
   </div>
 </div>
 {% endif %}
@@ -187,7 +174,6 @@
 <form method="post" id="form-student" enctype="multipart/form-data" action="{% url 'student_profile' request.user.student.id %}">
     {% csrf_token %}
 	<div class="row">
-		<input type="hidden" id="skills_m" name="skills_m" >
     <div class="col-sm-4 mb-3">
           {{ form.phone | as_crispy_field }}
       </div>
@@ -204,6 +190,28 @@
     	<div class="col-sm-8 mb-3">
       		{{ form.about | as_crispy_field }}
     	</div>
+      <div class="col-sm-8 mb-3">
+        {{ form.joining_immediate | as_crispy_field }}
+        {{ form.avail_for_intern | as_crispy_field }}
+        {{ form.willing_to_relocate | as_crispy_field }}
+
+      </div>
+     
+      <div class="container">
+        <label for="skills">Select Skills</label>
+        <select name="skills" class='skills' id="skills" multiple searchable>
+          <option value="">Select Skills</option>
+          {% for group in skill_groups %}
+            {% ifnotequal group.num_skills 0 %}
+              <optgroup label="{{ group.name }}">
+                {% for skill in group.skill_set.all %}
+                  <option value={{skill.id}} {% if skill.id in student_skills %} selected {% endif %}>{{skill.name}}</option>
+                {% endfor %}
+              </optgroup>
+            {% endifnotequal %}
+          {% endfor %}
+        </select> 
+      </div>
       <div class="col-sm-8">
         <hr>
         <div class="alert alert-info" role="alert">
@@ -453,15 +461,20 @@
 </form>
 {% endblock %}
 {% block jquery %}
-<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script> 
+{% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {% endcomment %}
+<script type="text/javascript" src="{% static '/external/dropdown-search-box-amsify-select/js/jquery.amsifyselect.js' %}"></script>
+<script>
+  $('.skills').amsifySelect({
+    type : 'amsify'
+  });
+  {% comment %} alert('done'); {% endcomment %}
+</script>
 {% endblock %}
 {% block js %}
-<!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
-
-<!-- <script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script> -->
-
+ <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> 
+ <script  src="{% static '/external/Searchable-Multi-select-jQuery-Dropdown/jquery.dropdown.js' %}" ></script>
 <script type="text/javascript">
-
   function validateEmail(email) {
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
@@ -485,7 +498,7 @@ function apply_for_job(spk_user_id,job_id,student_id){
   }
 
 $(document).ready(function() {
-
+  
   // get current insti
   var c_insti = $('#current-insti').val()
   if (c_insti) {
@@ -558,18 +571,6 @@ $(document).ready(function() {
 
   }
 
-  // get city & state from currennt insti
-  //set value of state & city in current education
-
-  e = document.querySelectorAll('#div_id_resume label')[1];
-  e.style.display="none";
-  e = document.querySelectorAll('#div_id_cover_letter label')[1];
-  e.style.display="none";
-  e = document.querySelector('#div_id_resume input');
-  e.style.display="none";
-  e = document.querySelector('#div_id_cover_letter input');
-  e.style.display="none";
-
     if ($('#disable-form').html()) {
       $("#form-student :input").prop("disabled", true);
     }
@@ -580,7 +581,7 @@ $(document).ready(function() {
     var start_year_list = [];
     var end_year_list = [];
     var current_index = 0;
-    // $('.js-example-basic-multiple').select2();
+    
     $('.demo').dropdown({});
     $( "#modify" ).click(function() {
       $("#"+this.id).hide();
@@ -588,10 +589,6 @@ $(document).ready(function() {
       $('#save_changes_btn').show();
       $('#cancel_btn').show();
       $("#form-student :input").prop("disabled", false);
-    
-    // $("#update_profile").show();
-    // $("#form-student :input").prop("disabled", false);
-
     });
     $( "#cancel_btn" ).click(function() {
       $("#"+this.id).hide();
@@ -600,11 +597,6 @@ $(document).ready(function() {
       $('#confirm_apply').show();
       $('#modify').show();
       $("#form-student :input").prop("disabled", true);
-      
-    
-    // $("#update_profile").show();
-    // $("#form-student :input").prop("disabled", false);
-
     });
 
     $( "#update_profile" ).click(function() {
@@ -620,25 +612,12 @@ $(document).ready(function() {
         elem.appendChild(node);
         node.setAttribute('class','email-feedback');
         node.setAttribute('display','block');
-        // $("#div_id_alternate_email").scroll();
         $('html, body').animate({
         scrollTop: $("#div_id_alternate_email").offset().top - 100
     }, 100);
 
       }
       }
-  	 var res = $('.dropdown-selected').text();
-  	 var res1 = $('.dropdown-chose').text();
-  	 var x =[];
-  	 $('.dropdown-chose').each(function(index, obj)
-  	 {
-  	  x.push($(this).text());
-  	 });
-	$('#skills_m').val(x);
-  
-	
-
-
 	});
 
   
@@ -700,6 +679,7 @@ var options = '';
 
 });
 </script>
+
 <script type="text/javascript">
   function add_projects(p_num,url_val='',desc_val=''){
   
@@ -765,6 +745,7 @@ var options = '';
     $('#btn-prev-edu').show();
     $('#past_edu').hide();
  }); 
+ 
 </script>
 
 {% endblock %}

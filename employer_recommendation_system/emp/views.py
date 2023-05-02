@@ -16,7 +16,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin,UserPassesTestMix
 from django.http import HttpResponse, JsonResponse
 from .filterset import CompanyFilterSet
 from .forms import ACTIVATION_STATUS, JobSearchForm, JobApplicationForm
-from django.db.models import Q,F
+from django.db.models import Q,F,OuterRef, Subquery,Count, Prefetch
 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
@@ -40,7 +40,6 @@ from django.core.exceptions import PermissionDenied,MultipleObjectsReturned
 from django.http import FileResponse, Http404
 from .send_mail_students import send_mail_shortlist
 import itertools
-from django.db.models import OuterRef, Subquery
 from .models import STATUS
 import datetime
 from django.core.mail import send_mail
@@ -50,7 +49,6 @@ from .helper import *
 from collections import defaultdict
 import csv
 import os
-
 
 @check_user
 def document_view(request,pk):
@@ -357,7 +355,6 @@ class JobListView(FormMixin,ListView):
             try:
                 if has_student_role(self.request.user.student):
                     job_short_list = get_applied_joblist(self.request.user.student)
-                    print(f"job_short_list ******* {job_short_list}")
                     all_jobs = Job.objects.all()
                     applied_jobs = [x.job for x in job_short_list]
                     in_process_jobs = [x.job for x in job_short_list if x.status==JOB_APP_STATUS['RECEIVED_APP']]
@@ -518,8 +515,10 @@ def save_education(edu_form,student):
 def save_student_profile(request,student):    
     student_form = StudentForm(request.POST,request.FILES)
     c_education_form = EducationForm(request.POST)
+    
         
     if student_form.is_valid() and c_education_form.is_valid():
+        
         student.about = student_form.cleaned_data['about']
         student.github = student_form.cleaned_data['github']
         student.linkedin = student_form.cleaned_data['linkedin']
@@ -527,7 +526,10 @@ def save_student_profile(request,student):
         student.phone = student_form.cleaned_data['phone']
         student.address = student_form.cleaned_data['address']
         student.certifications = student_form.cleaned_data['certifications']
-        
+        student.joining_immediate = student_form.cleaned_data['joining_immediate']
+        student.avail_for_intern = student_form.cleaned_data['avail_for_intern']
+        student.willing_to_relocate = student_form.cleaned_data['willing_to_relocate']
+        student.skills.set(student_form.cleaned_data['skills'])
         # code for saving projects starts
         urls = request.POST.getlist('pr_url', '')
         descs = request.POST.getlist('pr_desc', '')
@@ -584,7 +586,7 @@ def save_student_profile(request,student):
         save_education(c_education_form,student)
         save_prev_education(request,student)
     else:
-        messages.error(request, 'Error in updating profile')
+        messages.error(request, f'Error in updating profile : {student_form.errors}')
     return student_form,c_education_form
 
 
@@ -615,7 +617,6 @@ def student_profile_confirm(request,pk,job):
 def student_profile(request,pk):
     context = {}
     student = Student.objects.get(user=request.user)
-
     context['student']=student
     if request.method=='POST':
         student_form = StudentForm(request.POST)
@@ -624,7 +625,7 @@ def student_profile(request,pk):
             student_form,education_form = save_student_profile(request,student)
             messages.success(request, 'Profile updated successfully')
         else:
-            messages.error(request, 'Error in updating profile')
+            messages.error(request, f'Error in updating profile - {student_form.errors} {c_education_form.errors}')
     else:
         student_form = StudentForm(instance = student)
     try:
@@ -638,7 +639,6 @@ def student_profile(request,pk):
         context['past_edu']=p_edu
     except:
         p_education_form = EducationForm(initial={'order': PAST_EDUCATION})
-    
     context['form']=student_form
     context['education_form'] = c_education_form
     context['institutes'] = AcademicCenter.objects.values('id','institution_name').order_by('institution_name')
@@ -652,7 +652,11 @@ def student_profile(request,pk):
     context['PAST_EDUCATION'] = PAST_EDUCATION
     context['states'] = SpokenState.objects.values('id','name').order_by('name')
     context['cities'] = SpokenCity.objects.values('id','name').order_by('name')
-
+    # context['skill_groups'] = SkillGroup.objects.values('id', 'name')
+    # context['skills'] = Skill.objects.annotate(group_name=F('group__name')).values('id', 'name', 'group_id','group_name')
+    context['skill_groups'] = SkillGroup.objects.annotate(num_skills=Count('skill')).prefetch_related('skill_set')
+    context['student_skills'] = Skill.objects.filter(student=student).values_list('id',flat=True)
+    student_skills = Skill.objects.filter(student=student).values_list('id',flat=True)
     return render(request,'emp/student_form.html',context)
 
 
@@ -884,7 +888,8 @@ def student_profile_details(request,id,job):
     context['current_education'] = student.education.filter(order=CURRENT_EDUCATION)
     context['past_education'] = student.education.filter(order=PAST_EDUCATION).first()
     complete,empty_fields = getFieldsInfo(student)
-    
+    context['skill_groups'] = SkillGroup.objects.prefetch_related(Prefetch('skill_set',queryset=Skill.objects.filter(student=student)))
+    skill_groups = SkillGroup.objects.prefetch_related(Prefetch('skill_set',queryset=Skill.objects.filter(student=student)))
     context['complete']=complete
     context['empty_fields']=', '.join(empty_fields)
     context['notifications'] = Notifications.objects.filter(user = student.user)
@@ -1349,7 +1354,6 @@ class TestimonialsList(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         events=Event.objects.filter(id__in=Testimonial.objects.filter(active=True).values('event_id'))
-        print(events)
         context['events']=events
         return context
         

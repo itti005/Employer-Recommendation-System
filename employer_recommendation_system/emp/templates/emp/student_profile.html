@@ -62,11 +62,11 @@
   	<b><i class="bi bi-person-square c-icon"></i></b><span> {{student.user.get_full_name | title}}</span><br>
   	<b><i class="bi bi-geo-alt-fill c-icon"></i><small>(Address)</small></b> <span>{{student.address |default_if_none:'Data Not Available'}}</span><br>
   	<!-- <b><i class="bi bi-bank2"></i><small>(Institute)</small></b> <span>{{student.spk_institute |default_if_none:'Data Not Available'}}</span><br> -->
-    {% if request.user|has_group:"STUDENT" %}
+    
     <b><i class="bi bi-envelope c-icon"></i> <small>Email</small>: </b><span>{{student.user.email}}</span><br>
     <b><i class="bi bi-envelope c-icon"></i> <small>Alternate Email</small>: </b><span>{{student.alternate_email}}</span><br>
     <b><i class="bi bi-telephone c-icon"></i> <small>Contact</small>: </b><span>{{student.phone}}</span><br>
-    {% endif %}
+    
     <hr>
     <b>Gender : </b><span>{{student.gender | title}}</span><br>
     <!-- <b>Spoken User Id: </b><span>{{student.spk_usr_id | title}}</span><br> -->
@@ -142,6 +142,30 @@
     </li>
    </li>
   {% endif %}
+  
+  <li class="list-group-item list-group-item-info"><span>Student Skills</span>
+    {% if student.skills.all %} 
+    <li class="list-group-item">
+      {% for group in skill_groups %}
+        {% if group.skill_set.all %}
+          <p><b>{{group}}</b> : {{ group.skill_set.all|join:', ' }}</p>
+        {% endif %}
+      {% endfor %}
+    </li>
+    {% else %}
+    <li class="list-group-item"><p>No skills added.</p></li>
+  {% endif %}
+</li>
+<li class="list-group-item list-group-item-info"><span>Student Preferences</span>
+  <li class="list-group-item"><p><strong>Able to join immediately : </strong>{{student.joining_immediate | yesno:"Yes,No,Unknown"}}</p></li>
+  <li class="list-group-item"><p><strong>Interested in internship : </strong>{{student.avail_for_intern | yesno:"Yes,No,Unknown"}}</p></li>
+  <li class="list-group-item"><p><strong>Willing to relocate : </strong>
+    {% with relocate=student.willing_to_relocate %}
+      {{relocate|join:", " | default:"Unknown"}}
+    {% endwith %}
+  </p></li>
+</li>
+
   
   <li class="list-group-item list-group-item-info"><span>Profile</span></li>
   <li class="list-group-item">
