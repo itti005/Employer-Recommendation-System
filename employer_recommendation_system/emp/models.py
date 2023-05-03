@@ -112,12 +112,6 @@ class JobType(models.Model):
     #         obj.slug = slugify(obj.id) 
     #         obj.save()
 
-class Skill(models.Model):
-    name = models.CharField(max_length=240)
-
-    def __str__(self):
-        return self.name
-
 class CustomDisciplineManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().order_by('name')
@@ -166,6 +160,27 @@ class Project(models.Model):
     def __str__(self):
         return str(self.url)
 
+class SkillGroup(models.Model):
+    name = models.CharField(max_length=220)
+    
+    class Meta:
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+class Skill(models.Model):
+    name = models.CharField(max_length=250)
+    group = models.ForeignKey(SkillGroup, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+    
 class Student(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     phone = models.CharField(validators=[phone_regex], max_length=17)
@@ -199,6 +214,10 @@ class Student(models.Model):
     certifications = models.TextField(null=True,blank=True)
     notified_date = models.DateTimeField(null=True,blank=True)
     profile_update_date = models.DateTimeField(null=True,blank=True)
+    joining_immediate = models.BooleanField(null=True,blank=False)
+    avail_for_intern = models.BooleanField(null=True,blank=False)
+    willing_to_relocate = models.JSONField(null=True,blank=False)
+    skills = models.ManyToManyField(Skill)
     def __str__(self):
         return self.user.username+'-'+self.user.email+'-'+str(self.id)
 
