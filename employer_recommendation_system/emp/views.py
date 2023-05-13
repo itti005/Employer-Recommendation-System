@@ -157,6 +157,11 @@ def student_homepage(request):
     context['jobs_to_display'] = jobs_to_display if len(jobs_to_display)<6 else jobs_to_display[:6]
     rec_jobs = get_recommended_jobs(rec_student)
     context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
+    active_event = Event.objects.filter(status=1,type='JOBFAIR').order_by('-start_date').first()
+    if active_event:
+        context['active_event'] = active_event
+        context['jobfair'] = JobFair.objects.get(event=active_event)
+        context['is_registered_for_jobfair'] = JobFair.objects.filter(event=active_event,students=rec_student).exists()
     return render(request,'emp/student_homepage.html',context)
 
 @user_passes_test(is_manager)
@@ -1488,3 +1493,21 @@ def check_mail_status(request,id):
             print(f"{e}")
         context['log'] = d
     return render(request,'emp/mail_status.html',context)
+
+@csrf_exempt
+def update_jobfair_student_status(request):
+    # data = {}
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            jobfair_id = data['jobfair_id']
+            email = data['email']
+            enrolled = data['enrolled']#ToDo - if we give unenroll option later
+            student = Student.objects.get(user__email=email)
+            jobfair = JobFair.objects.get(id=jobfair_id)
+            student.jobfair_set.add(jobfair)
+            student.save()
+            return JsonResponse({'message': 'Student enrolled successfully.'}, status=200)
+        except Exception as e:
+            print(f"Exception : {e}")
+            return JsonResponse({'error': 'Error occured while enrolling.'}, status=400)
