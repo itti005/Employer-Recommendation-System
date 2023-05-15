@@ -158,7 +158,9 @@ def student_homepage(request):
     rec_jobs = get_recommended_jobs(rec_student)
     context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
     active_event = Event.objects.filter(status=1,type='JOBFAIR').order_by('-start_date').first()
-    if active_event:
+    is_eligible = TestAttendance.objects.filter(student_id=rec_student.spk_student_id,mdlgrade__gte=settings.PASS_GRADE).exists()
+    context['is_eligible'] = is_eligible
+    if active_event and is_eligible :
         context['active_event'] = active_event
         context['jobfair'] = JobFair.objects.get(event=active_event)
         context['is_registered_for_jobfair'] = JobFair.objects.filter(event=active_event,students=rec_student).exists()
