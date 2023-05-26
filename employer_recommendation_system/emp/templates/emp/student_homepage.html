@@ -83,8 +83,8 @@ div#cke table{
   </div>
   <div class="card-footer text-muted d-flex justify-content-center">
     <div class="mx-3"><span style="color: #0066A0"><i class="fas fa-map-marker-alt"></i></span> {{jobfair.venue}}</div>
-    <div class="mx-3"><span style="color: #0066A0"><i class="fas fa-calendar-day"></i></span> July 2023*</div>
-    <div>(*Venue & dates will be announced soon!)</div>
+    <div class="mx-3"><span style="color: #0066A0"><i class="fas fa-calendar-day"></i></span> {{jobfair.event.start_date}}</div>
+    {% comment %} <div>(*Venue & dates will be announced soon!)</div> {% endcomment %}
   </div>
 </div>
 {% endif %}
