@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.contrib.auth.views import LoginView
 from django.views import generic
 from django.urls import reverse_lazy, reverse
@@ -46,101 +46,61 @@ class LoginViewCustom(LoginView):
 			return reverse('change_password')
 		return url
 
-# class RegisterView(generic.CreateView):
-# 	form_class = RegisterForm
-# 	template_name = 'accounts/register.html'
+class RegisterView(generic.CreateView):
+	form_class = RegisterForm
+	template_name = 'accounts/register.html'
 	
-# 	def get_success_url(self):
-# 		messages.add_message(self.request, messages.INFO, 'Successfully Registered !')
-# 		return reverse('login')
+	def get_success_url(self):
+		messages.add_message(self.request, messages.INFO, 'Successfully Registered !')
+		return reverse('login')
 
-# 	def form_valid(self, form):
-# 		response = super().form_valid(form)
-# 		user = UserModel.objects.get(Q(username__iexact=form.data['username']) | Q(email__iexact=form.data['email']))
-# 		group_type = form.data['group']
-# 		if group_type=='students':
-# 			pass
-		
-# 		g = Group.objects.get(name=group_type)
-# 		user.groups.add(g)
-# 		user.save()
-# 		return response
+	def form_valid(self, form):
+		response = super().form_valid(form)
+		user = UserModel.objects.get(Q(username__iexact=form.data['username']) | Q(email__iexact=form.data['email']))
+		group_type = form.data['group']
+		if group_type=='students':
+			pass
+		g = Group.objects.get(name=group_type)
+		user.groups.add(g)
+		user.save()
+		return response
 def update_msg(request):
 	django_messages = []
 	for message in messages.get_messages(request):
 			django_messages.append({'message':message.message,'tag':message.tags})	
 			return django_messages
 
-# def validate_student(request):
-# #def validate_student():
-# 	email = request.GET.get('email', None)
-# 	#email = 'ankita7@gmail.com' 
-
-# 	if User.objects.filter(email__iexact=email).exists():
-# 		data = {'is_rec_student':True}
-# 		messages.success(request,'Email Id already registered with recommendation system')
-# 		data['messages'] = update_msg(request)
-# 		return JsonResponse(data)
-
-# 	is_spoken_student = User.objects.using('spk').filter(email__iexact=email).exists()
-# 	data = {'is_spoken_student':is_spoken_student}
-# 	if is_spoken_student:
-# 		user = User.objects.using('spk').filter(email__iexact=email)[0]
-# 		try:
-# 			student = SpkStudent.objects.using('spk').filter(user_id=user.id)[0]
-# 			attendance_exists = TestAttendance.objects.using('spk').filter(student_id=student.id).exists()
-# 			if attendance_exists:
-# 				data['is_spk_test_user']=True
-# 				data['email']=email
-# 				messages.success(request,'Email registered with spoken tutorial')
-# 				data['messages'] = update_msg(request)
-# 				return JsonResponse(data)
-# 		except Exception as e:
-# 			messages.error(request,'Email is not registered with spoken tutorial test')
-# 			data['messages']=update_msg(request)
-# 			return JsonResponse(data)
-# 	else:
-# 		messages.error(request,'Email is not registered with spoken tutorial')
-# 		data['messages']=update_msg(request)
-# 		return JsonResponse(data)	
-# 	return JsonResponse(data)
-
+def validate_student(request):
+	email = request.GET.get('email', None)
+	data = {}
+	#check if user is jrs student
+	is_jrs_student = Student.objects.filter(user__email__iexact=email).exists()
+	is_spk_student = SpokenStudent.objects.filter(user__email__iexact=email).exists()
+	if is_jrs_student or is_spk_student:
+		data['is_student'] = True
+		messages.success(request,"Email Id is already registered. Please click below sign in button & login using your Spoken Tutorial credentials.")
+		data['messages'] = update_msg(request)
+		return JsonResponse(data)
+	data['is_student'] = False
+	return JsonResponse(data)
+	
 def register_student(request):
 	if request.method == 'POST':
-		email = request.POST['student_email']
+		email = request.POST['email']
 		password = request.POST['password']
+		first_name = request.POST['first_name']
+		last_name = request.POST['last_name']
 		try:
-			user = User.objects.using('spk').get(Q(email__iexact=email))
-			if user is not None:
-				if user.check_password(password):
-					# rec_user = User.objects.create_user(username=user.username,password=user.password,email=user.email
-					# 	,first_name=user.first_name,last_name=user.last_name)
-					rec_user = User.objects.using('spk').get(pk=user.id)
-					rec_user.pk = None
-					rec_user.save(using='default')
-					try:
-						student_group = Group.objects.get(id=settings.ROLES['STUDENT'][0])
-						rec_user.groups.add(student_group)
-						rec_user.save()
-						student_obj=RecStudent.objects.create(user=rec_user)
-						# fetch student university from spoken db
-						student_spk = SpkStudent.objects.using('spk').filter(user_id=user.id)[0]
-						# univ = TestAttendance.objects.using('spk').filter(student_id=student.id)
-						testAttendance = TestAttendance.objects.using('spk').filter(student_id=student_spk.id).select_related('test')
-						academic_insti = testAttendance[0].test.academic_id
-						student_obj.university = AcademicCenter.objects.using('spk').get(pk=academic_insti).institution_name
-						student_obj.save()
-						
-					except Exception as e:
-						print(e)
-					login(request, rec_user)
-					return render(request, 'emp/student_homepage.html')
-				else:
-					messages.add_message(request, messages.INFO, 'Incorrect password !')
-					return render(request, 'register.html',{'email':email})
+			user = User.objects.create_user(username=email,email=email,password=password,first_name=first_name,last_name=last_name)
+			student_group = Group.objects.get(id=settings.ROLES['STUDENT'][0])
+			user.groups.add(student_group)
+			user.save()
+			student_obj=RecStudent.objects.create(user=user)
+			messages.add_message(request, messages.INFO, f'User with email {email} registered successfully!')
 		except Exception as e:
 			print(e)
-	return render(request, 'accounts/login.html')
+	return redirect(reverse('login'))
+
 def create_profile(user, phone):
     confirmation_code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(7))
     profile = Profile(user=user, confirmation_code=confirmation_code, phone=phone,created=datetime.now())

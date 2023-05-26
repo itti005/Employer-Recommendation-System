@@ -235,7 +235,7 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
                  </small> -->
                  {% if job in reccomended_jobs  %}
              <!--  <a href="{% url 'student_profile_confirm' request.user.student.id job.id %}" class="btn btn-success" id="apply_{{job.id}}"><i class="bi bi-cursor "></i> Apply</a> -->
-             <a class="btn btn-sm btn-success pre-apply " href="{% url 'student_profile_details' request.user.student.spk_usr_id job.id %}" id="apply_{{job.id}}"><i class="bi bi-cursor "></i> Apply</a>
+             <a class="btn btn-sm btn-success pre-apply " href="{% url 'student_profile_details' request.user.student.id job.id %}" id="apply_{{job.id}}"><i class="bi bi-cursor "></i> Apply</a>
               {% endif %} 
             {% if job in applied_jobs %}
               {% if job in in_process_jobs  %}

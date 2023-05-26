@@ -158,9 +158,7 @@ def student_homepage(request):
     rec_jobs = get_recommended_jobs(rec_student)
     context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
     active_event = Event.objects.filter(status=1,type='JOBFAIR').order_by('-start_date').first()
-    is_eligible = TestAttendance.objects.filter(student_id=rec_student.spk_student_id,mdlgrade__gte=settings.PASS_GRADE).exists()
-    context['is_eligible'] = is_eligible
-    if active_event and is_eligible :
+    if active_event:
         context['active_event'] = active_event
         context['jobfair'] = JobFair.objects.get(event=active_event)
         context['is_registered_for_jobfair'] = JobFair.objects.filter(event=active_event,students=rec_student).exists()
@@ -881,13 +879,11 @@ def getFieldsInfo(student):
 @access_profile
 def student_profile_details(request,id,job):
     context = {}
-    context['spk_student_id']=id
     if job:
         context['job_id']=job
         job_obj = Job.objects.get(id=job)
         context['job']=job_obj
-    # student = Student.objects.get(spk_student_id=id)
-    student = Student.objects.get(spk_usr_id=id)
+    student = Student.objects.get(id=id)
     context['student']=student
     context['MEDIA_URL']=settings.MEDIA_URL
     context['scores']=fetch_student_scores(student)
