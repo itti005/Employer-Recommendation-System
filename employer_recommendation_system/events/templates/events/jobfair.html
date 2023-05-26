@@ -138,9 +138,9 @@
         <div class="d-flex justify-content-center" style="padding-right:15%;padding-left:15%">
             <img src="{% static 'jobfair/img-2.png'%}" alt="Your Image" class="img-fluid me-3" style="width:80px;height:100%;">
             <div>
-                <p style="line-height:2rem;"><b>How to participate - </b>This job fair is open for the students who have enrolled in the Spoken Tutorial Project
-                and completed training and tests as well as other students who are willing to join this job fair. Fill the details
-                here and confirm participation by clicking on the "confirm" button.</p><br>
+                <p style="line-height:2rem;"><b>How to participate - </b>This job fair is open for the students who have appeared at least in one Spoken Tutorial test 
+                  as well as other students who are willing to participate. 
+                  Do confirm your participation by clicking on "Register and confirm" button provided below.   </p><br>
                 {% if is_registered_for_jobfair %}
                   <div class="row">
                     <div class="col">
@@ -162,7 +162,7 @@
                   <div class="col">
                       <div class="card" style="width: 18rem;">
                           <div class="card-body text-center">
-                            <h6 class="card-subtitle mb-2 text-muted">Non Spoken Tutorial Students</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">Non-Spoken Tutorial Students</h6>
                             <a type="button" class="btn btn-primary" id="enrollButton" href="{% url 'register' %}">Register and Confirm</a>
                           </div>
                         </div>
@@ -173,14 +173,13 @@
         </div>
       </div>
       <div class="container-fluid ">
-        <div class="card mx-auto my-5" style="width: 25rem;">
+        <div class="card mx-auto my-5" style="width: 30rem;">
             <div class="card-header text-center" style="background-color:#67c0fe;">
                 <h5>Companies</h5>
               </div>
             <img src="{% static 'jobfair/img-3.png'%}" class="card-img-top" alt="...">
             <div class="card-body">
-              <p class="card-text">Leading MNCs and SMEs from various job sectors. See below - IT/Graphics Designer/Engineers/Accounting Staff
-                / Programmers/Marketing/Manufacturing/Healthcare</p>
+              <p class="card-text">Leading MNCs and SMEs from various job sectors: <br>IT/Graphics Designer/Engineers/Accounting Staff/ Programmers/Marketing/Manufacturing/Healthcare etc</p>
               <a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSchJ1YdMUtYGuGOA0aIiffWfMEJngCAKq6XyAZoUp5hFd1QeA/viewform" class="btn btn-primary" style="width:100%;">Register</a>
             </div>
           </div>
