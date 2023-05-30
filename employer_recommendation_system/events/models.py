@@ -7,7 +7,7 @@ from django.template.defaultfilters import slugify
 from ckeditor.fields import RichTextField
 
 
-from emp.models import Company, Job
+from emp.models import Company, Job, Student
 # Create your models here.
 
 EVENT_TYPE = [
@@ -102,6 +102,7 @@ class JobFair(models.Model):
     student_last_registration = models.DateField(null=True,blank=True)
     emp_last_registration = models.DateField(null=True,blank=True)
     event = models.ForeignKey(Event,on_delete=models.CASCADE)
+    students = models.ManyToManyField(Student, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.event.name

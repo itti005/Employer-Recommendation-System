@@ -9,164 +9,80 @@
 <style type="text/css">
 
     #top{
-                background-image: url("../../../static/images/background.png");
+                /*background-image: url("../../../static/images/background.png");*/
                 width: 100%;
                 height: auto;
-                background-color: #cccccc;
+                background-color: #ffffff;
                 background-size: cover; 
-                padding: 8% 2% 1% 2%;
+                padding-top: 8% 0px;
             }
             .card{margin: 16px;}
-            .recruiter-block{padding: 4% 10% 4% 10%;}
-            .past-recruiter,.current-recruiter {                
-                width: 100px;
-                height: 100%;
-            }
-            .pr{width: 100%;}
-            .pr-wrapper{
-                width: 25%;
-                padding: 16px;
-            }
-            .past-recruiter1{
-                width: 60%;
-                margin: auto;
-            }
-            .current-recruiter1{
-                width:80%;
-                margin: auto;
-            }
-            .border-r-b{
-                border-right:2px solid #e9e9e9;
-                border-bottom:2px solid #e9e9e9;
-            }
-            .border-b{border-bottom:2px solid #e9e9e9;}
-            .border-r{border-right:2px solid #e9e9e9; }
             .social-icons{font-size: 32px;}
             .social-icons a{color: #fff;}
             .social-media-wrapper{
-                background-color: #054C77;
+                background-color: #172c35;
                 color : #ffff;
             }
-            .fa-icon{color: #ED7D2B;}
-           .display-6{
-               font-size: 1.5rem;
-               font-weight: bold;
-               color: #054C77;
-           }
-           .display-5{font-size: 2rem;}
-           .points{
-               color: #ED7D2B;
-               font-size: 1.2rem;;
-           }
-           .card-points{height: 100%;;}
-           .call-to-action a{background-color: #054C77;}
-           .call-to-action a:hover{background-color: #054C77;}
-            .serif{font-family: serif;}
             body{font-family: Verdana, Geneva, Tahoma, sans-serif;}
             /* media queries */
-            @media (min-width: 768px) {
-                .user-block{
-                    /* width: 35%; */
-                }
-                .tech-asp{
-                    width: 50%;
-                }
-                #student-img{
-                    height: 180px;
-                    max-height: 200px;
-                    width: auto!important;
-                }
-                #emp-img{
-                    height: 180px;
-                    max-height: 200px;
-                    width: auto!important;
-                }
-            }
-            @media (max-width: 768px) {
-
-                .projects{
-                    margin-top: 60px;
-                }
-                .img-asp{
-                    width: 100%!important;
-                    /* padding-right: 1px!important;
-                    padding-left: 1px; */
-                    /* user-block */
-                }
-                #mobile-heading{
-                    font-size: 20px;
-                }
-                #mobile-tag{
-                    font-size: 16px;
-                }
-                .past-recruiter1{
-                width: 100%;
-                margin: auto;
-            }
-            .pr-wrapper{
-                /* width: 25%; */
-                padding: 2px;
-            }
-                
-            }
-            @media (max-width: 991.98px) {
-                .user-block{
-                    /* width: 100%; */
-                }
-                #mobile-view-banner{
-                    display: block!important;
-                }
-                #desktop-view-banner{
-                    display: none!important;
-                }   
-                
-            }
-            @media (min-width: 991.98px) {
-                #mobile-view-banner{
-                    display: none!important;
-                }
-                #desktop-view-banner{
-                    display: flex!important;
-                }   
-                .user-block{
-                    width: 35%;
-                }
-            }
-            
-            @media (min-width: 768px) and (max-width: 1199.98px) { 
-                .img-asp{
-                    width: 100%;
-                }
-             }
+            @media (min-width: 768px) { }
+            @media (max-width: 768px) { }
+            @media (max-width: 991.98px) { }
+            @media (min-width: 991.98px) { }
+            @media (min-width: 768px) and (max-width: 1199.98px) { }
              @media (max-width: 576px) {
                 .w-social{
                     width: 50%!important;
-                }
-                .pr-wrapper p{
-                font-size: 0.8rem;
+                } 
             }
-            }
-            .current_company{
-                /* background-color: #fff; */
-                /* border: 1px solid green;; */
-            }
-            .com-block{
-                background-color: #fff;
-                height: 100%;
-            }
-            .pr-wrapper p{
-                color: #aab1b7;
-            }
-            .position{
-                color: #aab1b7;
-            }
+            /* NEW*/
+            .image-container {
+                position: relative;
+                display: inline-block;
+              }
+              .image-caption {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                padding: 10px;
+                background-color: rgba(0, 0, 0, 0.7);
+                color: #fff;
+                font-size: 14px;
+              }
+              .container-bg1 {
+                background-image: url('{% static "jobfair/bg-1.png"%}');
+                background-size: cover;
+                background-position: center;
+                padding: 50px;
+              }
+              .container-bg2 {
+                background-image: url('{% static "jobfair/bg-2.png"%}');
+                background-size: cover;
+                background-position: center;
+                padding: 50px;
+              }
+              .container-bg3 {
+                background-image: url('{% static "jobfair/bg-3.png"%}');
+                background-size: cover;
+                background-position: center;
+                padding: 50px;
+              }
+              .logo{
+                width: 80%;
+              }
+              .img-caption-sm{
+                background: black;
+                color: white;
+                opacity: 0.4;
+              }
+              
 </style>
 {% endblock %}
 
 {% block main %}
-<div class="container-fluid">
+<div class="container">
 	<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-  <div class="container-fluid">
+  <div class="container">
     <a class="navbar-brand" href="{% url 'index' %}">Spoken Tutorial</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -182,173 +98,147 @@
 </nav>
 </div>
 
-<div id="top" class="container-fluid d-flex flex-column justify-content-center align-items-center mb-5">
-    <div id="mobile-view-banner">
-        <div class="d-flex mb-2 justify-content-center projects" style="width: 80%;">
-            <div class="d-flex mx-5">
-                <img style="height: 50px;width: auto;;margin-right: 12px;"src="../../../static/images/logo/st-logo.png">
-                <b>Spoken <br><span style="color: orange;">Tutorial</span></b>
-            </div>
-            <img  style="height: 50px;width: auto;"src="../../../static/images/logo/fossee-logo.png">
-        </div>
-        <p class="text-center my-3" style="font-size:18px;font-style: italic;">Presents</p>
-        <h1 class="mb-5 display-5 mx-5"  id="mobile-heading" style="color: #054C77; border-bottom: 2px solid rgba(0,0,0,0.2);">{{jobfair.event.name}}</h1>
-    </div>
-    <div class="d-flex justify-content-between" id="desktop-view-banner">
-        <div class="d-flex mx-3">
-            <img style="height: 50px;width: auto;;margin-right: 12px;"src="../../../static/images/logo/st-logo.png">
-            <b>Spoken <br><span style="color: orange;">Tutorial</span></b>
-        </div>
-        <h1 class="mb-5 display-5 mx-3" style="color: #054C77; border-bottom: 2px solid rgba(0,0,0,0.2);">{{jobfair.event.name}}</h1>
-        <img  class="mx-3" style="height: 50px;width: auto;"src="../../../static/images/logo/fossee-logo.png">
-    </div>
-    
-    <!-- <p class="mb-5 h5" style="font-family: verdana; ">Spoken Tutorial & FOSSEE Team presents a unique opportunity for students to connect with suitable Employers</p> -->
-    <p class="mb-5 h5 px-3 text-center" style="font-family: verdana; " id="mobile-tag">A unique opportunity for students to connect with potential employers</p>
-    <div class="d-flex">
-        <span class="d-block mx-md-5 h4-md " style="margin-right: 12px!important;"><i class="far fa-calendar-alt mb-5 fa-icon"></i>  June - July</span>
-        <span class="d-block mx-md-5 h4-md "><i class="fas fa-map-marker-alt fa-icon"></i> {{jobfair.venue}}</span>
-    </div>
-    <div class="d-md-flex justify-content-center">
-        <div class="card user-block">
-            <div class="card-header ">
-                <h5 class="card-title text-center display-6 pt-2 serif">For Students</h5>
-              </div>
-              <div>
-                <!-- <img id="student-img" src="../../../static/images/student1.png" class="card-img-top d-block mx-auto" alt="..." style="height: 180px; width: 80%;max-height: 200px;"> -->
-                <img id="student-img" src="../../../static/images/student1.png" class="card-img-top d-block mx-auto" alt="..." >
-              </div>
-            
-            <div class="card-body d-flex flex-column card-points">
-              <p class="card-text"><i class="far fa-handshake points"></i> A great way to connect with companies and discover new career opportunities.</p>
-              <p class="card-text"> <i class="fas fa-wallet points"></i> The Job Fair is entirely free for Spoken Tutorial students.</p>
-              <p class="card-text"> <i class="fas fa-wallet points"></i> Use your student dashboard login credentials for JRS login.</p>
-              <div class="call-to-action" style="margin-top: auto;"><a href="{% url 'login' %}" class="btn btn-primary d-block" style="margin-top: auto;" target="_blank">Login to Job Recommendation System</a></div>
-              
+<div id="top" class="container d-flex flex-column justify-content-center align-items-center  px-md-5">
+    <div style="width:100%;">
+        <div class="image-container mt-5">
+            <img src="{% static 'jobfair/top-bar.png'%}" alt="Your Image" style="width:100%;margin:auto;">
+            <div class="image-caption d-none d-md-block">
+                <h5>8th July 2023, Saturday</h5>
+                <p>Venue - The International Institute of Information Technology, Hyderabad </p>
             </div>
           </div>
-          <div class="card user-block" >
-            <div class="card-header">
-                <h5 class="card-title text-center display-6 pt-2 serif">For Employers</h5>
-              </div>
-              <div>
-                <!-- <img id="emp-img" src="../../../static/images/employer1.png" class="card-img-top d-block mx-auto" alt="..." style="height: 180px; width: 80%;max-height: 200px;"> -->
-                <img id="emp-img" src="../../../static/images/employer1.png" class="card-img-top d-block mx-auto" alt="..." >
-              </div>
-            
-            <div class="card-body d-flex flex-column ">
-              <p class="card-text"><i class="fas fa-laptop-code points"></i> All the candidates have been trained to use open source software</p>
-              <p class="card-text"><i class="fas fa-clipboard-check points"></i> Subsequently they have cleared software tests or participated in National level software competitions</p>
-              <p class="card-text"><i class="fas fa-chalkboard-teacher points"></i> Highly motivated students as they have completed the course through self-learning mode</p>
-            </p>
-            <div class="call-to-action" style="margin-top: auto;"><a href="https://forms.gle/E1ysD2reXVYe6DZdA" class="btn btn-primary d-block" style="margin-top: auto;" target="_blank">Register</a></div>
+          <div class="d-md-none img-caption-sm p-3 mt-2">
+            <h5>8th July 2023, Saturday</h5>
+            <p>Venue - The International Institute of Information Technology, Hyderabad </p>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center my-4" >
+        <p class="mx-3"><a href="#about">About us</a> |</p>
+        <p class="mx-3"><a href="#participants">Participants</a> |</p>
+        <p class="mx-3"><a href="#contact">Contact us</a></p>
+    </div>
+    <div class="container-bg1 container my-2" id="about">
+        <div class="row">
+          <div class="col-md-8 px-md-5">
+            <div class="text-container px-5">
+              <p class="px-md-5" style="line-height: 2rem; ">
+                The Spoken Tutorial Project, IIT Bombay and Digital Employment Exchange of Telangana (DEET) are jointly organizing a jobfair.
+                This job fair will broing employers, working professionals and entry level talented individuals across India under one roof.
+                We strongly believe that this job fair will connect entry level individuals with prospective employers who can give a 
+                kick-start to your career.
+              </p>
             </div>
           </div>
-    </div>
-</div>
-<div class="container px-lg-5">
-    <div class="d-md-flex">
-        <div class="px-lg-5">
-            <img src="../../../static/images/aspirant.png" style="width: 400px;height: auto;" class="img-asp">
+          <div class="col-md-4 pe-5">
+            <img src="{% static 'jobfair/img-1.png'%}" alt="Your Image" class="img-fluid">
+          </div>
         </div>
-        <div class="px-lg-5 py-5 d-flex flex-column justify-content-md-center tech-asp">
-            <h4>Are you a Technical Job Aspirant?</h4><br>
-            <p>To participate in the Virtual Job Fair you should have undergone Spoken Tutorial software training & scored above 60% in the corresponding software test.</p>
-            <p>To take Spoken Tutorial Software Training & Test and get a chance to participate in our Virtual Job Fair, <a href="https://process.spoken-tutorial.org/index.php/Software-Training#Contacts_For_Training" style="color:#054C77!important ;" target="_blank">click here.</a></p>
-        </div>
-    </div>
-</div>
-
-<div class="container-lg d-flex flex-column align-items-center recruiter-block" >
-    <h4>Current Recruiters</h4><br>
-    <div class="d-flex  pr" >
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b">
-            <img class="past-recruiter1 d-block" src="../../../static/images/logo/capgemini.png"/>
-        <p class="d-none  d-md-block">Positions:20</p>
-        </div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b">
-            <img class="past-recruiter1 d-block" src="../../../static/images/logo/Intech.png"/>
-            <p class="d-none  d-md-block">Positions:10</p>
-        </div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b">
-            <img class="past-recruiter1 d-block" src="../../../static/images/logo/raster.jpg"/>
-            <p class="d-none  d-md-block">Positions:5</p>
-        </div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-b">
-            <img class="past-recruiter1 d-block" src="../../../static/images/logo/colorjet.jpeg"/>
-        <p class="d-none  d-md-block">Positions:4</p>
-        </div>
-    </div>
-    <div class="d-flex  pr">
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r">
-            <img class="past-recruiter1 d-block" src="../../../static/images/logo/cybrain.jpg"/>
-            <p class="d-none  d-md-block">Positions:4</p>
-        </div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r" >
-            <img class="past-recruiter1 d-block" src="../../../static/images/logo/ideal-insti.jpeg" style="width: 40%;height: auto;"/>
-            <p class="d-none  d-md-block">Positions:3</p>
-        </div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r">
-            <img class="past-recruiter1 d-block" src="../../../static/images/logo/tropilite.jpeg"/>
-            <p class="d-none  d-md-block">Positions:2</p>
-        </div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r">
-            <img class="past-recruiter1 d-block" src="../../../static/images/logo/icare.jpeg" style="width: 40%;height: auto;">
-            <p class="d-none  d-md-block">Positions:2</p>
-        </div>
-        <div class="pr-wrapper d-flex flex-column align-items-center">
-            <img class="past-recruiter1 d-block" src="../../../static/images/logo/cdil.jpeg"/>
-            <p class="d-none  d-md-block">Positions:2</p>
-        </div>
-    </div>  
-</div>
-<div class="container-lg d-flex flex-column align-items-center recruiter-block" >
-    <h4>Our Past Recruiters</h4><br>
-    <div class="d-flex  pr" >
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b"><img class="past-recruiter1 d-block" src="../../../static/images/logo/convergence.jpeg"/></div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b"><img class="past-recruiter1 d-block" src="../../../static/images/logo/iweb.jpeg"/></div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r-b"><img class="past-recruiter1 d-block" src="../../../static/images/logo/merce.jpeg"/></div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-b"><img class="past-recruiter1 d-block" src="../../../static/images/logo/rapidqube.png"/></div>
-    </div>
-    <div class="d-flex  pr">
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r"><img class="past-recruiter1 d-block" src="../../../static/images/logo/rave.jpeg"/></div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r" style="background-color: rgba(0,0,0,0.2);"><img class="past-recruiter1 d-block" src="../../../static/images/logo/qualitykiosk.png"/></div>
-        <div class="pr-wrapper d-flex flex-column align-items-center border-r"><img class="past-recruiter1 d-block" src="../../../static/images/logo/pentation.png"/></div>
-        <div class="pr-wrapper d-flex flex-column align-items-center"><img class="past-recruiter1 d-block" src="../../../static/images/logo/tech-mahindraa.png"/></div>
-    </div>  
-</div>
-<div class="container-fluid d-flex flex-column align-items-center py-4" style="background-color: antiquewhite;">
-    <h6>Contact for Job Fair related queries</h6>
-    <div class="d-md-flex">
-        <div  class="p-2 mr-2"><i class="far fa-envelope" style="color: #054C77;"></i> hrspokentutorial@gmail.com</div>
-        <div  class="p-2 mr-2"><i class="far fa-envelope" style="color: #054C77;"></i> hr@spoken-tutorial.org</div>
-        <div  class="p-2"><i class="fas fa-phone-square-alt" style="color: #054C77;"></i> 022 2576 4229</div>
-    </div>
-</div>
-<div class="d-flex flex-column align-items-center social-media-wrapper py-3">
-    <div class="mx-2 my-2">Follow us on social media for more updates!</div>
-    <div class="row px-3" style="width: 100%;">
-        <div class="col-md-6 d-md-flex flex-column">
-            <div class="d-flex justify-content-sm-around justify-content-md-center ">
-                <span class="w-social">@SpokenTutorials</span>
-            <div class="mx-2 social-icons"><a href="https://twitter.com/spokentutorials?lang=en" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
-            <div class="mx-2 social-icons"><a href="https://www.facebook.com/SpokenTutorial.org/"  target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
-            <div class="mx-2 social-icons"><a href="https://in.linkedin.com/company/spokentutorial" style="margin-right: 12px;;" target="_blank"><i class="fab fa-linkedin social-icons"></i></a></div>
+      </div>
+      <div class="container-bg2" id="participants">
+        <div class="d-flex justify-content-center" style="padding-right:15%;padding-left:15%">
+            <img src="{% static 'jobfair/img-2.png'%}" alt="Your Image" class="img-fluid me-3" style="width:80px;height:100%;">
+            <div>
+                <p style="line-height:2rem;"><b>How to participate - </b>This job fair is open for the students who have appeared at least in one Spoken Tutorial test 
+                  as well as other students who are willing to participate. 
+                  Do confirm your participation by clicking on "Register and confirm" button provided below.   </p><br>
+                {% if is_registered_for_jobfair %}
+                  <div class="row">
+                    <div class="col">
+                      <div class="alert alert-success text-center" role="alert">
+                        Your profile is already registered for job fair.
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                <div class="row" id="register">
+                    <div class="col">
+                      <div class="card" style="width: 18rem;">
+                          <div class="card-body text-center">
+                            <h6 class="card-subtitle mb-2 text-muted">Spoken Tutorial Students</h6>
+                            <button type="button" class="btn btn-primary" id="enrollButtonSpk">Register and Confirm</button>
+                          </div>
+                        </div>
+                  </div>
+                  <div class="col">
+                      <div class="card" style="width: 18rem;">
+                          <div class="card-body text-center">
+                            <h6 class="card-subtitle mb-2 text-muted">Non-Spoken Tutorial Students</h6>
+                            <a type="button" class="btn btn-primary" id="enrollButton" href="{% url 'register' %}">Register and Confirm</a>
+                          </div>
+                        </div>
+                  </div>
+                  </div>
+                {% endif %}
             </div>
         </div>
-        <div class="col-md-6 d-flex justify-content-sm-around justify-content-md-center">
-            
-            <span class="w-social">@FOSSEE</span>
-            <div class="mx-2 social-icons"><a href="https://twitter.com/FOSSEE/status/1534449568162942976" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
-            <div class="mx-2 social-icons"><a href="https://www.facebook.com/FOSSEENMEICT/posts/5221007834631220" target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
-            <div class="mx-2 social-icons"><a href="https://www.instagram.com/p/CeiZMWbOmHg/?igshid=YmMyMTA2M2Y=" target="_blank"><i class="fab fa-instagram social-icons"></i></a></div>
+      </div>
+      <div class="container-fluid ">
+        <div class="card mx-auto my-5" style="width: 30rem;">
+            <div class="card-header text-center" style="background-color:#67c0fe;">
+                <h5>Companies</h5>
+              </div>
+            <img src="{% static 'jobfair/img-3.png'%}" class="card-img-top" alt="...">
+            <div class="card-body">
+              <p class="card-text">Leading MNCs and SMEs from various job sectors: <br>IT/Graphics Designer/Engineers/Accounting Staff/ Programmers/Marketing/Manufacturing/Healthcare etc</p>
+              <a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSchJ1YdMUtYGuGOA0aIiffWfMEJngCAKq6XyAZoUp5hFd1QeA/viewform" class="btn btn-primary" style="width:100%;">Register</a>
+            </div>
+          </div>
+      </div>
+      <div class="container-bg3" id="contact">
+        <div class="alert alert-secondary p-5" role="alert">
+            <b>Contact Us - </b> <br>For any queries on Job fair, write to us at hrspokentutorial@gmail.com or call on
+            022 2576 4229. Call between (10am - 6pm)
+          </div>
+      </div>
+      <div class=" container d-flex justify-content-between my-5">
+        <div><img src="{% static 'jobfair/logo-1.png'%}" alt="IIT Bombay" class="img-fluid logo" ></div>
+        <div><img src="{% static 'jobfair/logo-2.png'%}" alt="Spoken Tutorial" class="img-fluid logo"></div>
+        <div><img src="{% static 'jobfair/logo-3.png'%}" alt="FOSSEE" class="img-fluid logo"></div>
+        <div><img src="{% static 'jobfair/logo-4.png'%}" alt="DEET" class="img-fluid logo"></div>
+        <div><img src="{% static 'jobfair/logo-5.png'%}" alt="WHEELS" class="img-fluid logo"></div>
+      </div>  
+</div>
+<div style="padding-right:8%;padding-left:8%;">
+    <div class="d-flex flex-column align-items-center social-media-wrapper py-3 mb-3" >
+        <div class="mx-2 my-2">Follow us on social media for more updates!</div>
+        <div class="row px-3" style="width: 100%;">
+            <div class="col-md-6 d-md-flex flex-column">
+                <div class="d-flex justify-content-sm-around justify-content-md-center ">
+                    <span class="w-social">@SpokenTutorials</span>
+                <div class="mx-2 social-icons"><a href="https://twitter.com/spokentutorials?lang=en" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
+                <div class="mx-2 social-icons"><a href="https://www.facebook.com/SpokenTutorial.org/"  target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
+                <div class="mx-2 social-icons"><a href="https://in.linkedin.com/company/spokentutorial" style="margin-right: 12px;;" target="_blank"><i class="fab fa-linkedin social-icons"></i></a></div>
+                </div>
+            </div>
+            <div class="col-md-6 d-flex justify-content-sm-around justify-content-md-center">
+                
+                <span class="w-social">@FOSSEE</span>
+                <div class="mx-2 social-icons"><a href="https://twitter.com/FOSSEE/status/1534449568162942976" target="_blank"><i class="fab fa-twitter-square"></i></a></div>
+                <div class="mx-2 social-icons"><a href="https://www.facebook.com/FOSSEENMEICT/posts/5221007834631220" target="_blank"><i class="fab fa-facebook-square social-icons"></i></a></div>
+                <div class="mx-2 social-icons"><a href="https://www.instagram.com/p/CeiZMWbOmHg/?igshid=YmMyMTA2M2Y=" target="_blank"><i class="fab fa-instagram social-icons"></i></a></div>
+            </div>
+        </div>
+        <div>
+            <span class="d-block text-center" style="font-size: 12px;">Spoken Tutorial and FOSSEE projects developed at IIT Bombay are the initiatives of Ministry of Education, Government of India.</span>
         </div>
     </div>
 </div>
-
-<div class="px-5 py-3">
-    <span class="d-block text-center" style="font-size: 12px;">Spoken Tutorial and FOSSEE projects developed at IIT Bombay are the initiatives of Ministry of Education, Government of India.</span>
-</div>
+<div class="modal" tabindex="-1" id="statusModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p id="modalText"></p>
+        </div>
+        {% comment %} <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div> {% endcomment %}
+      </div>
+    </div>
+  </div>
 
 
 
@@ -362,7 +252,49 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
   $( document ).ready(function() {
-   
+    const enrollButtonSpk = document.querySelector('#enrollButtonSpk');
+    enrollButtonSpk.addEventListener('click', enrollInJobFair);
+    var myModal = new bootstrap.Modal(document.getElementById('statusModal'), {
+        keyboard: false
+      })
+      
+    function enrollInJobFair() {
+        if("{{user}}" == "AnonymousUser"){
+            console.log("YES AnonymousUser");
+            location.href="/login";
+        } else{
+            console.log("NOT AnonymousUser");
+            console.log("{{jobfair.id}}");
+            console.log("{{user.email}}");
+            fetch('/update_jobfair_student_status/', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  jobfair_id: '{{jobfair.id}}', 
+                  email: '{{user.email}}', 
+                  enrolled: true
+                })
+              })
+              .then(response => {
+                if (response.ok) {
+                  var modalTextElement = document.getElementById('modalText');
+                  modalTextElement.innerHTML = "Successfully registered for job fair!"; 
+                  myModal.show();
+                  $('#register').hide();
+                } else {
+                    console.log(myModal);
+                    var modalTextElement = document.getElementById('modalText');
+                    modalTextElement.innerHTML =  "Error in registering for job fair."; 
+                  myModal.show();
+                }
+              })
+              .catch(error => {
+                console.log('There was an error:', error);
+              });
+        }  
+    }
   });
 </script>
 {% endblock %}

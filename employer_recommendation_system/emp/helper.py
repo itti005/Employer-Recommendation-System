@@ -117,7 +117,6 @@ def merge_scores(d1,d2):
 
 
 def unique_foss_scores(scores):
-    
     unique_foss = {}
     unique_scores = []
 
@@ -132,26 +131,21 @@ def unique_foss_scores(scores):
     
     return unique_scores
     
-# def fetch_ta_scores(student,df_fmc):
+
 def fetch_ta_scores(student):
-    # fmc = FossMdlCourses.objects.values('foss_id','mdlcourse_id','mdlquiz_id')
-    # df_fmc = pd.DataFrame(fmc)
-    # df_fmc = df_fmc.set_index(['mdlcourse_id','mdlquiz_id'])
     scores = []
-    ta = TestAttendance.objects.filter(student_id = student.spk_student_id,status__gte=3)
-    for item in ta :
-        try:
-            if item.mdlcourse_id and item.mdlquiz_id:
-                # foss_id = df_fmc.loc[(item.mdlcourse_id,item.mdlquiz_id)].values[0][0]
-                test = Test.objects.get(id=item.test_id)
-                foss = test.foss
-                # foss_id = item.test.foss_id
-                # fs = FossCategory.objects.get(id=foss_id)
-                scores.append({'foss': foss.id,
-                            'name':foss.foss,'grade':item.mdlgrade,'quiz':item.mdlquiz_id,'mdl':item,'updated':item.created})
-        except:
-            print("Test does not exist")
-    scores = unique_foss_scores(scores)
+    if student.spk_student_id:
+        ta = TestAttendance.objects.filter(student_id = student.spk_student_id,status__gte=3)
+        for item in ta :
+            try:
+                if item.mdlcourse_id and item.mdlquiz_id:
+                    test = Test.objects.get(id=item.test_id)
+                    foss = test.foss
+                    scores.append({'foss': foss.id,
+                                'name':foss.foss,'grade':item.mdlgrade,'quiz':item.mdlquiz_id,'mdl':item,'updated':item.created})
+            except:
+                print("Test does not exist")
+        scores = unique_foss_scores(scores)
     return scores
 
 def get_participant(student):

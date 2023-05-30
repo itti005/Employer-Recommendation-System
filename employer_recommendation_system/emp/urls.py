@@ -54,6 +54,7 @@ urlpatterns = [
     path('ajax-send-mail/', views.ajax_send_mail, name='ajax_send_mail'),
     path('ajax-get-state-city/', views.ajax_get_state_city, name='ajax_get_state_city'),
     path('ajax-contact-form/', views.ajax_contact_form, name='ajax_contact_form'),
+    path('update_jobfair_student_status/', views.update_jobfair_student_status, name='update_jobfair_student_status'),
 
 
     path('student_filter',views.student_filter,name='student_filter'),

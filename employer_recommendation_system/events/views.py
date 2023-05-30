@@ -94,10 +94,15 @@ class EventPageView(TemplateView):
 
 def display_jobfair(request,pk):
     context = {}
-    print(f"pk *************** here *************** {pk}")
     try:
         jobfair = JobFair.objects.get(id=pk)
         context['jobfair'] = jobfair
+        if request.user.is_authenticated:
+            student_lst = Student.objects.filter(user=request.user)
+            if student_lst:
+                active_event = Event.objects.filter(status=1,type='JOBFAIR').order_by('-start_date').first()
+                context['is_registered_for_jobfair'] = JobFair.objects.filter(event=active_event,students=student_lst[0]).exists()
+            
     except Exception as e:
         raise PermissionDenied()
     return render(request,'events/jobfair.html',context)
