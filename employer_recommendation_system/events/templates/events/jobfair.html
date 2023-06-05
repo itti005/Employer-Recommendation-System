@@ -44,7 +44,7 @@
                 position: absolute;
                 bottom: 0;
                 right: 0;
-                padding: 10px;
+                padding: 20px 60px;
                 background-color: rgba(0, 0, 0, 0.7);
                 color: #fff;
                 font-size: 14px;
@@ -104,12 +104,12 @@
             <img src="{% static 'jobfair/top-bar.png'%}" alt="Your Image" style="width:100%;margin:auto;">
             <div class="image-caption d-none d-md-block">
                 <h5>9th July 2023, Sunday</h5>
-                <p>Venue - The International Institute of Information Technology, Hyderabad </p>
+                <p>Venue - {{jobfair.venue}} </p>
             </div>
           </div>
           <div class="d-md-none img-caption-sm p-3 mt-2">
             <h5>9th July 2023, Sunday</h5>
-            <p>Venue - The International Institute of Information Technology, Hyderabad </p>
+            <p>Venue - {{jobfair.venue}} </p>
         </div>
     </div>
     <div class="d-flex justify-content-center my-4" >
@@ -163,7 +163,7 @@
                       <div class="card" style="width: 18rem;">
                           <div class="card-body text-center">
                             <h6 class="card-subtitle mb-2 text-muted">Non-Spoken Tutorial Students</h6>
-                            <a type="button" class="btn btn-primary" id="enrollButton" href="{% url 'register' %}">Register and Confirm</a>
+                            <a target="_blank" type="button" class="btn btn-primary" id="enrollButton" href="https://docs.google.com/forms/d/e/1FAIpQLSf5gKtT4xxe7voS1kNPPOVAOA3Oa3ezoT9ZvojjOZPi2wmfZA/viewform">Register and Confirm</a>
                           </div>
                         </div>
                   </div>
