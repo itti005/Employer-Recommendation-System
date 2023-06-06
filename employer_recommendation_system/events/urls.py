@@ -11,6 +11,7 @@ urlpatterns = [
     path('events', EventListView.as_view(), name='event-list'),
     path('event/<pk>', EventPageView.as_view(), name='public-event'),
     path('jobfair/<pk>', views.display_jobfair, name='jobfair'),
-
+    path('confirmation/', Confirmation.as_view(), name='confirmation'),
+    path('job-fair-students/', External.as_view(), name='job-fair-students'),
     
 ] 

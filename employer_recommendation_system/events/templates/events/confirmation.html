@@ -1,0 +1,37 @@
+{% extends 'emp/base_generic.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load helper %}
+{% block content-header %}Homepage{% endblock %}
+{% block css %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+{% block main %}
+{% include "emp/header.html" %}
+<div class="container mt-5 py-5">
+ <div class="py-5">
+    <p class="text-center"><b>Have you taken any Spoken Tutorial online test ?</b></p>
+
+    <div class="d-flex justify-content-center" >
+        <a type="button" class="btn btn-success mx-5"  href="{% url 'login' %}" style="width:150px;"><i class="fas fa-check-circle"></i> Yes</a>
+        <a type="button" class="btn btn-danger mx-5"  href="{% url 'job-fair-students' %}" style="width:150px;"><i class="fas fa-times-circle"></i> No</a>
+    </div>
+ </div>
+</div>
+
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+{% block js %}
+<script type = "text/javascript">
+    
+   
+    $(document).ready(function(){
+      
+    });
+</script>
+{% endblock %}
