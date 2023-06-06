@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.utils.decorators import method_decorator
 from emp.helper import is_manager
 from django.core.exceptions import PermissionDenied
+from django.views.generic.base import View
 
 # Create your views here.
 # CBVs for event
@@ -106,3 +107,12 @@ def display_jobfair(request,pk):
     except Exception as e:
         raise PermissionDenied()
     return render(request,'events/jobfair.html',context)
+
+class Confirmation(TemplateView):
+    template_name = 'events/confirmation.html'
+    
+class External(TemplateView):
+    template_name = 'events/external.html'
+        
+    
+    

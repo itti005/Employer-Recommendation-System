@@ -113,7 +113,7 @@
         </div>
     </div>
     <div class="d-flex justify-content-center my-4" >
-        <p class="mx-3"><a href="#about">About us</a> |</p>
+        <p class="mx-3"><a href="#about">About the event</a> |</p>
         <p class="mx-3"><a href="#participants">Participants</a> |</p>
         <p class="mx-3"><a href="#contact">Contact us</a></p>
     </div>
@@ -122,10 +122,13 @@
           <div class="col-md-8 px-md-5">
             <div class="text-container px-5">
               <p class="px-md-5" style="line-height: 2rem; ">
-                The Spoken Tutorial Project, IIT Bombay and Digital Employment Exchange of Telangana (DEET) are jointly organizing a Job fair.
-                This job fair will bring employers, working professionals and entry level talented individuals across India under one roof.
-                We strongly believe that this job fair will connect entry level individuals with prospective employers who can give a 
-                kick-start to your career.
+                The Spoken Tutorial Project IIT Bombay, is a multi award winning Education Technology platform 
+                with a mission to take high quality education to India's population in English and vernacular languages. 
+                Through our IT training initiative, we have trained over 70 lakh students across the country.<br>
+                In partnership with Digital Employment Exchange of Telangana (DEET), we are excited to jointly organize a job fair. 
+                This job fair will bring employers, working professionals and entry level talented individuals across India under one roof. 
+                We believe that this job fair will be a great platform for entry level individuals to connect with prospective employers 
+                who can kick-start their career. 
               </p>
             </div>
           </div>
@@ -138,9 +141,9 @@
         <div class="d-flex justify-content-center" style="padding-right:15%;padding-left:15%">
             <img src="{% static 'jobfair/img-2.png'%}" alt="Your Image" class="img-fluid me-3" style="width:80px;height:100%;">
             <div>
-                <p style="line-height:2rem;"><b>How to participate - </b>This job fair is open for the students who have appeared at least in one Spoken Tutorial test 
-                  as well as other students who are willing to participate. 
-                  Do confirm your participation by clicking on "Register and confirm" button provided below.   </p><br>
+                <p style="line-height:2rem;"><b>How to participate - </b>This Job Fair is open to all.
+                  Those who have taken one or more Spoken Tutorial Online Tests are especially welcome.<br>
+                  Do confirm your participation by clicking on the "Register and confirm" button provided below.</p><br>
                 {% if is_registered_for_jobfair %}
                   <div class="row">
                     <div class="col">
@@ -151,6 +154,11 @@
                   </div>
                 {% else %}
                 <div class="row" id="register">
+                  <div class="col text-center">
+                    <a type="button" class="btn btn-primary" target="_blank" href="{% url 'confirmation' %}">Register and Confirm</a>
+                  </div>
+                </div>
+                <!-- <div class="row" id="register">
                     <div class="col">
                       <div class="card" style="width: 18rem;">
                           <div class="card-body text-center">
@@ -167,7 +175,7 @@
                           </div>
                         </div>
                   </div>
-                  </div>
+                  </div> -->
                 {% endif %}
             </div>
         </div>
