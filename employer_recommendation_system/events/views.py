@@ -102,7 +102,8 @@ def display_jobfair(request,pk):
             student_lst = Student.objects.filter(user=request.user)
             if student_lst:
                 active_event = Event.objects.filter(status=1,type='JOBFAIR').order_by('-start_date').first()
-                context['is_registered_for_jobfair'] = JobFair.objects.filter(event=active_event,students=student_lst[0]).exists()
+                # context['is_registered_for_jobfair'] = JobFair.objects.filter(event=active_event,students=student_lst[0]).exists()
+                context['is_registered_for_jobfair'] = JobFairAttendance.objects.filter(event=active_event,student=student_lst[0]).exists()
             
     except Exception as e:
         raise PermissionDenied()

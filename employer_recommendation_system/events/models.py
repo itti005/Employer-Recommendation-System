@@ -102,7 +102,13 @@ class JobFair(models.Model):
     student_last_registration = models.DateField(null=True,blank=True)
     emp_last_registration = models.DateField(null=True,blank=True)
     event = models.ForeignKey(Event,on_delete=models.CASCADE)
-    students = models.ManyToManyField(Student, null=True, blank=True)
+    # students = models.ManyToManyField(Student, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.event.name
+    
+class JobFairAttendance(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    attended = models.BooleanField(default=False)
+    created_date = models.DateTimeField(auto_now_add=True)
