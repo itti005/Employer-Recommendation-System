@@ -900,6 +900,13 @@ def student_profile_details(request,id,job):
     context['notifications'] = Notifications.objects.filter(user = student.user)
     return render(request,'emp/student_profile.html',context)
 
+def student_profile_details_spk(request,id):
+    try:
+        id = Student.objects.get(spk_student_id=id).id
+        return redirect(reverse('student_profile_details',kwargs={'id': id,'job':0}))
+    except Exception as e:
+        return redirect(reverse('data_stats'))
+        
 @user_passes_test(is_student)
 def student_jobs(request):
     context = {}

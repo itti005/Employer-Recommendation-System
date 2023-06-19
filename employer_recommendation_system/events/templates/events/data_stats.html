@@ -1,0 +1,394 @@
+{% extends 'emp/base.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.13.0/pivot.min.css">
+
+<style>
+    .box{
+        border:1px solid rgba(0,0,0,0.2);
+        border-radius: 5px;
+        
+    }
+    .custom-col{
+        padding-left: 0!important;
+        padding-right: 0!important;
+        padding-bottom: 12px;;
+        margin-top: 12px;
+        max-height: 600px;
+        overflow: scroll;
+    }
+    .header{
+        border:1px solid rgba(0,0,0,0.2);
+        padding: 12px;
+        margin-bottom: 12px;;
+    }
+    .content{
+        padding: 12px;
+    }
+    .highlight{
+        background-color: rgb(255,254,224)!important;
+        background-color: rgb(255,254,200)!important;
+    }
+    option{
+        font-size: 0.8rem!important;
+    }
+
+</style>
+{% endblock %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div>
+    <ul class="nav nav-tabs" id="myTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if not is_post %}active{% endif %}" id="tab1" data-bs-toggle="tab" href="#content1" role="tab" aria-controls="content1" aria-selected="true">Data</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if is_post %}active{% endif %}" id="tab2" data-bs-toggle="tab" href="#content2" role="tab" aria-controls="content2" aria-selected="false">Student filter</a>
+        </li>
+        <!---ToDo-->
+        <!--<li class="nav-item" role="presentation">
+            <a class="nav-link" id="tab3" data-bs-toggle="tab" href="#content3" role="tab" aria-controls="content3" aria-selected="false">Tab 3</a>
+        </li> -->
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade {% if not is_post %}show active{% endif %}" id="content1" role="tabpanel" aria-labelledby="tab1">
+            <div class="row">
+                <div>
+                    <div class="alert alert-primary mt-2" role="alert">
+                        <span style="font-size:1rem;">Total students enrolled for the job fair : <h5>{{total_students_enrolled}}</h5></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 box custom-col">
+                            
+                                <div class="header" role="alert">
+                                    <b >Gender based distribution </b>
+                                </div>
+                                <div class="content">
+                                   {% for item,count in gender_based_count %}
+                                   <span class="me-5">{{item | default_if_none:'No data'}} - {{count}}</span>
+                                   {% endfor %}
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 box custom-col">
+                    <div class="header" role="alert">
+                        <b >State based distribution </b>
+                    </div>
+                    <div class="content">
+                        <table class="table dt" id="state-count">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">State</th>
+                                    <th scope="col">Count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for state,count in state_based_count %}
+                                    <tr {% if forloop.counter <= 5 %}class="highlight"{% endif %}>
+                                        <th scope="row">{{forloop.counter}}</th>
+                                        <td>{{state}}</td>
+                                        <td>{{count}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4 box custom-col">
+                    <div class="header" role="alert">
+                        <b >City based distribution </b>
+                    </div>
+                    <div class="content">
+                        <table class="table dt" id="city-count">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">City</th>
+                                    <th scope="col">State</th>
+                                    <th scope="col">Count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for city,state,count in city_based_count %}
+                                    <tr {% if forloop.counter <= 5 %}class="highlight"{% endif %}>
+                                        <th scope="row">{{forloop.counter}}</th>
+                                        <td>{{city}}</td>
+                                        <td>{{state}}</td>
+                                        <td>{{count}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4 box custom-col">
+                    <div class="header" role="alert">
+                        <b >Skills based distribution </b>
+                    </div>
+                    <div class="content">
+                        <table class="table dt" id="skill-count">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Skill</th>
+                                    <th scope="col">Count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for skill,count in skill_distribution %}
+                                    <tr {% if forloop.counter <= 5 %}class="highlight"{% endif %}>
+                                        <th scope="row">{{forloop.counter}}</th>
+                                        <td>{{skill}}</td>
+                                        <td>{{count}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4 box custom-col">
+                    <div class="header" role="alert">
+                        <b >Skill group based distribution </b>
+                    </div>
+                    <div class="content">
+                        <table class="table dt" id="skill-grp-count">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">City</th>
+                                    <th scope="col">State</th>
+                                    <th scope="col">Count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for skillgrp,count in skillgrp_distribution %}
+                                    <tr {% if forloop.counter <= 5 %}class="highlight"{% endif %}>
+                                        <th scope="row">{{forloop.counter}}</th>
+                                        <td>{{skillgrp}}</td>
+                                        <td>{{count}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4 box custom-col">
+                    <div class="header" role="alert">
+                        <b >Foss based distribution </b>
+                    </div>
+                    <div class="content">
+                        <table class="table dt" id="foss-count">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Foss</th>
+                                    <th scope="col">Count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for foss,count in foss_based_distribution %}
+                                    <tr {% if forloop.counter <= 5 %}class="highlight"{% endif %}>
+                                        <th scope="row">{{forloop.counter}}</th>
+                                        <td>{{foss}}</td>
+                                        <td>{{count}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4 box custom-col">
+                    <div class="header" role="alert">
+                        <b >Degree based distribution </b>
+                    </div>
+                    <div class="content">
+                        <table class="table dt" id="degree-count">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Foss</th>
+                                    <th scope="col">Count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for degree,count in degree_based_dist %}
+                                    <tr {% if forloop.counter <= 5 %}class="highlight"{% endif %}>
+                                        <th scope="row">{{forloop.counter}}</th>
+                                        <td>{{degree}}</td>
+                                        <td>{{count}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4 box custom-col">
+                    <div class="header" role="alert">
+                        <b >Discipline based distribution </b>
+                    </div>
+                    <div class="content">
+                        <table class="table dt" id="discipline-count">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Foss</th>
+                                    <th scope="col">Count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for discipline,count in discipline_based_dist %}
+                                    <tr {% if forloop.counter <= 5 %}class="highlight"{% endif %}>
+                                        <th scope="row">{{forloop.counter}}</th>
+                                        <td>{{discipline}}</td>
+                                        <td>{{count}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade {% if is_post %}show active{% endif %}" id="content2" role="tabpanel" aria-labelledby="tab2">
+            <form method="post" id="filter-form">
+                {% csrf_token %}
+                <div class="form-check my-2">
+                    <input class="form-check-input" type="radio" name="type" id="jobfair" value="jobfair" checked>
+                    <label class="form-check-label" for="jobfair">
+                        Search only students who have registered for job fair
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="type" value="all" id="all" >
+                    <label class="form-check-label" for="all">
+                    Search all students from spoken database 
+                    </label>
+                </div>
+                <label><b>Enter minimum grade</b></label>
+                <input class="form-control" type="number" placeholder="Minimum Student grade" name="mdlgrade" value="60">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label><b>Select State</b></label>
+                        <select class="form-select" size="3" aria-label="size 3 select example" name="states" multiple>
+                            <option value="0" selected>All States</option>
+                            {% for id,state in states_data %}
+                                <option value="{{id}}">{{state}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label><b>Select Foss</b></label>
+                        <select class="form-select" size="3" aria-label="size 3 select example" name="fosses" multiple>
+                            <option value="0" selected>All FOSS</option>
+                            {% for id,foss in foss_data %}
+                                <option value="{{id}}">{{foss}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label><b>Select Degree Type</b></label>
+                        <select class="form-select" size="3" aria-label="size 3 select example" name="degree" multiple>
+                            <option value="0" selected>All Degree Titles</option>
+                            {% for id,degree in degree_data %}
+                                <option value="{{id}}">{{degree}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label><b>Select Discipline</b></label>
+                        <select class="form-select" size="3" aria-label="size 3 select example" name="discipline" multiple>
+                            <option value="0" selected>All Disciplines</option>
+                            {% for id,disp in discipline_data %}
+                                <option value="{{id}}">{{disp}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mb-3">Search</button>
+            </form>
+            <div>
+                {% if students %}
+                <div><b>Total results : {{student_count}}</b></div>
+                <table class="table dt" id="tb-filter">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Institute</th>
+                            <th scope="col">State</th>
+                            <th scope="col">City</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id,student,acad,state,city in studentmaster %}
+                        <tr>
+                            <th>{{forloop.counter}}</th>
+                            <td><a href="{% url 'student_profile_details_spk' id  %}" target="_blank">{{student}}</a></td>
+                            <td>{{acad}}</td>
+                            <td>{{state}}</td>
+                            <td>{{city}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p> No data</p>
+                {% endif %}
+            </div>
+        </div>
+        <!---ToDo-->
+       <!-- <div class="tab-pane fade" id="content3" role="tabpanel" aria-labelledby="tab3">
+            
+            <h3>Content for Tab 3</h3>
+            <p>This is the content of Tab 3.</p>
+            <div id="output"></div>
+        </div>-->
+    </div>
+</div>
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+{% block js %}
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.13.0/pivot.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pivottable/2.6.0/tips_data.min.js"></script> -->
+
+<script type = "text/javascript">
+    $(function(){ 
+        $('#tb-filter').dataTable({"pageLength": 25});
+    });
+    $(document).ready(function(){
+        $('.dt').dataTable({"pageLength": 25});
+        
+        
+        
+//        ToDo
+//        $(function(){ 
+//            $("#output").pivotUI(
+//                [
+//                    {color: "blue", shape: "circle"},
+//                    {color: "red", shape: "triangle"}
+//                ],
+//                {
+//                    rows: ["color"],
+//                    cols: ["shape"]
+//                }
+//            );
+        });
+//    });
+</script>
+{% endblock %}
+

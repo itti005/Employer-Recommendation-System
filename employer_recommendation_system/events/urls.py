@@ -13,5 +13,6 @@ urlpatterns = [
     path('jobfair/<pk>', views.display_jobfair, name='jobfair'),
     path('confirmation/', Confirmation.as_view(), name='confirmation'),
     path('job-fair-students/', External.as_view(), name='job-fair-students'),
+    path('data/', data_stats, name='data_stats'),
     
 ] 

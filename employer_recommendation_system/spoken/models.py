@@ -397,3 +397,25 @@ class EventTestStatus(models.Model):
         managed = False
         db_table = 'training_eventteststatus'
 
+class StudentBatch(models.Model):
+    academic = models.ForeignKey(AcademicCenter, on_delete=models.PROTECT )
+    organiser = models.ForeignKey(Organiser, on_delete=models.PROTECT )
+    department = models.ForeignKey(Department, on_delete=models.PROTECT )
+    year = models.PositiveIntegerField() # 2010-2014
+    stcount = models.PositiveIntegerField(default=0)
+    batch_name = models.CharField(max_length=200, null=True)
+    
+    class Meta:
+        managed = False
+        db_table = 'events_studentbatch'
+
+class StudentMaster(models.Model):
+    batch = models.ForeignKey(StudentBatch, on_delete=models.PROTECT )
+    student = models.ForeignKey(SpokenStudent, on_delete=models.PROTECT )
+    moved = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+    
+    class Meta:
+        managed = False
+        db_table = 'events_studentmaster'
