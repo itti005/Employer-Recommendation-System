@@ -9,6 +9,7 @@ urlpatterns = [
     path('<pk>/profile',views.student_profile,name='student_profile'),
     path('add_student_job_status',views.add_student_job_status,name='add_student_job_status'),
     path('student_profile/<int:id>/<int:job>',views.student_profile_details,name='student_profile_details'),
+    path('student_profile_spk/<int:id>',views.student_profile_details_spk,name='student_profile_details_spk'),
     path('student-list',StudentListView.as_view(),name='student-list'),
     path('notify-student-profile/',views.notify_student,name='notify-student-profile'),
 
