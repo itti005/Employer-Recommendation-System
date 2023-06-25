@@ -1377,12 +1377,24 @@ class StudentListView(PermissionRequiredMixin,ListView):
     
     def get_queryset(self):
         search = self.request.GET.get('name')
+        event = self.request.GET.get('event')
         if search:
+            if event:
+                students_id = [x.student_id for x in JobFairAttendance.objects.filter(event_id=event)]
+                return Student.objects.filter(id__in=students_id)
             return Student.objects.filter(Q(user__first_name__icontains=search)|Q(user__last_name__icontains=search)|Q(user__email__icontains=search))
+        if event:
+            students_id = [x.student_id for x in JobFairAttendance.objects.filter(event_id=event)]
+            print(f"\033[92m count students_id ** {len(students_id)}  \033[0m")
+            return Student.objects.filter(id__in=students_id).order_by('user__first_name')
         return Student.objects.all().order_by('user__first_name')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['total_students'] = Student.objects.count()
+        event = self.request.GET.get('event')
+        if event:
+            context['event'] = event
+            context['total_event_tudents'] = JobFairAttendance.objects.filter(event_id=event).count()
         return context
 
 @csrf_exempt
