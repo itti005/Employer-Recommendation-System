@@ -42,9 +42,9 @@
         <li class="nav-item" role="presentation">
             <a class="nav-link {% if not is_post %}active{% endif %}" id="tab1" data-bs-toggle="tab" href="#content1" role="tab" aria-controls="content1" aria-selected="true">Data</a>
         </li>
-        <li class="nav-item" role="presentation">
+        {% comment %} <li class="nav-item" role="presentation">
             <a class="nav-link {% if is_post %}active{% endif %}" id="tab2" data-bs-toggle="tab" href="#content2" role="tab" aria-controls="content2" aria-selected="false">Student filter</a>
-        </li>
+        </li> {% endcomment %}
         <!---ToDo-->
         <!--<li class="nav-item" role="presentation">
             <a class="nav-link" id="tab3" data-bs-toggle="tab" href="#content3" role="tab" aria-controls="content3" aria-selected="false">Tab 3</a>
@@ -56,7 +56,7 @@
             <div class="row">
                 <div>
                     <div class="alert alert-primary mt-2" role="alert">
-                        <span style="font-size:1rem;">Total students enrolled for the job fair : <h5>{{total_students_enrolled}}</h5></span>
+                        <span style="font-size:1rem;">Total students enrolled for the job fair : <h5>{{total_students_enrolled}}</h5><button class="btn btn-sm btn-light "><a href="{% url 'student-list'  %}?event=41">Click to view student details</a></button></span>
                     </div>
                     <div class="row">
                         <div class="col-12 box custom-col">
@@ -161,8 +161,7 @@
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">City</th>
-                                    <th scope="col">State</th>
+                                    <th scope="col">Skill Group</th>
                                     <th scope="col">Count</th>
                                 </tr>
                                 </thead>
