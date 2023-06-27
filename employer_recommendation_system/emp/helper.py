@@ -81,7 +81,7 @@ def access_profile(view_func):
             rec_jobs = get_recommended_jobs(request.user.student)
             try:
                 job_obj = Job.objects.get(id=job)
-                if job_obj in rec_jobs and request.user.student.spk_usr_id==int(id):
+                if job_obj in rec_jobs and request.user.student.id==int(id):
                     return view_func(request,id,job, *args, **kwargs)
             except:
                 raise PermissionDenied()
