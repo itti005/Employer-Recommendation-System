@@ -32,7 +32,7 @@
 <section>
   {# if request.user|has_group:"STUDENT" #}
   {% if request.user|is_student %}
-    {% if current_education %}
+    {% if profile_completed %}
       <div>
         <div class="d-none">
         <form id="form-job-app" action="{% url 'add_student_job_status' %}" method="POST">
@@ -50,7 +50,7 @@
     </div>
     {% else %}
     <div class="alert alert-danger" role="alert">
-      <span>Please <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link text-decoration-underline" ><i class="bi bi-pencil-square"></i> add education & contact details in your profile</a> to apply for jobs! </span>
+      <span>Please <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link text-decoration-underline" ><i class="bi bi-pencil-square"></i> add all the details to complete your profile</a> to apply for jobs! </span>
     </div>
     {% endif %}
   {% endif %}

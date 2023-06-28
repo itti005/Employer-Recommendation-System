@@ -275,11 +275,6 @@
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Student Dashboard</span></a>
               </li>
-              <!-- <li class="nav-item">
-                 <a class="nav-link" href="{% url 'student_profile' pk=request.user.id%}" id="student_profile">
-          <i class="fas fa-user-graduate"></i>
-          <span>My Profile</span></a>
-              </li> -->
               <li class="nav-item" id="s-profile">
                 <a class="nav-link" href="{% url 'student_profile' pk=request.user.student.id %}">
           <i class="bi bi-pencil-square"></i>
@@ -325,8 +320,17 @@
     </nav>
 
     <main class="col-md-9 ms-sm-auto col-lg-10 p-md-4">
-      {% block content %}
-      {% endblock %}
+      {% if ctx_profile_completed %}
+        {% block content %}
+        {% endblock %}
+      {% else %}
+        <div class="alert alert-danger" role="alert">
+          <span>Dear Student, <br><br>To continue accessing job related information, kindly provide the following details to complete your profile.</span><br>
+          <span>{{ctx_empty_fields}}</span><br><br>
+          <span><a href="{% url 'student_profile' request.user.student.id %}" class="alert-link text-decoration-underline" ><i class="bi bi-pencil-square"></i> Click here to add all the details to complete your profile.</a>  </span><br>
+          
+        </div>
+      {% endif %}
     </main>
   </div>
 </div>

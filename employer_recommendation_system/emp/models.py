@@ -190,14 +190,14 @@ class Student(models.Model):
     spk_institute = models.IntegerField(null=True)  #spk
     #course = models.ForeignKey(Course,null=True,blank=True,on_delete=models.CASCADE)
     skills = models.ManyToManyField(Skill, null=True,blank=True)
-    about = models.TextField(null=True,blank=True,verbose_name='About Yourself') #Short description/introduction about student profile
+    about = models.TextField(null=True,blank=True,verbose_name='About Yourself*') #Short description/introduction about student profile
     projects = models.ManyToManyField(Project, null=True,blank=True)
     #photo = models.ImageField(null=True,blank=True) #profile photo
     picture = models.FileField(upload_to=profile_picture, null=True, blank=True)    #spk
     github = models.URLField(null=True,blank=True)
     linkedin = models.URLField(null=True,blank=True)
     cover_letter = models.FileField(null=True,blank=True,upload_to='')
-    resume = models.FileField(null=True,blank=True,upload_to='')
+    resume = models.FileField(null=True,blank=True,upload_to='',verbose_name='Resume*')
     # cover_letter = models.FileField(null=True,blank=True,upload_to=user_directory_path)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
