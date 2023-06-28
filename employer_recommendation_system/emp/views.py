@@ -872,7 +872,7 @@ def getFieldsInfo(student):
     if student.joining_immediate is None : empty_fields.append('Available to join immediately')
     if student.avail_for_intern is None : empty_fields.append('Available for internship')
     if student.willing_to_relocate is None : empty_fields.append('Willing to relocate')
-    if not student.skills : empty_fields.append('Skills')
+    if not student.skills.all() : empty_fields.append('Skills')
     
     complete = round((total_fields-len(empty_fields))/total_fields*100)
     return complete,empty_fields
