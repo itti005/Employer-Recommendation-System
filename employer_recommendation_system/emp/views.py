@@ -861,18 +861,18 @@ def ajax_contact_form(request):
 
 # @user_passes_test(is_manager)
 def getFieldsInfo(student):
-    total_fields = 9
-    all_fields = [a for a in dir(student) if not a.startswith('__')]
+    total_fields = 10
     empty_fields = []
     if not student.phone : empty_fields.append('Phone')
     if not student.address : empty_fields.append('Address')
     if not Education.objects.filter(student=student): empty_fields.append('education')
-    if not student.skills : empty_fields.append('Skills')
     if not student.about : empty_fields.append('About')
     if not student.projects : empty_fields.append('Projects')
-    if not student.cover_letter : empty_fields.append('Cover Letter')
     if not student.resume : empty_fields.append('Resume')
-    if not student.alternate_email : empty_fields.append('Alternate_email')
+    if student.joining_immediate is None : empty_fields.append('Available to join immediately')
+    if student.avail_for_intern is None : empty_fields.append('Available for internship')
+    if student.willing_to_relocate is None : empty_fields.append('Willing to relocate')
+    if not student.skills : empty_fields.append('Skills')
     
     complete = round((total_fields-len(empty_fields))/total_fields*100)
     return complete,empty_fields
@@ -893,6 +893,7 @@ def student_profile_details(request,id,job):
     context['current_education'] = student.education.filter(order=CURRENT_EDUCATION)
     context['past_education'] = student.education.filter(order=PAST_EDUCATION).first()
     complete,empty_fields = getFieldsInfo(student)
+    context['profile_completed'] = False if empty_fields else True
     context['skill_groups'] = SkillGroup.objects.prefetch_related(Prefetch('skill_set',queryset=Skill.objects.filter(student=student)))
     skill_groups = SkillGroup.objects.prefetch_related(Prefetch('skill_set',queryset=Skill.objects.filter(student=student)))
     context['complete']=complete

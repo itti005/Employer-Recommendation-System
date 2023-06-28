@@ -181,7 +181,7 @@
           {{ form.alternate_email | as_crispy_field }}
       </div>
       <div class="col-md-8 mb-3">
-        <label>Address</label>
+        <label>Address*</label>
         <div class="input-group">
           <div class="input-group-text"><i class="bi bi-house"></i></div>
           <input type="text" class="form-control" value="{{student.address | default_if_none:'' }}" name="address">
