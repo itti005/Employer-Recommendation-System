@@ -70,7 +70,7 @@ class MdlUser(models.Model):
     lastname = models.CharField(max_length=300)
     email = models.CharField(max_length=300)
     #emailstop = models.IntegerField()
-    icq = models.CharField(max_length=45)
+    # icq = models.CharField(max_length=45)
     skype = models.CharField(max_length=150)
     yahoo = models.CharField(max_length=150)
     aim = models.CharField(max_length=150)

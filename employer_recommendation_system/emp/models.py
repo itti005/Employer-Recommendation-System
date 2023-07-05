@@ -239,7 +239,7 @@ class Company(models.Model):
     logo = models.ImageField(upload_to='logo/',null=True,blank=True)
     description = models.TextField(null=True,blank=True,verbose_name="Description about the company")
     # domain = models.ForeignKey(Domain,on_delete=models.CASCADE) 
-    domain = models.ManyToManyField(Domain,blank=True,related_name='domains') #Domain of work Eg. Consultancy, Development, Software etc
+    domain = models.ManyToManyField(Domain,blank=True,related_name='domains',null=True) #Domain of work Eg. Consultancy, Development, Software etc
     company_size = models.CharField(max_length=25,choices=NUM_OF_EMPS,default=DEFAULT_NUM_EMP) #Number of employees in company
     website = models.URLField(null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -273,13 +273,13 @@ class Foss(models.Model):
 class Job(models.Model):
     title = models.CharField(max_length=250,verbose_name="Title of the job page") #filter
     designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
-    state_job = models.IntegerField(null=False,blank=False)  
+    state_job = models.IntegerField(null=True,blank=False)  
     #state_job = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    city_job = models.IntegerField(null=False,blank=False)  
+    city_job = models.IntegerField(null=True,blank=False)  
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    skills = models.CharField(max_length=400,null=True,blank=True) 
+    skills = models.ManyToManyField(Skill, related_name='jobs')
     description = RichTextField(null=True,blank=True,verbose_name="Job Description")
-    domain = models.ForeignKey(Domain,on_delete=models.CASCADE,verbose_name='Job Sector') #Domain od work Eg. Consultancy, Development, Software etc
+    domain = models.ForeignKey(Domain,on_delete=models.CASCADE,verbose_name='Job Sector', null=True) #Domain od work Eg. Consultancy, Development, Software etc
     salary_range_min = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Minimum)')
     salary_range_max = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Maximum)')
     date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
@@ -292,7 +292,7 @@ class Job(models.Model):
     # 4: Student selected & job closed.
     status = models.IntegerField(default=1,blank=True)
     requirements = RichTextField(null=True,blank=True,verbose_name="Qualifications/Skills Required") #Educational qualifications, other criteria
-    shift_time = models.CharField(max_length=200,blank=True)
+    shift_time = models.CharField(max_length=200,blank=True, null=True)
     key_job_responsibilities = RichTextField(null=True,blank=True,verbose_name="Key Job Responsibilities")
     gender = models.CharField(max_length=10,choices=GENDER,default='a')
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
@@ -303,16 +303,16 @@ class Job(models.Model):
     # institute_type = models.CharField(max_length=200,null=True,blank=True)
     institute_type = models.CharField(max_length=200,blank=True)
     # state = models.CharField(max_length=200,null=True,blank=True)
-    state = models.CharField(max_length=200,blank=True)#spk #filter
+    state = models.CharField(max_length=200,blank=True, null=True)#spk #filter
     # city = models.CharField(max_length=200,null=True,blank=True)
-    city = models.CharField(max_length=200,blank=True)#spk #filter
-    grade = models.IntegerField()
+    city = models.CharField(max_length=200,blank=True, null=True)#spk #filter
+    grade = models.IntegerField(null=True)
     activation_status = models.IntegerField(max_length=10,choices=ACTIVATION_STATUS,blank=True,null=True)
     from_date = models.DateField(null=True,blank=True,verbose_name='Test Date From')
     to_date = models.DateField(null=True,blank=True,verbose_name='Test Date Upto')
-    num_vacancies = models.IntegerField(default=1,blank=True)
-    degree = models.ManyToManyField(Degree,blank=True,related_name='degrees')
-    discipline = models.ManyToManyField(Discipline,blank=True,related_name='disciplines')
+    num_vacancies = models.IntegerField(default=1,blank=True, null=True)
+    degree = models.ManyToManyField(Degree,blank=True,related_name='degrees', null=True)
+    discipline = models.ManyToManyField(Discipline,blank=True,related_name='disciplines', null=True)
     job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
     def __str__(self):
         return self.title
