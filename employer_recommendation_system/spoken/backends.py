@@ -60,12 +60,14 @@ class SpokenStudentBackend(ModelBackend):
                             # if is_ilw:
                             #     create_ilw_student_role(jrs_user)
                             return jrs_user
+            else:
+                messages.add_message(request,messages.ERROR,"The email is not registered with Spoken Tutorial.")
 
 
-        mdl_user = is_mdl_user(email,password)
-        if mdl_user:
-            jrs_user = create_mdl_user_in_jrs(mdl_user,password)
-            return jrs_user
+        # mdl_user = is_mdl_user(email,password)
+        # if mdl_user:
+        #     jrs_user = create_mdl_user_in_jrs(mdl_user,password)
+        #     return jrs_user
         return None                
 
     def get_user(self, user_id):

@@ -19,6 +19,8 @@ def auth_jrs(email):
 
 def is_spk_user(email):
     result = SpokenUser.objects.filter(email=email)
+    if not result:
+        return None
     if len(result) > 1:
         print("Found multiple users; mail web-team & the user .& display relevant message")
     else:
