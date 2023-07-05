@@ -99,6 +99,12 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
       </td>
     </tr>
     <tr>
+      <th >Skills</th>
+      <td>
+        {{ object.skills.all|join:', ' }}
+      </td>
+    </tr>
+    <tr>
       <th >Other</th>
       <td>
         <table class="table table-bordered ">
