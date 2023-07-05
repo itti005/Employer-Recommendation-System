@@ -439,7 +439,8 @@ class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         context['state']=SpokenState.objects.all()
         context['city']=SpokenCity.objects.all()
         context['job']=job
-        context['filter_foss']=list(map(int,job.foss.split(',')))
+        if job.foss:
+            context['filter_foss']=list(map(int,job.foss.split(',')))
         filter_form = StudentGradeFilterForm({'foss':job.foss,'state':job.state,
             'city':job.city,'grade':job.grade,'institution_type':job.institute_type,
             'activation_status':job.activation_status,'from_date':job.from_date,'to_date':job.to_date})
