@@ -66,7 +66,7 @@ div#cke table{
 {% include 'accounts/messages.html' %} 
 
 <br><br>
-{% if active_event %}
+{% comment %} {% if active_event %}
 <div class="card text-center border-warning">
   <div class="card-header text-dark bg-warning">
     <b>Registration open!</b>
@@ -84,34 +84,11 @@ div#cke table{
   <div class="card-footer text-muted d-flex justify-content-center">
     <div class="mx-3"><span style="color: #0066A0"><i class="fas fa-map-marker-alt"></i></span> {{jobfair.venue}}</div>
     <div class="mx-3"><span style="color: #0066A0"><i class="fas fa-calendar-day"></i></span> {{jobfair.event.start_date}}</div>
-    {% comment %} <div>(*Venue & dates will be announced soon!)</div> {% endcomment %}
+    
   </div>
 </div>
-{% endif %}
-<!--display 5 rated Company--> <!--Temporary commented out--> 
-<!-- <div class="d-flex justify-content-between">
-  <div class="text-center w-100">
-    <span class="text-decoration-line-through">
-      <span style="color: #fff;" class="me-2">------------ </span></span>
-      <b class="title">In collaboration with</b>
-      <span class="text-decoration-line-through">
-      <span style="color: #fff;" class="me-2">------------ </span></span>
-  </div>
-    <button type="button" class="btn btn-info">View all companies</button>
-</div>
-<br>
-<div class="row">
-{% for company in company_display %}
-<div class="col-4 col-md-2">  
-  <div class="border d-flex flex-column p-1" style="height: 100%;">
-    {% if company.logo %}
-    <img class="d-block align-self-center m-2" src="{{ company.logo.url|default_if_none:'#' }}" 
-    style=" height: 60px;display: inline;" alt="{{company.name}} logo">{% endif %}<br>
-    <span class="c-name align-self-center"><b>{{company.name}}</b></span>
-  </div>
-</div>
-{% endfor %}
-</div> -->
+{% endif %} {% endcomment %}
+
 <section>
 
 <br>
