@@ -69,49 +69,6 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
   $( document ).ready(function() {
-    const enrollButtonSpk = document.querySelector('#enrollButtonSpk');
-    enrollButtonSpk.addEventListener('click', enrollInJobFair);
-    var myModal = new bootstrap.Modal(document.getElementById('statusModal'), {
-        keyboard: false
-      })
-      
-    function enrollInJobFair() {
-        if("{{user}}" == "AnonymousUser"){
-            console.log("YES AnonymousUser");
-            location.href="/login";
-        } else{
-            console.log("NOT AnonymousUser");
-            console.log("{{jobfair.id}}");
-            console.log("{{user.email}}");
-            fetch('/update_jobfair_student_status/', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  jobfair_id: '{{jobfair.id}}', 
-                  email: '{{user.email}}', 
-                  enrolled: true
-                })
-              })
-              .then(response => {
-                if (response.ok) {
-                  var modalTextElement = document.getElementById('modalText');
-                  modalTextElement.innerHTML = "Successfully registered for job fair!"; 
-                  myModal.show();
-                  $('#register').hide();
-                } else {
-                    console.log(myModal);
-                    var modalTextElement = document.getElementById('modalText');
-                    modalTextElement.innerHTML =  "Error in registering for job fair."; 
-                  myModal.show();
-                }
-              })
-              .catch(error => {
-                console.log('There was an error:', error);
-              });
-        }  
-    }
   });
 </script>
 {% endblock %}
