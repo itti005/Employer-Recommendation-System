@@ -14,5 +14,6 @@ urlpatterns = [
     path('confirmation/', Confirmation.as_view(), name='confirmation'),
     path('job-fair-students/', External.as_view(), name='job-fair-students'),
     path('data/', data_stats, name='data_stats'),
+    path('details/', jobfair_data, name='jobfair_data'),
     
 ] 

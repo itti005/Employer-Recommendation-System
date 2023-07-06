@@ -1,0 +1,76 @@
+{% extends 'emp/base_generic.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load helper %}
+{% block content-header %}Event List{% endblock %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style type="text/css">
+
+
+</style>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+	<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'index' %}">JRS - Spoken Tutorial</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Home</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+</div>
+<div class="container pt-5">
+    
+    <div class="row pt-5">
+        <div class="col-12 text-center mb-2"><a href="{% url 'login' %}" type="button" class="btn btn-light ">Go back to homepage</a></div>
+        {% for company in companies.all %}
+        <div class="col-md-6 mb-1">
+            <div class="card">
+                <div class="card-header">
+                <b style="color: #0000A3">{{company.name}}</b>
+                </div>
+                <div class="card-body">
+                {% for job in company.job_set.all %}
+                    <p><i class="fas fa-briefcase"></i> {{job}}</p>
+                    <p>Skills:<br>{{ job.skills.all|join:", " }}</p>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        {% endfor %}
+        
+
+    </div>
+    
+</div>
+
+
+
+
+{% endblock %}
+{% block jquery %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+{% endblock %}
+
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+  $( document ).ready(function() {
+  });
+</script>
+{% endblock %}
+
+

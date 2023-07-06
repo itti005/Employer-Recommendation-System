@@ -207,3 +207,12 @@ def data_stats(request):
         
     return render(request,'events/data_stats.html',context)    
 
+
+def jobfair_data(request):
+    context = {}
+    active_event = Event.objects.filter(status=True).first()
+    jobfair = JobFair.objects.filter(event = active_event).first()
+    context['companies'] = jobfair.companies
+    
+    
+    return render(request,'events/jobfair_data.html',context)
