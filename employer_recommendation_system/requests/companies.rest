@@ -1,0 +1,55 @@
+GET http://127.0.0.1:8000/api/api/companies HTTP/1.1
+
+###
+POST http://127.0.0.1:8000/api/api/companies/ HTTP/1.1
+content-type: application/json
+
+{
+    
+    "name": "sogo",
+    "emp_name": "Raj",
+    "emp_contact": "7896543210",
+    "state_c": 1,
+    "city_c": 1,
+    "address": "kurla rd",
+    "email": "nusoft@gmail.com",
+ 
+    "description": "xyz",
+    "company_size": "100_500",
+    "website": "http://127.0.0.1:8000/admin/emp/company/add/",
+    
+    "status": true,
+    "slug": "2",
+    "rating": 1,
+    "added_by": null,
+    "domain": []
+  }
+    
+
+
+###
+GET http://127.0.0.1:8000/api/api/companies/1 HTTP/1.1
+
+###
+PATCH http://127.0.0.1:8000/api/api/companies/2/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "ghi"
+    
+}
+
+
+
+
+###
+DELETE http://127.0.0.1:8000/api/api/companies/2/ HTTP/1.1
+
+###
+GET http://127.0.0.1:8000/api/api/companies?search= HTTP/1.1
+
+
+
+
+
+

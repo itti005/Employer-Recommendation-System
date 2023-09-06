@@ -48,7 +48,9 @@ INSTALLED_APPS = [
     'spoken',
     'ckeditor',
     'events',
-
+    'registration_api',
+    'rest_framework',
+  
 ]
 
 MIDDLEWARE = [
@@ -137,6 +139,14 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ),
+}
 
 
 # Internationalization

@@ -1,0 +1,54 @@
+GET http://127.0.0.1:8000/api/api/Jobs/3/ HTTP/1.1
+
+###
+POST http://127.0.0.1:8000/api/api/Jobs/ HTTP/1.1
+content-type: application/json
+
+{
+    
+    "title": "Supervisor",
+    "designation": "supervisor",
+    "state_job": 1,
+    "city_job": 1,
+    "description": "<p>Teacher</p>",
+    "salary_range_min": 1,
+    "salary_range_max": 2,
+    "status": 1,
+    "requirements": "<p>Master,ph.d in English</p>",
+    "shift_time": "9-3",
+    "key_job_responsibilities": "<p>xyz</p>",
+    "gender": "f",
+    "slug": "1",
+    "last_app_date": "2023-09-04T06:00:00Z",
+    "rating": 1,
+    "foss": "1",
+    "institute_type": "xyz",
+    "state": "1",
+    "city": "1",
+    "grade": 1,
+    "activation_status": 1,
+    "from_date": "2023-09-05",
+    "to_date": "2023-09-09",
+    "num_vacancies": 1,
+    "domain": 1,
+    "job_type": 1,
+    "company": 2,
+    "skills": [
+      1
+    ]
+    
+  }
+
+###
+GET http://127.0.0.1:8000/api/api/Jobs/ HTTP/1.1
+
+###
+PATCH http://127.0.0.1:8000/api/api/Jobs/4/ HTTP/1.1
+content-type: application/json
+
+{
+    "gender":"m"
+}
+
+###
+DELETE http://127.0.0.1:8000/api/api/Jobs/3/ HTTP/1.1
