@@ -1,8 +1,21 @@
 from django.urls import path
 from .views import * 
 from . import views
+from django.urls import  include
+from .views import StudentViewSet
+from .views import DomainViewSet
+from rest_framework.routers import DefaultRouter
+from .views import DisciplineViewSet
+router = DefaultRouter()
+router.register(r'students', StudentViewSet)
+router.register(r'domains', DomainViewSet)
+router.register(r'disciplines', DisciplineViewSet)
 
+    
 urlpatterns = [
+    path('api/', include(router.urls)),
+    path('api/', include(router.urls)),
+    path('api/', include(router.urls)),
     path('',views.index,name='index'),
     path('student',views.student_homepage,name="student"),
     path('<pk>/profile/<int:job>',views.student_profile_confirm,name='student_profile_confirm'),
@@ -69,7 +82,12 @@ urlpatterns = [
     # path('image_details/<int:pk>', GalleryImageDetail.as_view(),name='gallery_image_detail' ),
     path('update_testimonial/<int:pk>', TestimonialUpdate.as_view(),name='update_testimonial' ),
     path('list_testimonials/', TestimonialsList.as_view(),name='list_testimonials' ),
+        # Your other URL patterns
+    # path('api/', include(router.urls)),
     
+
+#     path('', include(router.urls)),
+
 
     # path('<slug:slug>/', GalleryImageDetail.as_view(), name='gallery-image-detail'),
     # path('degree/<slug:slug>/', DegreeDetailView.as_view(), name='degree-detail'),

@@ -49,6 +49,45 @@ from .helper import *
 from collections import defaultdict
 import csv
 import os
+from django.shortcuts import render
+from rest_framework import viewsets, pagination
+from emp.models import Student
+from .serializers import StudentSerializer
+from .pagination import CustomPagination
+
+class StudentViewSet(viewsets.ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    pagination_class = CustomPagination  # Set the custom pagination class
+
+
+class CustomPagination(pagination.PageNumberPagination):
+    page_size = 1 # Set the number of items per page
+    page_size_query_param = 'page_size'
+    # max_page_size = 100
+
+ 
+from emp.models import Domain
+from .serializers import DomainSerializer
+# from .pagination import CustomPagination 
+class DomainViewSet(viewsets.ModelViewSet):
+    queryset = Domain.objects.all()
+    serializer_class = DomainSerializer
+
+class DomainViewSet(viewsets.ModelViewSet):
+    queryset = Domain.objects.all()
+    serializer_class = DomainSerializer
+    pagination_class = CustomPagination
+    page_size=2
+
+
+from emp.models import Discipline
+from .serializers import DisciplineSerializer
+
+class DisciplineViewSet(viewsets.ModelViewSet):
+    queryset = Discipline.objects.all()
+    serializer_class = DisciplineSerializer
+
 
 @check_user
 def document_view(request,pk):

@@ -48,7 +48,12 @@ INSTALLED_APPS = [
     'spoken',
     'ckeditor',
     'events',
-
+    'Utilities',
+    'spreadsheet',
+    'rest_framework',
+    'backend',
+    'server_side',
+    'student_api'
 ]
 
 MIDDLEWARE = [
