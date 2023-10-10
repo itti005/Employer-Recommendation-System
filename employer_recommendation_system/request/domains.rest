@@ -1,0 +1,24 @@
+GET http://127.0.0.1:8000/api/domains HTTP/1.1
+
+###
+POST http://127.0.0.1:8000/api/domains/ HTTP/1.1
+content-type: application/json
+
+{
+    "name": "heroin"
+    
+}
+
+###
+GET http://127.0.0.1:8000/api/domains/2/ HTTP/1.1
+
+###
+PATCH http://127.0.0.1:8000/api/domains/2/ HTTP/1.1
+content-type: application/json
+
+{
+  "name":"heroine"
+}
+
+###
+DELETE http://127.0.0.1:8000/api/domains/2  HTTP/1.1
