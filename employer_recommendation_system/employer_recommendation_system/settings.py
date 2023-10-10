@@ -51,9 +51,9 @@ INSTALLED_APPS = [
     'Utilities',
     'spreadsheet',
     'rest_framework',
-    'backend',
-    'server_side',
-    'student_api'
+    # 'backend',
+    # 'server_side',
+    # 'student_api'
 ]
 
 MIDDLEWARE = [
