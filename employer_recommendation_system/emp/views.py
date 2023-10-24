@@ -14,7 +14,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import PermissionRequiredMixin,UserPassesTestMixin
 from django.http import HttpResponse, JsonResponse
-from .filterset import CompanyFilterSet
+# from .filterset import CompanyFilterSet
 from .forms import ACTIVATION_STATUS, JobSearchForm, JobApplicationForm
 from django.db.models import Q,F,OuterRef, Subquery,Count, Prefetch
 
@@ -54,12 +54,13 @@ from rest_framework import viewsets, pagination
 from emp.models import Student
 from .serializers import StudentSerializer
 from .pagination import CustomPagination
+from .filterset import StudentFilter, DomainFilter, DisciplineFilter, CompanyFilterSet, JobFilter
 
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     pagination_class = CustomPagination  # Set the custom pagination class
-
+    filter_class = StudentFilter
 
 class CustomPagination(pagination.PageNumberPagination):
     page_size = 1 # Set the number of items per page
@@ -73,6 +74,7 @@ from .serializers import DomainSerializer
 class DomainViewSet(viewsets.ModelViewSet):
     queryset = Domain.objects.all()
     serializer_class = DomainSerializer
+    filter_class = DomainFilter 
 
 class DomainViewSet(viewsets.ModelViewSet):
     queryset = Domain.objects.all()
@@ -87,8 +89,21 @@ from .serializers import DisciplineSerializer
 class DisciplineViewSet(viewsets.ModelViewSet):
     queryset = Discipline.objects.all()
     serializer_class = DisciplineSerializer
+    filter_class = DisciplineFilter 
+# views.py
 
+from emp.models import Company, Job
+from .serializers import CompanySerializer, JobSerializer
 
+class CompanyViewSet(viewsets.ModelViewSet):
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
+    filter_class = CompanyFilterSet  
+    
+class JobViewSet(viewsets.ModelViewSet):
+    queryset = Job.objects.all()
+    serializer_class = JobSerializer
+    filter_class = JobFilter
 @check_user
 def document_view(request,pk):
     try:

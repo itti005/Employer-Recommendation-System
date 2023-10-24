@@ -6,16 +6,23 @@ from .views import StudentViewSet
 from .views import DomainViewSet
 from rest_framework.routers import DefaultRouter
 from .views import DisciplineViewSet
+from .views import CompanyViewSet, JobViewSet
+from django_filters.rest_framework import DjangoFilterBackend
+
 router = DefaultRouter()
 router.register(r'students', StudentViewSet)
 router.register(r'domains', DomainViewSet)
 router.register(r'disciplines', DisciplineViewSet)
 
-    
+router.register(r'companies', CompanyViewSet)
+router.register(r'jobs', JobViewSet)
+router.default_filters = [DjangoFilterBackend]     
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/', include(router.urls)),
     path('api/', include(router.urls)),
+    path('api/', include(router.urls)),
+
     path('',views.index,name='index'),
     path('student',views.student_homepage,name="student"),
     path('<pk>/profile/<int:job>',views.student_profile_confirm,name='student_profile_confirm'),
