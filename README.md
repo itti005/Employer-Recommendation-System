@@ -1,3 +1,12 @@
+
+| sr. | Project Stack | Version |
+| -------- | -------- | -------- |
+| 1 | Node | v18.16.0 |
+| 2 | React | ^18.2.0 |
+| 3 | Python | 3.6 |
+| 4 | Django | 3.2.19 |
+
+
 # Employer-Recommendation-System
 
 ## Project Set-up
