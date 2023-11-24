@@ -337,7 +337,7 @@ class CompanyUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
         form.fields['city_c'].widget = HiddenInput()
         update_company_form(self,form)
         return form
-
+    
 #---------------- CBV for Create, Detail, List, Update for Jobs starts ----------------#
 def update_form_widgets(self,form):
     form.fields['last_app_date'].widget = DateInput()
@@ -1585,3 +1585,23 @@ def update_jobfair_student_status(request):
         except Exception as e:
             print(f"Exception : {e}")
             return JsonResponse({'error': 'Error occured while enrolling.'}, status=400)
+        
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+
+def check_email_domain( email):
+    user_email_domain = email.split('@')[-1]  
+    existing_domains = User.objects.values_list('email', flat=True).distinct()
+    existing_domains = [email.split('@')[-1] for email in existing_domains]
+
+    if user_email_domain in existing_domains:
+        raise ValidationError("This email domain already exists.")
+
+def test():
+    try:
+       check_email_domain('etty@gmail.com')
+       print("inside_tryblock")
+
+    except ValidationError as e:
+        print(f" error ocurred: {e}")
+

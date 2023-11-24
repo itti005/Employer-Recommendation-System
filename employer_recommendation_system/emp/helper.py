@@ -303,3 +303,63 @@ def get_state_city_lst():
     states = SpokenState.objects.all()
     cities = SpokenCity.objects.all()
     return states, cities
+
+
+
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+
+def check_email_domain( email):
+    user_email_domain = email.split('@')[-1]  
+    existing_domains = User.objects.values_list('email', flat=True).distinct()
+    existing_domains = [email.split('@')[-1] for email in existing_domains]
+
+    if user_email_domain in existing_domains:
+        raise ValidationError("This email domain already exists.")
+    
+
+from difflib import SequenceMatcher
+from django.core.exceptions import ValidationError
+from .models import Company  # Adjust the import path based on your project structure
+
+# Defining a function for company name validation and registration
+def validate_and_register_company():
+    """
+    Validate user input for the company name and register if it's not too similar to existing names.
+
+    Raises:
+    - ValidationError if the name is too similar to any existing names.
+    """
+    # Function to calculate similarity ratio between two strings
+    def similar(a, b):
+        return SequenceMatcher(None, a, b).ratio()
+
+    # Take user input for the company name
+    new_company_name = input("Enter the company name: ")
+
+    # Fetch all existing company names from the database
+    existing_names = Company.objects.values_list('name', flat=True)
+
+    # Check for an exact match in a case-insensitive manner
+    if new_company_name.lower() in [name.lower() for name in existing_names]:
+        raise ValidationError(f"The company name '{new_company_name}' is already registered.")
+
+    # Loop through existing names and check for similarity
+    for existing_name in existing_names:
+        # Calculate similarity ratios for the full name and first three characters
+        similarity_full = similar(new_company_name.lower(), existing_name.lower())
+        similarity_short = similar(new_company_name[:3].lower(), existing_name[:3].lower())
+
+        # Adjust the threshold as needed
+        if similarity_full > 0.8 or similarity_short > 0.8:
+            raise ValidationError(f"The company name '{new_company_name}' is too similar to an existing name.")
+
+    # If no similarity, register the new company
+    new_company = Company(name=new_company_name)
+    new_company.save()
+
+    print("Registered")
+
+# Example usage:
+validate_and_register_company()
+
